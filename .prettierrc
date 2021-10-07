@@ -1,0 +1,9 @@
+{
+	"printWidth": 120,
+	"tabWidth": 4,
+	"useTabs": false,
+	"trailingComma": "all",
+	"endOfLine": "lf",
+	"overrides": []
+}
+
