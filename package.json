@@ -10,7 +10,7 @@
         "nft"
     ],
     "author": "DappRadar",
-    "license": "MIT license",
+    "license": "gpl-3.0 license",
     "homepage": "https://github.com/dappradar/nft-sales-adapters#readme",
     "private": true,
     "dependencies": {

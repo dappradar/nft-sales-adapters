@@ -11,7 +11,7 @@ Repository is maintained through community support, to add your collection or ma
 Apply for API key by filling out form [https://forms.gle/QiwW6mKLKHXHTnzNA](https://forms.gle/QiwW6mKLKHXHTnzNA).
 
 API keys necessary to simplify testing of the adapters and even if we will review untested adapters, 
-process will be a lot faster if developers tests adapters using API key before submitting PR.
+process will be a lot faster if developers tests adapters using API key before submitting a pull request.
 
 ## Contribution
 
@@ -23,7 +23,7 @@ process will be a lot faster if developers tests adapters using API key before s
 
 ## Repository Structure
 
-All adapters should have separated from other and have its own directory, example:
+All adapters should have separated from other and have its own directory, for example:
 
 * _adapters/ens_
 * _adapters/axie-infinity_
