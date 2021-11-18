@@ -37,6 +37,12 @@ class ENS {
     getSymbol = async () => {
         const resp = await axios.get(
             `${URL}/token-metadata?key=${KEY}&token_address=${this.token}&protocol=${this.protocol}`,
+            {
+                headers: {
+                    "User-Agent":
+                        "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4619.141 Safari/537.36",
+                },
+            },
         );
         const symbol = resp.data;
         return symbol;
@@ -44,10 +50,15 @@ class ENS {
     getPrice = async timestamp => {
         const resp = await axios.get(
             `${URL}/token-price?key=${KEY}&token_address=${this.token}&protocol=${this.protocol}&timestamp=${timestamp}`,
+            {
+                headers: {
+                    "User-Agent":
+                        "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4619.141 Safari/537.36",
+                },
+            },
         );
         return resp.data;
     };
-
     stop = async () => {
         this.sdk.stop();
     };
