@@ -1,44 +1,45 @@
 # DappRadar NFT Sales Adapters
 
-This repository hosts the adapters for integrating NFT collections or marketplaces on 
+This repository hosts the adapters for integrating NFT collections or marketplaces on
 [dappradar.com/nft](https://dappradar.com/nft) and other products.
 
-Repository is maintained through community support, to add your collection or marketplace please read 
+Repository is maintained through community support, to add your collection or marketplace please read
 [contribution guidelines](https://github.com/dappradar/nft-sales-adapters#contributing).
 
 ## API key
 
 Apply for API key by filling out form [https://forms.gle/QiwW6mKLKHXHTnzNA](https://forms.gle/QiwW6mKLKHXHTnzNA).
 
-API keys necessary to simplify testing of the adapters and even if we will review untested adapters, 
+API keys necessary to simplify testing of the adapters and even if we will review untested adapters,
 process will be a lot faster if developers tests adapters using API key before submitting a pull request.
 
 ## Contribution
 
-* Fork the GitHub repository
-* Get the API key by filling up the [form](https://forms.gle/QiwW6mKLKHXHTnzNA)
-* Build an adapter inside _adapters/_ directory
-* Test adapter code using provided testing tool
-* Create a pull request to the main repository
+-   Fork the GitHub repository
+-   Get the API key by filling up the [form](https://forms.gle/QiwW6mKLKHXHTnzNA)
+-   Build an adapter inside _adapters/_ directory
+-   Test adapter code using provided testing tool
+-   Create a pull request to the main repository
 
 ## Repository Structure
 
 All adapters should have separated from other and have its own directory, for example:
 
-* _adapters/ens_
-* _adapters/axie-infinity_
+-   _adapters/ens_
+-   _adapters/axie-infinity_
 
 Inside adapter directory there should be at least 2 files
-* `abi.json` - ABI of the contract used by collection or marketplace
-* `index.js` - adapter code
+
+-   `abi.json` - ABI of the contract used by collection or marketplace
+-   `index.js` - adapter code
 
 ## Technical Documentation
 
 Supported blockchain protocols
 
-* Ethereum
-* Binance Smart Chain
-* Polygon
+-   Ethereum
+-   Binance Smart Chain
+-   Polygon
 
 ### Environment Configuration
 
@@ -55,8 +56,9 @@ after that create you adapter inside _adapters/my-adapter_, the naming should be
 with multiple words divided by `-`, for example: `my-adapter`
 
 To run & test your adapter simply while being in root write:
+
 ```shell
-node src/tester ../adapters/my-adapter/index.js
+node ./tester/test.js ../adapters/my-adapter/index.js
 ```
 
 It should run a validator and your adapter if you pass make a pull request!
@@ -80,7 +82,7 @@ this.contract = "0x283af0b28c62c092c9727f1ee09c02ca627eb7f5"
 Regarding adapters constructor values, the name should be the same as the _adapters/_ location name,
 the block should be the starting block when the contract was released and the contract is self-explanatory.
 
-The websocket for web3 is defined in _/sdk/util.js_, inside the headers please choose your supported blockchain, 
+The websocket for web3 is defined in _/sdk/util.js_, inside the headers please choose your supported blockchain,
 this file should not be committed, but feel free to change it while working on the adapter.
 
 _/sdk/metadata.js_ is our inner file and should not be updated in any way also as it's used by out internal tracking.
