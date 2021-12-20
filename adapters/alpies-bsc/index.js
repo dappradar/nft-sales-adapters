@@ -8,13 +8,13 @@ const URL = "http://nft-sales-service.dappradar.com/open-source";
 const KEY = process.env.DAPPRADAR_API_KEY;
 const path = require("path");
 
-class Alpies {
+class AlpiesBSC {
     constructor() {
-        this.name = "alpies-eth";
+        this.name = "alpies-bsc";
         this.symbol = null;
         this.token = "0x0000000000000000000000000000000000000000";
-        this.protocol = "ethereum";
-        this.block = 13531146;
+        this.protocol = "binance-smart-chain";
+        this.block = 11873270;
         this.contract = "0x57A7c5d10c3F87f5617Ac1C60DA60082E44D539e";
         this.events = ["NameRegistered", "NameRenewed"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
@@ -112,4 +112,4 @@ class Alpies {
     };
 }
 
-module.exports = Alpies;
+module.exports = AlpiesBSC;
