@@ -7,8 +7,8 @@ const headers = {
     protocol: AVAILABLE_PROTOCOLS.ETH,
 };
 
-const WS_PROXY_URL = "ws://nft-sales-websocket.dappradar.com";
-
+//const WS_PROXY_URL = "ws://nft-sales-websocket.dappradar.com";
+const WS_PROXY_URL = "wss://rpc-mainnet.matic.quiknode.pro";
 // @see https://web3js.readthedocs.io/en/v1.2.11/web3.html#configuration
 const options = {
     headers,
