@@ -111,5 +111,4 @@ class AlpiesBSC {
         return entity;
     };
 }
-
 module.exports = AlpiesBSC;
