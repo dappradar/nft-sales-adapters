@@ -1,6 +1,5 @@
 require("dotenv").config();
 const { AVAILABLE_PROTOCOLS } = require("./constants");
-const Web3 = require("web3");
 const key = process.env.DAPPRADAR_API_KEY;
 const headers = {
     key,
