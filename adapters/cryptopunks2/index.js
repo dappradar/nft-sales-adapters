@@ -13,8 +13,8 @@ class CRYPTOPUNKS2 {
     constructor() {
         this.name = "cryptopunks2";
         this.symbol = "PUNKS2";
-        this.token = "0xc02d332AbC7f9E755e2b1EB56f6aE21A7Da4B7AD";
-        this.protocol = "polygon";
+        this.token = "0x0000000000000000000000000000000000001010";
+        this.protocol = "matic";
         this.block = 20346370;
         this.contract = "0xc02d332AbC7f9E755e2b1EB56f6aE21A7Da4B7AD";
         this.events = ["Transfer"],
@@ -37,11 +37,26 @@ class CRYPTOPUNKS2 {
     getSymbol = async () => {
         return "PUNKS2";
     };
+    /*
     getPrice = async timestamp => {
         let date = new Date(timestamp * 1000);
         let dateDisp = date.getDate() + "-" + date.getUTCMonth() + "-" + date.getFullYear();
         const query = "https://api.coingecko.com/api/v3/coins/matic-network/history?date=" + dateDisp;
         const resp = await axios.get(query);
+        return resp.data;
+    };
+    */
+    getPrice = async timestamp => {
+        
+        const resp = await axios.get(
+            `${URL}/token-price?key=${KEY}&token_address=${this.token}&protocol=${this.protocol}&timestamp=${timestamp}`,
+            {
+                headers: {
+                    "User-Agent":
+                        "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4619.141 Safari/537.36",
+                },
+            },
+        );
         return resp.data;
     };
 
@@ -69,8 +84,9 @@ class CRYPTOPUNKS2 {
         if(baseTx.value == 0){
             return; // ignore marketing (zero value) mints
         }
+        
         const txReceipt = await this.sdk.getTransactionReceipt(event.transactionHash);
-
+        
         let numberOfTokens = 0;
 
         for(let i=0; i< txReceipt.logs.length; i++) {
@@ -78,7 +94,7 @@ class CRYPTOPUNKS2 {
                 numberOfTokens++;
             }
         }
-
+        
         const po = await this.getPrice(block.timestamp);
         let nativePrice = new BigNumber(0);
         if(baseTx.value > 0)
@@ -103,18 +119,19 @@ class CRYPTOPUNKS2 {
             token_symbol: this.symbol,
             amount: 1,
             price: nativePrice.toNumber(),
-            price_usd: nativePrice.multipliedBy(po.market_data.current_price.usd).toNumber(),
+            price_usd: nativePrice.multipliedBy(po.price).toNumber(),
             seller: this.contract, // its bought from ens and transfered to the owner
             buyer,
             sold_at: timestamp.format("YYYY-MM-DD HH:mm:ss"),
             block_number: event.blockNumber,
             transaction_hash: event.transactionHash,
         };
-        console.log("ENTITY:", entity);
+
         await this.addToDatabase(entity);
     };
 
     addToDatabase = async entity => {
+        
         console.log(`creating sale for ${entity.nft_contract} with id ${entity.nft_id}`);
         return entity;
     };
