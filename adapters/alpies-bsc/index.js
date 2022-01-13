@@ -10,13 +10,13 @@ const path = require("path");
 
 class AlpiesBSC {
     constructor() {
-        this.name = "alpies-bsc";
-        this.symbol = null;
+        this.name = "Alpies";
+        this.symbol = "ALPIES";
         this.token = "0x0000000000000000000000000000000000000000";
         this.protocol = "binance-smart-chain";
         this.block = 11873270;
-        this.contract = "0x57A7c5d10c3F87f5617Ac1C60DA60082E44D539e";
-        this.events = ["NameRegistered", "NameRenewed"];
+        this.contract = "0x57a7c5d10c3f87f5617ac1c60da60082e44d539e";
+        this.events = ["LogMintReserve", "LogPreMint", "LogMint", "LogSetBaseURI", "LogReveal", "LogRefund"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
         this.chunkSize = 6;

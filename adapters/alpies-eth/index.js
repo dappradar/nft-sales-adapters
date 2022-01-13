@@ -10,13 +10,23 @@ const path = require("path");
 
 class AlpiesETH {
     constructor() {
-        this.name = "alpies-eth";
-        this.symbol = null;
-        this.token = "0x0000000000000000000000000000000000000000";
+        this.name = "Alpies";
+        this.symbol = "ALPIES";
+        this.token = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
         this.protocol = "ethereum";
         this.block = 13531146;
-        this.contract = "0x57A7c5d10c3F87f5617Ac1C60DA60082E44D539e";
-        this.events = ["NameRegistered", "NameRenewed"];
+        this.contract = "0x57a7c5d10c3f87f5617ac1c60da60082e44d539e";
+        this.events = [
+            "LogMintReserve",
+            "LogPreMint",
+            "LogMint",
+            "LogSetBaseURI",
+            "LogReveal",
+            "LogRefund",
+            "LogClaim",
+            "LogClaimFreebie",
+            "LogStopSale",
+        ];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
         this.chunkSize = 6;
