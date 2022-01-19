@@ -3,6 +3,7 @@ const AVAILABLE_PROTOCOLS = {
     BSC: "binance-smart-chain",
     POLYGON: "polygon",
     AVALANCHE: "avalanche",
+    TEZOS: "tezos",
 };
 
 module.exports = { AVAILABLE_PROTOCOLS };
