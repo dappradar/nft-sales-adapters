@@ -19,9 +19,10 @@ class EVMC {
 
     connect = () => {
         // @see https://web3js.readthedocs.io/en/v1.2.11/web3.html#configuration
-        const Web3ClientSocket = new Web3.providers.WebsocketProvider(WS_PROXY_URL, options);
+        const customOptions = options;
+        customOptions.headers.protocol = this.protocol ? this.protocol : options.headers.protocol;
+        const Web3ClientSocket = new Web3.providers.WebsocketProvider(WS_PROXY_URL, customOptions);
         this.web3 = new Web3(Web3ClientSocket);
-
         this.web3.currentProvider.once("error", function(error) {
             console.error("Error in web3", error);
             throw new Error(error);
