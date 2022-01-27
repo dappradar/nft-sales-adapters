@@ -40,6 +40,7 @@ Supported blockchain protocols
 -   Ethereum
 -   Binance Smart Chain
 -   Polygon
+-   Avalanche
 
 ### Environment Configuration
 
