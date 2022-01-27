@@ -7,9 +7,9 @@ const headers = {
 };
 
 const WS_PROXY_URL = "ws://nft-sales-websocket.dappradar.com";
+// // @see https://web3js.readthedocs.io/en/v1.2.11/web3.html#configuration
 const HTTP_PROXY_URL = "http://nft-sales-websocket.dappradar.com";
 
-// @see https://web3js.readthedocs.io/en/v1.2.11/web3.html#configuration
 const options = {
     headers,
     clientConfig: {
