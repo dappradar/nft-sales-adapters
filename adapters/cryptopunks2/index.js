@@ -2,26 +2,23 @@ require("dotenv").config();
 
 const moment = require("moment");
 const BigNumber = require("bignumber.js");
-const Ethereum = require("../../sdk/EVMC");
+const Matic = require("../../sdk/matic");
 const axios = require("axios");
 const URL = "http://nft-sales-service.dappradar.com/open-source";
 const KEY = process.env.DAPPRADAR_API_KEY;
 const path = require("path");
 
 class CRYPTOPUNKS2 {
-
     constructor() {
         this.name = "cryptopunks2";
-        this.symbol = "PUNKS2";
         this.token = "0x0000000000000000000000000000000000001010";
         this.protocol = "matic";
         this.block = 20346370;
         this.contract = "0xc02d332AbC7f9E755e2b1EB56f6aE21A7Da4B7AD";
-        this.events = ["Transfer"],
+        this.events = ["Transfer"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
         this.chunkSize = 6;
-        this.sdk = new Ethereum(this);
     }
 
     run = async () => {
@@ -32,22 +29,23 @@ class CRYPTOPUNKS2 {
     };
 
     loadSdk = () => {
-        return new Ethereum(this);
+        return new Matic(this);
     };
     getSymbol = async () => {
-        return "PUNKS2";
+        const resp = await axios.get(
+            `${URL}/token-metadata?key=${KEY}&token_address=${this.token}&protocol=${this.protocol}`,
+            {
+                headers: {
+                    "User-Agent":
+                        "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4619.141 Safari/537.36",
+                },
+            },
+        );
+        const symbol = resp.data;
+        return symbol;
     };
-    /*
+
     getPrice = async timestamp => {
-        let date = new Date(timestamp * 1000);
-        let dateDisp = date.getDate() + "-" + date.getUTCMonth() + "-" + date.getFullYear();
-        const query = "https://api.coingecko.com/api/v3/coins/matic-network/history?date=" + dateDisp;
-        const resp = await axios.get(query);
-        return resp.data;
-    };
-    */
-    getPrice = async timestamp => {
-        
         const resp = await axios.get(
             `${URL}/token-price?key=${KEY}&token_address=${this.token}&protocol=${this.protocol}&timestamp=${timestamp}`,
             {
@@ -77,36 +75,32 @@ class CRYPTOPUNKS2 {
     };
 
     process = async event => {
-
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
         const baseTx = await this.sdk.getTransaction(event.transactionHash);
-        if(baseTx.value == 0){
+        if (baseTx.value == 0) {
             return; // ignore marketing (zero value) mints
         }
-        
+
         const txReceipt = await this.sdk.getTransactionReceipt(event.transactionHash);
-        
+
         let numberOfTokens = 0;
 
-        for(let i=0; i< txReceipt.logs.length; i++) {
-            if(txReceipt.logs[i].topics[0] == "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"){
+        for (let i = 0; i < txReceipt.logs.length; i++) {
+            if (txReceipt.logs[i].topics[0] == "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef") {
                 numberOfTokens++;
             }
         }
-        
+
         const po = await this.getPrice(block.timestamp);
         let nativePrice = new BigNumber(0);
-        if(baseTx.value > 0)
-            nativePrice = new BigNumber(baseTx.value).dividedBy(10**18).dividedBy(numberOfTokens);
-
+        if (baseTx.value > 0) nativePrice = new BigNumber(baseTx.value).dividedBy(10 ** 18).dividedBy(numberOfTokens);
 
         const buyer = baseTx.from;
 
         if (!buyer) {
             return;
         }
-
 
         const tokenId = event.returnValues.tokenId;
         const entity = {
@@ -116,11 +110,11 @@ class CRYPTOPUNKS2 {
             nft_contract: this.contract,
             nft_id: tokenId,
             token: this.token,
-            token_symbol: this.symbol,
+            token_symbol: this.symbol.symbol,
             amount: 1,
             price: nativePrice.toNumber(),
             price_usd: nativePrice.multipliedBy(po.price).toNumber(),
-            seller: this.contract, // its bought from ens and transfered to the owner
+            seller: this.contract,
             buyer,
             sold_at: timestamp.format("YYYY-MM-DD HH:mm:ss"),
             block_number: event.blockNumber,
@@ -131,7 +125,6 @@ class CRYPTOPUNKS2 {
     };
 
     addToDatabase = async entity => {
-        
         console.log(`creating sale for ${entity.nft_contract} with id ${entity.nft_id}`);
         return entity;
     };
