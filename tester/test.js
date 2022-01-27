@@ -31,14 +31,13 @@ const tester = async () => {
     await adapter.run();
 
     for (const entity of array) {
-        console.log("TESTING ENTITY:", entity);
         // Should have all needed properties
         if (Object.keys(entity).length !== ENTITY_KEYS.length) {
             throw new Error("Missing properties in entity, they should be: " + ENTITY_KEYS);
         }
         ENTITY_KEYS.forEach(key => {
             const value = entity[key];
-          
+
             if (!value) {
                 throw new Error("Missing entity key: " + key);
             }
@@ -50,7 +49,8 @@ const tester = async () => {
                 if (typeof value !== "string") {
                     throw new Error("Bad type for key " + key);
                 }
-                if (key === "protocol" && !Object.values(AVAILABLE_PROTOCOLS).includes(value)) {
+                if (key === "protocol" && ![...Object.values(AVAILABLE_PROTOCOLS), "matic"].includes(value)) {
+                    console.log(value, Object.values(AVAILABLE_PROTOCOLS));
                     throw new Error("Unsuported protocol provided");
                 }
             }
