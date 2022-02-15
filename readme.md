@@ -8,7 +8,7 @@ Repository is maintained through community support, to add your collection or ma
 
 ## API key
 
-Apply for API key by filling out form [https://forms.gle/QiwW6mKLKHXHTnzNA](https://forms.gle/QiwW6mKLKHXHTnzNA).
+Apply for API key by filling out form [https://forms.gle/5E8hsZhyd94X9a3M7](https://forms.gle/5E8hsZhyd94X9a3M7).
 
 API keys necessary to simplify testing of the adapters and even if we will review untested adapters,
 process will be a lot faster if developers tests adapters using API key before submitting a pull request.
@@ -16,7 +16,7 @@ process will be a lot faster if developers tests adapters using API key before s
 ## Contribution
 
 -   Fork the GitHub repository
--   Get the API key by filling up the [form](https://forms.gle/QiwW6mKLKHXHTnzNA)
+-   Get the API key by filling up the [form](https://forms.gle/5E8hsZhyd94X9a3M7)
 -   Build an adapter inside _adapters/_ directory
 -   Test adapter code using provided testing tool
 -   Create a pull request to the main repository

@@ -12,9 +12,9 @@ class CRYPTOPUNKS2 {
     constructor() {
         this.name = "cryptopunks2";
         this.token = "0x0000000000000000000000000000000000001010";
-        this.protocol = "matic";
+        this.protocol = "polygon";
         this.block = 20346370;
-        this.contract = "0xc02d332AbC7f9E755e2b1EB56f6aE21A7Da4B7AD";
+        this.contract = "0xc02d332abc7f9e755e2b1eb56f6ae21a7da4b7ad";
         this.events = ["Transfer"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
