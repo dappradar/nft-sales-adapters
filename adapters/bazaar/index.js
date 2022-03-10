@@ -1,15 +1,13 @@
 require("dotenv").config();
 
 const moment = require("moment");
-const BigNumber = require("bignumber.js");
-const Ethereum = require("../../sdk/EVMC");
+const BSC = require("../../sdk/EVMC");
 const axios = require("axios");
 const URL = "http://nft-sales-service.dappradar.com/open-source";
 const KEY = process.env.DAPPRADAR_API_KEY;
 const path = require("path");
 
 class Bazaar {
-    // stands for Ethereum name service
     constructor() {
         this.name = "bazaar";
         this.symbol = "SKILL";
@@ -21,7 +19,7 @@ class Bazaar {
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
         this.chunkSize = 6;
-        this.sdk = new Ethereum(this);
+        this.sdk = undefined;
     }
 
     run = async () => {
@@ -32,8 +30,9 @@ class Bazaar {
     };
 
     loadSdk = () => {
-        return new Ethereum(this);
+        return new BSC(this);
     };
+
     getSymbol = async () => {
         const resp = await axios.get(
             `${URL}/token-metadata?key=${KEY}&token_address=${this.token}&protocol=${this.protocol}`,
@@ -44,9 +43,9 @@ class Bazaar {
                 },
             },
         );
-        const symbol = resp.data;
-        return symbol;
+        return resp.data;
     };
+
     getPrice = async timestamp => {
         const resp = await axios.get(
             `${URL}/token-price?key=${KEY}&token_address=${this.token}&protocol=${this.protocol}&timestamp=${timestamp}`,
@@ -59,6 +58,7 @@ class Bazaar {
         );
         return resp.data;
     };
+
     stop = async () => {
         this.sdk.stop();
     };
@@ -79,7 +79,7 @@ class Bazaar {
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
         const po = await this.getPrice(block.timestamp);
-        const nativePrice = new BigNumber(event.returnValues.cost).dividedBy(10 ** this.symbol.decimals);
+        const nativePrice = +event.returnValues.price;
         const buyer = await this.getBuyer(event);
         if (!buyer) {
             return;
@@ -95,8 +95,8 @@ class Bazaar {
             token: this.token,
             token_symbol: this.symbol.symbol,
             amount: 1,
-            price: nativePrice.toNumber(),
-            price_usd: nativePrice.multipliedBy(po.price).toNumber(),
+            price: +nativePrice,
+            price_usd: +nativePrice * +po.price,
             seller: this.contract,
             buyer: buyer.toLowerCase(),
             sold_at: timestamp.format("YYYY-MM-DD HH:mm:ss"),
@@ -107,7 +107,7 @@ class Bazaar {
     };
 
     addToDatabase = async entity => {
-        console.log(`creating sale for ${entity.nft_contract} with id ${entity.nft_id}`);
+        // console.log(`creating sale for ${entity.nft_contract} with id ${entity.nft_id}`);
         return entity;
     };
 }
