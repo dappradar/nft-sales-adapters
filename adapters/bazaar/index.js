@@ -98,7 +98,7 @@ class Bazaar {
             price: nativePrice.toNumber(),
             price_usd: nativePrice.multipliedBy(po.price).toNumber(),
             seller: this.contract,
-            buyer,
+            buyer: buyer.toLowerCase(),
             sold_at: timestamp.format("YYYY-MM-DD HH:mm:ss"),
             block_number: event.blockNumber,
             transaction_hash: event.transactionHash,
