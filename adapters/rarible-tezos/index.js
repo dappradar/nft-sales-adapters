@@ -10,7 +10,7 @@ const TOKEN = "xtz";
 
 const KEY = process.env.DAPPRADAR_API_KEY;
 
-class Rarible {
+class RaribleTezos {
     constructor() {
         this.name = "rarible-tezos";
         this.token = TOKEN;
@@ -130,4 +130,4 @@ class Rarible {
     };
 }
 
-module.exports = Rarible;
+module.exports = RaribleTezos;
