@@ -79,7 +79,7 @@ class Bazaar {
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
         const po = await this.getPrice(block.timestamp);
-        const nativePrice = new BigNumber(event.returnValues.cost).dividedBy(10 ** this.symbol.decimals);
+        const nativePrice = new BigNumber(event.returnValues.price).dividedBy(10 ** this.symbol.decimals);
         const buyer = await this.getBuyer(event);
         if (!buyer) {
             return;
