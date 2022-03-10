@@ -1421,7 +1421,7 @@ eslint-scope@^5.0.0:
     esrecurse "^4.3.0"
     estraverse "^4.1.1"
 
-"eslint-stats@github:ianvs/eslint-stats#cb1ff8251b50c7f0cb431a2b395431ebfdeb10c8":
+eslint-stats@ianvs/eslint-stats#cb1ff8251b50c7f0cb431a2b395431ebfdeb10c8:
   version "1.0.0"
   resolved "https://codeload.github.com/ianvs/eslint-stats/tar.gz/cb1ff8251b50c7f0cb431a2b395431ebfdeb10c8"
   dependencies:
