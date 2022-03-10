@@ -16,7 +16,7 @@ class Bazaar {
         this.token = "0x154a9f9cbd3449ad22fdae23044319d6ef2a1fab";
         this.protocol = "bsc";
         this.block = 8114624;
-        this.contract = "0x90099dA42806b21128A094C713347C7885aF79e2";
+        this.contract = "0x90099da42806b21128a094c713347c7885af79e2";
         this.events = ["PurchasedListing"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
