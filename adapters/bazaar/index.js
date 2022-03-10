@@ -89,7 +89,7 @@ class Bazaar {
         const entity = {
             provider_name: this.name,
             provider_contract: this.contract,
-            protocol: this.protocol,
+            protocol: "binance-smart-chain",
             nft_contract: this.contract,
             nft_id: tokenId,
             token: this.token,
