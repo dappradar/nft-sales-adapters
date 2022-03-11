@@ -34,7 +34,7 @@ class WazirxNft {
         this.protocol = "bsc";
         this.token_symbol = "bnb";
         this.block = 14571030;
-        this.contract = "0x0edAbdB72be02Cc7CF1D29894ACA1B1053286919";
+        this.contract = "0x0edabdb72be02cc7cf1d29894aca1b1053286919";
         this.events = ["TokenSold"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
@@ -110,8 +110,8 @@ class WazirxNft {
             amount: 1,
             price: nativePrice.toNumber() || 1,
             price_usd: nativePrice.multipliedBy(po.price).toNumber(),
-            seller: event.returnValues.seller,
-            buyer: event.returnValues.buyer,
+            seller: event.returnValues.seller.toLowerCase(),
+            buyer: event.returnValues.buyer.toLowerCase(),
             sold_at: timestamp.format("YYYY-MM-DD HH:mm:ss"),
             block_number: event.blockNumber,
             transaction_hash: event.transactionHash,
