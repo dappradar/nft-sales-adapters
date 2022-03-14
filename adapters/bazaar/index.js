@@ -76,15 +76,29 @@ class Bazaar {
         return buyer;
     };
 
+    _getPrice = async (event, block) => {
+        if (!this.symbol.decimals) {
+            return { price: null, priceUsd: null };
+        }
+
+        const po = await this.getPrice(block.timestamp);
+        const nativePrice = new BigNumber(event.returnValues.price).dividedBy(10 ** this.symbol.decimals);
+
+        return {
+            price: nativePrice.toNumber(),
+            priceUsd: nativePrice.multipliedBy(po.price).toNumber(),
+        };
+    };
+
     process = async event => {
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
-        const po = await this.getPrice(block.timestamp);
-        const nativePrice = new BigNumber(event.returnValues.price).dividedBy(10 ** this.symbol.decimals);
         const buyer = await this.getBuyer(event);
         if (!buyer) {
             return;
         }
+
+        const { price, priceUsd } = await this._getPrice(event, block);
 
         const tokenId = event.returnValues.nftID;
         const entity = {
@@ -96,8 +110,8 @@ class Bazaar {
             token: this.token,
             token_symbol: this.symbol.symbol,
             amount: 1,
-            price: nativePrice.toNumber(),
-            price_usd: nativePrice.multipliedBy(po.price).toNumber(),
+            price,
+            price_usd: priceUsd,
             seller: this.contract,
             buyer: buyer.toLowerCase(),
             sold_at: timestamp.format("YYYY-MM-DD HH:mm:ss"),
