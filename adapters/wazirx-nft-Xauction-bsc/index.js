@@ -11,30 +11,15 @@ const KEY = process.env.DAPPRADAR_API_KEY;
 const path = require("path");
 const { AVAILABLE_PROTOCOLS } = require("../../sdk/constants");
 
+const WRX_TOKEN = "0x8e17ed70334c87ece574c9d537bc153d8609e2a3";
+const BNB_TOKEN = "bnb";
+
 class WazirxNft {
     constructor() {
         this.name = "WazirXNFT";
-        this.symbol = "WRXNFT";
-        this.currencyCode = {
-            "0": {
-                symbol: "WRX",
-                decimals: 8,
-                token_address: "0x8e17ed70334c87ece574c9d537bc153d8609e2a3",
-            },
-            "1": {
-                symbol: "WRX",
-                decimals: 8,
-                token_address: "0x8e17ed70334c87ece574c9d537bc153d8609e2a3",
-            },
-            "2": {
-                symbol: "BNB",
-                decimals: 18,
-                token_address: "bnb",
-            },
-        };
-        this.token = "0x0000000000000000000000000000000000000000";
+        this.symbol = "BNB";
+        this.token = BNB_TOKEN;
         this.protocol = "bsc";
-        this.token_symbol = "bnb";
         this.block = 14571030;
         this.nftContract = "0x23cad0003e3a2b27b12359b25c25dd9a890af8e1";
         this.contract = "0x12e2ea4adb0c384fb273279c9e169e2f494cca21";
@@ -46,7 +31,9 @@ class WazirxNft {
     }
 
     run = async () => {
+        const s = await this.getSymbol();
         this.sdk = this.loadSdk();
+        this.symbol = s;
         await this.sdk.run();
     };
 
@@ -101,8 +88,7 @@ class WazirxNft {
             tx => tx.topics[0] === TRANSFER_TOPIC && tx.topics[1].toLowerCase() === auctionContract,
         );
 
-        const bnbusd = await this.getPrice(block.timestamp, this.currencyCode["2"].token_address);
-
+        const bnbusd = await this.getPrice(block.timestamp, BNB_TOKEN);
 
         if (logs.length) {
             // Look for highest amount transfer
@@ -124,7 +110,7 @@ class WazirxNft {
                 }
                 return sum;
             }, 0);
-            po = await this.getPrice(block.timestamp, this.currencyCode["1"].token_address);
+            po = await this.getPrice(block.timestamp, WRX_TOKEN);
             nativePrice = new BigNumber(price).times(po.price).dividedBy(bnbusd.price);
         } else {
             let events = [];
@@ -155,7 +141,7 @@ class WazirxNft {
             nft_contract: this.nftContract,
             nft_id: tokenId,
             token: this.token,
-            token_symbol: this.token_symbol,
+            token_symbol: this.symbol,
             amount: 1,
             price: nativePrice.toNumber() || 1,
             price_usd: nativePrice.multipliedBy(po.price).toNumber(),

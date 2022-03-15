@@ -9,30 +9,32 @@ const KEY = process.env.DAPPRADAR_API_KEY;
 const path = require("path");
 const { AVAILABLE_PROTOCOLS } = require("../../sdk/constants");
 
+const WRX_TOKEN = "0x8e17ed70334c87ece574c9d537bc153d8609e2a3";
+const BNB_TOKEN = "bnb";
+
 class WazirxNft {
     constructor() {
         this.name = "WazirXNFT";
-        this.symbol = "WRXNFT";
+        this.symbol = "BNB";
         this.currencyCode = {
             "0": {
                 symbol: "WRX",
                 decimals: 8,
-                token_address: "0x8e17ed70334c87ece574c9d537bc153d8609e2a3",
+                token_address: WRX_TOKEN,
             },
             "1": {
                 symbol: "WRX",
                 decimals: 8,
-                token_address: "0x8e17ed70334c87ece574c9d537bc153d8609e2a3",
+                token_address: WRX_TOKEN,
             },
             "2": {
                 symbol: "BNB",
                 decimals: 18,
-                token_address: "bnb",
+                token_address: BNB_TOKEN,
             },
         };
-        this.token = "0x0000000000000000000000000000000000000000";
+        this.token = BNB_TOKEN;
         this.protocol = "bsc";
-        this.token_symbol = "bnb";
         this.block = 7836850;
         this.nftContract = "0x23cad0003e3a2b27b12359b25c25dd9a890af8e1";
         this.contract = "0xe431659e48d6fbb5c79b2fe3d8aac3194f2e727b";
@@ -44,7 +46,9 @@ class WazirxNft {
     }
 
     run = async () => {
+        const s = await this.getSymbol();
         this.sdk = this.loadSdk();
+        this.symbol = s;
         await this.sdk.run();
     };
 
@@ -90,7 +94,7 @@ class WazirxNft {
 
         // calculate price according to the currency(BNB / WRX)
         if (["0", "1"].includes(event.returnValues.currency)) {
-            const bnbusd = await this.getPrice(block.timestamp, this.currencyCode["2"].token_address);
+            const bnbusd = await this.getPrice(block.timestamp, BNB_TOKEN);
             nativePrice = new BigNumber(event.returnValues.price)
                 .dividedBy(10 ** currency.decimals)
                 .times(po.price)
@@ -106,7 +110,7 @@ class WazirxNft {
             nft_contract: this.nftContract,
             nft_id: tokenId,
             token: this.token,
-            token_symbol: this.token_symbol,
+            token_symbol: this.symbol,
             amount: 1,
             price: nativePrice.toNumber() || 1,
             price_usd: nativePrice.multipliedBy(po.price).toNumber(),
