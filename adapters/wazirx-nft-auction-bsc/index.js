@@ -1,7 +1,7 @@
 require("dotenv").config();
 const moment = require("moment");
 const BigNumber = require("bignumber.js");
-const Ethereum = require("../../sdk/EVMC");
+const BSC = require("../../sdk/EVMC");
 const axios = require("axios");
 const URL = "http://nft-sales-service.dappradar.com/open-source";
 const TRANSFER_TOPIC = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
@@ -25,7 +25,7 @@ class WazirxNft {
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
         this.chunkSize = 6;
-        this.sdk = new Ethereum(this);
+        this.sdk = null;
     }
 
     run = async () => {
@@ -36,7 +36,7 @@ class WazirxNft {
     };
 
     loadSdk = () => {
-        return new Ethereum(this);
+        return new BSC(this);
     };
     getSymbol = async () => {
         const resp = await axios.get(
