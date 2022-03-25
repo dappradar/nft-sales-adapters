@@ -18,7 +18,7 @@ class WazirxNft {
         this.symbol = "BNB";
         this.token = BNB_TOKEN;
         this.protocol = "bsc";
-        this.block = 7836850;
+        this.block = 10050294;
         this.nftContract = "0x23cad0003e3a2b27b12359b25c25dd9a890af8e1";
         this.contract = "0xbfdf64b48a46e66f665338ea3666d8c5db043f05";
         this.events = ["AuctionFinalized"];

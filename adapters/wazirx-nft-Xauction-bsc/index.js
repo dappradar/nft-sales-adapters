@@ -20,14 +20,14 @@ class WazirxNft {
         this.symbol = "BNB";
         this.token = BNB_TOKEN;
         this.protocol = "bsc";
-        this.block = 14571030;
+        this.block = 14675841;
         this.nftContract = "0x23cad0003e3a2b27b12359b25c25dd9a890af8e1";
         this.contract = "0x12e2ea4adb0c384fb273279c9e169e2f494cca21";
         this.events = ["AuctionFinalized"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
         this.chunkSize = 6;
-        this.sdk = new Ethereum(this);
+        this.sdk = null;
     }
 
     run = async () => {
