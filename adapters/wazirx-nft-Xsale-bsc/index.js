@@ -110,7 +110,7 @@ class WazirxNft {
             nft_contract: event.returnValues.nftContract,
             nft_id: tokenId,
             token: this.token,
-            token_symbol: this.symbol,
+            token_symbol: this.symbol.symbol,
             amount: 1,
             price: nativePrice.toNumber() || 1,
             price_usd: nativePrice.multipliedBy(po.price).toNumber(),
