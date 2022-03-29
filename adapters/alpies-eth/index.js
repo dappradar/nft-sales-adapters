@@ -12,7 +12,7 @@ class AlpiesETH {
     constructor() {
         this.name = "Alpies";
         this.symbol = "ALPIES";
-        this.token = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
+        this.token = "0x0000000000000000000000000000000000000000";
         this.protocol = "ethereum";
         this.block = 13531146;
         this.contract = "0x57a7c5d10c3f87f5617ac1c60da60082e44d539e";
@@ -20,12 +20,8 @@ class AlpiesETH {
             "LogMintReserve",
             "LogPreMint",
             "LogMint",
-            "LogSetBaseURI",
-            "LogReveal",
-            "LogRefund",
             "LogClaim",
             "LogClaimFreebie",
-            "LogStopSale",
         ];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
