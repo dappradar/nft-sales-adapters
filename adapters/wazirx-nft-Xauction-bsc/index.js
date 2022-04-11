@@ -25,8 +25,6 @@ class WazirxNft {
         this.contract = "0x12e2ea4adb0c384fb273279c9e169e2f494cca21";
         this.events = ["AuctionFinalized"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
-        this.range = 500;
-        this.chunkSize = 6;
         this.sdk = null;
     }
 
