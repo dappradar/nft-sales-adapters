@@ -7,12 +7,13 @@ const axios = require("axios");
 const URL = "http://nft-sales-service.dappradar.com/open-source";
 const KEY = process.env.DAPPRADAR_API_KEY;
 const path = require("path");
+const { AVAILABLE_PROTOCOLS } = require("../../sdk/util");
 
 class PolychainMonsters {
     constructor() {
-        this.name = "polychainMonsters";
+        this.name = "polychain-monsters";
         this.token = "0x1796ae0b0fa4862485106a0de9b654efe301d0b2";
-        this.protocol = "bsc";
+        this.protocol = AVAILABLE_PROTOCOLS.BSC;
         this.block = 8482954;
         this.contract = "0x85F0e02cb992aa1F9F47112F815F519EF1A59E2D";
         this.events = ["Transfer"];
