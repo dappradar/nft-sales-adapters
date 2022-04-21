@@ -3,7 +3,7 @@ const { AVAILABLE_PROTOCOLS } = require("./constants");
 const key = process.env.DAPPRADAR_API_KEY;
 const headers = {
     key,
-    protocol: AVAILABLE_PROTOCOLS.ETH,
+    protocol: AVAILABLE_PROTOCOLS.BSC,
 };
 
 const WS_PROXY_URL = "ws://nft-sales-websocket.dappradar.com";
