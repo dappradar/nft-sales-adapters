@@ -16,9 +16,7 @@ class AlpiesETH {
         this.protocol = "ethereum";
         this.block = 13531146;
         this.contract = "0x57a7c5d10c3f87f5617ac1c60da60082e44d539e";
-        this.events = [
-            "Transfer",
-        ];
+        this.events = ["Transfer"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
         this.chunkSize = 6;
