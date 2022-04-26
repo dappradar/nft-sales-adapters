@@ -1,24 +1,26 @@
 require("dotenv").config();
 
 const moment = require("moment");
-const BigNumber = require("bignumber.js");
-const Matic = require("../../sdk/matic");
+const BSC = require("../../sdk/EVMC");
 const axios = require("axios");
 const URL = "http://nft-sales-service.dappradar.com/open-source";
 const KEY = process.env.DAPPRADAR_API_KEY;
 const path = require("path");
+const BigNumber = require("bignumber.js");
 
-class CRYPTOPUNKS2 {
+class Bazaar {
     constructor() {
-        this.name = "cryptopunks2";
-        this.token = "matic";
-        this.protocol = "polygon";
-        this.block = 20346370;
-        this.contract = "0xc02d332abc7f9e755e2b1eb56f6ae21a7da4b7ad";
-        this.events = ["Transfer"];
+        this.name = "bazaar";
+        this.symbol = "SKILL";
+        this.token = "0x154a9f9cbd3449ad22fdae23044319d6ef2a1fab";
+        this.protocol = "binance-smart-chain";
+        this.block = 8114624;
+        this.contract = "0x90099da42806b21128a094c713347c7885af79e2";
+        this.events = ["PurchasedListing"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
         this.chunkSize = 6;
+        this.sdk = undefined;
     }
 
     run = async () => {
@@ -29,8 +31,9 @@ class CRYPTOPUNKS2 {
     };
 
     loadSdk = () => {
-        return new Matic(this);
+        return new BSC(this);
     };
+
     getSymbol = async () => {
         const resp = await axios.get(
             `${URL}/token-metadata?key=${KEY}&token_address=${this.token}&protocol=${this.protocol}`,
@@ -41,8 +44,7 @@ class CRYPTOPUNKS2 {
                 },
             },
         );
-        const symbol = resp.data;
-        return symbol;
+        return resp.data;
     };
 
     getPrice = async timestamp => {
@@ -64,7 +66,7 @@ class CRYPTOPUNKS2 {
 
     getBuyer = async event => {
         const buyer = event.returnValues.owner;
-        if (event.event === "Mint") {
+        if (event.event === "PurchasedListing") {
             const txReceipt = await this.sdk.getTransactionReceipt(event.transactionHash);
             if (txReceipt === null) {
                 return null;
@@ -74,60 +76,54 @@ class CRYPTOPUNKS2 {
         return buyer;
     };
 
-    process = async event => {
-        const block = await this.sdk.getBlock(event.blockNumber);
-        const timestamp = moment.unix(block.timestamp).utc();
-        const baseTx = await this.sdk.getTransaction(event.transactionHash);
-        if (baseTx.value == 0) {
-            return; // ignore marketing (zero value) mints
-        }
-
-        const txReceipt = await this.sdk.getTransactionReceipt(event.transactionHash);
-
-        let numberOfTokens = 0;
-
-        for (let i = 0; i < txReceipt.logs.length; i++) {
-            if (txReceipt.logs[i].topics[0] == "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef") {
-                numberOfTokens++;
-            }
+    _getPrice = async (event, block) => {
+        if (!this.symbol.decimals) {
+            return { price: null, priceUsd: null };
         }
 
         const po = await this.getPrice(block.timestamp);
-        let nativePrice = new BigNumber(0);
-        if (baseTx.value > 0) nativePrice = new BigNumber(baseTx.value).dividedBy(10 ** 18).dividedBy(numberOfTokens);
+        const nativePrice = new BigNumber(event.returnValues.price).dividedBy(10 ** this.symbol.decimals);
 
-        const buyer = baseTx.from;
+        return {
+            price: nativePrice.toNumber(),
+            priceUsd: nativePrice.multipliedBy(po.price).toNumber(),
+        };
+    };
 
+    process = async event => {
+        const block = await this.sdk.getBlock(event.blockNumber);
+        const timestamp = moment.unix(block.timestamp).utc();
+        const buyer = await this.getBuyer(event);
         if (!buyer) {
             return;
         }
 
-        const tokenId = event.returnValues.tokenId;
+        const { price, priceUsd } = await this._getPrice(event, block);
+
+        const tokenId = event.returnValues.nftID;
         const entity = {
-            provider_name: this.name, // the name of the folder
-            provider_contract: this.contract, // the providers contract from which you get data
+            provider_name: this.name,
+            provider_contract: this.contract,
             protocol: this.protocol,
             nft_contract: this.contract,
             nft_id: tokenId,
             token: this.token,
             token_symbol: this.symbol.symbol,
             amount: 1,
-            price: nativePrice.toNumber(),
-            price_usd: nativePrice.multipliedBy(po.price).toNumber(),
+            price,
+            price_usd: priceUsd,
             seller: this.contract,
-            buyer,
+            buyer: buyer.toLowerCase(),
             sold_at: timestamp.format("YYYY-MM-DD HH:mm:ss"),
             block_number: event.blockNumber,
             transaction_hash: event.transactionHash,
         };
-
         await this.addToDatabase(entity);
     };
 
     addToDatabase = async entity => {
-        console.log(`creating sale for ${entity.nft_contract} with id ${entity.nft_id}`);
         return entity;
     };
 }
 
-module.exports = CRYPTOPUNKS2;
+module.exports = Bazaar;
