@@ -2,7 +2,7 @@ require("dotenv").config();
 
 const moment = require("moment");
 const BigNumber = require("bignumber.js");
-const Ethereum = require("../../sdk/EVMC");
+const Binance = require("../../sdk/binance");
 const axios = require("axios");
 const URL = "http://nft-sales-service.dappradar.com/open-source";
 const KEY = process.env.DAPPRADAR_API_KEY;
@@ -15,12 +15,12 @@ class PolychainMonsters {
         this.token = "0x1796ae0b0fa4862485106a0de9b654efe301d0b2";
         this.protocol = AVAILABLE_PROTOCOLS.BSC;
         this.block = 8482954;
-        this.contract = "0x85F0e02cb992aa1F9F47112F815F519EF1A59E2D";
+        this.contract = "0x85f0e02cb992aa1f9f47112f815f519ef1a59e2d";
         this.events = ["Transfer"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
         this.chunkSize = 6;
-        this.sdk = new Ethereum(this);
+        this.sdk = new Binance(this);
     }
 
     run = async () => {
@@ -31,7 +31,7 @@ class PolychainMonsters {
     };
 
     loadSdk = () => {
-        return new Ethereum(this);
+        return new Binance(this);
     };
     getSymbol = async () => {
         const resp = await axios.get(
