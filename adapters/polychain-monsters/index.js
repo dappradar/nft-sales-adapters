@@ -64,7 +64,7 @@ class PolychainMonsters {
 
     getBuyer = async event => {
         const buyer = event.returnValues.owner;
-        if (event.event === "NameRenewed") {
+        if (event.event === "Transfer") {
             const txReceipt = await this.sdk.getTransactionReceipt(event.transactionHash);
             if (txReceipt === null) {
                 return null;
