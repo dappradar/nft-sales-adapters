@@ -11,7 +11,6 @@ const WS_PROXY_URL = "ws://nft-sales-websocket.dappradar.com";
 const HTTP_PROXY_URL = "http://nft-sales-websocket.dappradar.com";
 
 const options = {
-    timeout: 1000,
     // We had to adjust here as the http lib expects an array value (see node_modules/web3-providers-http/src/index.js, line 79 -> .forEach() function)
     headers: Object.entries(headers).map(([key, value]) => ({ name: key, value })),
     clientConfig: {
