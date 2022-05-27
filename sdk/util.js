@@ -1,6 +1,5 @@
 require("dotenv").config();
 const { AVAILABLE_PROTOCOLS } = require("./constants");
-const Web3 = require("web3");
 const key = process.env.DAPPRADAR_API_KEY;
 const headers = {
     key,
@@ -8,8 +7,9 @@ const headers = {
 };
 
 const WS_PROXY_URL = "ws://nft-sales-websocket.dappradar.com";
+// // @see https://web3js.readthedocs.io/en/v1.2.11/web3.html#configuration
+const HTTP_PROXY_URL = "http://nft-sales-websocket.dappradar.com";
 
-// @see https://web3js.readthedocs.io/en/v1.2.11/web3.html#configuration
 const options = {
     headers,
     clientConfig: {
@@ -25,4 +25,4 @@ const options = {
 };
 
 const asyncTimeout = async (seconds = 10) => new Promise(r => setTimeout(r, 1000 * seconds));
-module.exports = { WS_PROXY_URL, options, asyncTimeout, AVAILABLE_PROTOCOLS };
+module.exports = { WS_PROXY_URL, HTTP_PROXY_URL, options, asyncTimeout, AVAILABLE_PROTOCOLS };
