@@ -2,7 +2,7 @@ require("dotenv").config();
 
 const moment = require("moment");
 const BigNumber = require("bignumber.js");
-const Ethereum = require("../../sdk/EVMC");
+const Binance = require("../../sdk/binance");
 const axios = require("axios");
 const URL = "http://nft-sales-service.dappradar.com/open-source";
 const KEY = process.env.DAPPRADAR_API_KEY;
@@ -20,7 +20,7 @@ class AlpiesBSC {
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
         this.chunkSize = 6;
-        this.sdk = new Ethereum(this);
+        this.sdk = new Binance(this);
     }
 
     run = async () => {
@@ -31,7 +31,7 @@ class AlpiesBSC {
     };
 
     loadSdk = () => {
-        return new Ethereum(this);
+        return new Binance(this);
     };
     getSymbol = async () => {
         const resp = await axios.get(
@@ -64,7 +64,7 @@ class AlpiesBSC {
 
     getBuyer = async event => {
         const buyer = event.returnValues.owner;
-        if (event.event === "NameRenewed") {
+        if (event.event === "Transfer") {
             const txReceipt = await this.sdk.getTransactionReceipt(event.transactionHash);
             if (txReceipt === null) {
                 return null;
