@@ -2,7 +2,7 @@ require("dotenv").config();
 
 const moment = require("moment");
 const BigNumber = require("bignumber.js");
-const Ethereum = require("../../sdk/EVMC");
+const BSC = require("../../sdk/EVMC");
 const axios = require("axios");
 const URL = "http://nft-sales-service.dappradar.com/open-source";
 const KEY = process.env.DAPPRADAR_API_KEY;
@@ -17,12 +17,13 @@ class LABRATS {
         this.protocol = "binance-smart-chain";
         this.block = 15949226;
         this.contract = "0x1F5CEe46096b6136c551bB00f9C93a7207a8bd37";
-        this.events = ["NameRegistered", "NameRenewed"];
+        this.events = ["Transfer"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
         this.chunkSize = 6;
-        this.sdk = new Ethereum(this);
+        this.sdk = undefined;
     }
+
 
     run = async () => {
         const s = await this.getSymbol();
@@ -32,8 +33,9 @@ class LABRATS {
     };
 
     loadSdk = () => {
-        return new Ethereum(this);
+        return new BSC(this);
     };
+
     getSymbol = async () => {
         const resp = await axios.get(
             `${URL}/token-metadata?key=${KEY}&token_address=${this.token}&protocol=${this.protocol}`,
@@ -44,9 +46,9 @@ class LABRATS {
                 },
             },
         );
-        const symbol = resp.data;
-        return symbol;
+        return resp.data;
     };
+
     getPrice = async timestamp => {
         const resp = await axios.get(
             `${URL}/token-price?key=${KEY}&token_address=${this.token}&protocol=${this.protocol}&timestamp=${timestamp}`,
@@ -59,13 +61,14 @@ class LABRATS {
         );
         return resp.data;
     };
+
     stop = async () => {
         this.sdk.stop();
     };
 
     getBuyer = async event => {
         const buyer = event.returnValues.owner;
-        if (event.event === "NameRenewed") {
+        if (event.event === "PurchasedListing") {
             const txReceipt = await this.sdk.getTransactionReceipt(event.transactionHash);
             if (txReceipt === null) {
                 return null;
@@ -75,31 +78,44 @@ class LABRATS {
         return buyer;
     };
 
+    _getPrice = async (event, block) => {
+        if (!this.symbol.decimals) {
+            return { price: null, priceUsd: null };
+        }
+
+        const po = await this.getPrice(block.timestamp);
+        const nativePrice = new BigNumber(event.returnValues.price).dividedBy(10 ** this.symbol.decimals);
+
+        return {
+            price: nativePrice.toNumber(),
+            priceUsd: nativePrice.multipliedBy(po.price).toNumber(),
+        };
+    };
+
     process = async event => {
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
-        const po = await this.getPrice(block.timestamp);
-        const nativePrice = new BigNumber(event.returnValues.cost).dividedBy(10 ** this.symbol.decimals);
         const buyer = await this.getBuyer(event);
         if (!buyer) {
             return;
         }
 
-        const labelHash = event.returnValues.label;
-        const tokenId = new BigNumber(labelHash, 16).toFixed();
+        const { price, priceUsd } = await this._getPrice(event, block);
+
+        const tokenId = event.returnValues.nftID;
         const entity = {
-            provider_name: this.name, // the name of the folder
-            provider_contract: this.contract, // the providers contract from which you get data
+            provider_name: this.name,
+            provider_contract: this.contract,
             protocol: this.protocol,
             nft_contract: this.contract,
             nft_id: tokenId,
             token: this.token,
             token_symbol: this.symbol.symbol,
             amount: 1,
-            price: nativePrice.toNumber(),
-            price_usd: nativePrice.multipliedBy(po.price).toNumber(),
-            seller: this.contract, // its bought from ens and transfered to the owner
-            buyer,
+            price,
+            price_usd: priceUsd,
+            seller: this.contract,
+            buyer: buyer.toLowerCase(),
             sold_at: timestamp.format("YYYY-MM-DD HH:mm:ss"),
             block_number: event.blockNumber,
             transaction_hash: event.transactionHash,
@@ -108,7 +124,6 @@ class LABRATS {
     };
 
     addToDatabase = async entity => {
-        console.log(`creating sale for ${entity.nft_contract} with id ${entity.nft_id}`);
         return entity;
     };
 }
