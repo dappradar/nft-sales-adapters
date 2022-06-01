@@ -88,8 +88,7 @@ class AlpiesBSC {
             return;
         }
 
-        const labelHash = event.returnValues.tokenId;
-        const tokenId = new BigNumber(labelHash, 16).toFixed();
+        const tokenId = event.returnValues.tokenId;
         const entity = {
             provider_name: this.name, // the name of the folder
             provider_contract: this.contract, // the providers contract from which you get data
