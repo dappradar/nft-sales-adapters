@@ -76,10 +76,14 @@ class AlpiesETH {
 
     process = async event => {
         const block = await this.sdk.getBlock(event.blockNumber);
+        const baseTx = await this.sdk.getTransaction(event.transactionHash);
+        if (baseTx.value == 0) {
+            return;
+        }
         const timestamp = moment.unix(block.timestamp).utc();
         const po = await this.getPrice(block.timestamp);
-        const nativePrice = new BigNumber(event.returnValues.cost).dividedBy(10 ** this.symbol.decimals);
-        const buyer = await this.getBuyer(event);
+        const nativePrice = new BigNumber(baseTx.value).dividedBy(10 ** this.symbol.decimals);
+        const buyer = baseTx.from;
         if (!buyer) {
             return;
         }
