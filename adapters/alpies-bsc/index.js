@@ -88,7 +88,7 @@ class AlpiesBSC {
             return;
         }
 
-        const labelHash = event.returnValues.label;
+        const labelHash = event.returnValues.tokenId;
         const tokenId = new BigNumber(labelHash, 16).toFixed();
         const entity = {
             provider_name: this.name, // the name of the folder
