@@ -85,7 +85,7 @@ class RaribleTezos {
         }
         const timestamp = moment(call.timestamp, "YYYY-MM-DDTHH:mm:ssZ").utc();
         const s = this.symbol;
-        const po = await this.getPrice(timestamp);
+        const po = await this.getPrice(timestamp.unix());
         const nativePrice = new BigNumber(biggest.amount).dividedBy(10 ** s.decimals);
 
         const transferOp = operation.find(
