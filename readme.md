@@ -44,7 +44,7 @@ Inside adapter directory there should be at least 2 files
 Supported blockchain protocols
 
 -   Ethereum
--   Binance Smart Chain
+-   BNB Chain (Binance Smart Chain)
 -   Polygon
 -   Avalanche
 
