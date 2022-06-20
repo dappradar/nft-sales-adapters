@@ -4,7 +4,13 @@ This repository hosts the adapters for integrating NFT collections or marketplac
 [dappradar.com/nft](https://dappradar.com/nft) and other products.
 
 Repository is maintained through community support, to add your collection or marketplace please read
-[contribution guidelines](https://github.com/dappradar/nft-sales-adapters#contributing).
+[contribution guidelines](https://github.com/dappradar/nft-sales-adapters#guidelines).
+
+## Guidelines
+
+1. Integrations are done for marketplaces, not for separate collections (unless a collection also has a native marketplace, like CryptoPunks).
+2. Integration must be done in a way that it tracks all the sale events on the marketplace (sale, auction, etc.)
+3. Only sales on that specific marketplace should be counted. For example, if one smart contract is used by 3 NFT marketplaces, your integration needs to differentiate those and only include sales done on that specific marketplace.
 
 ## API key
 
