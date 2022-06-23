@@ -16,7 +16,7 @@ class NFTKey {
         this.protocol = "avalanche";
         this.block = 6421617;
         this.contract = "0x1A7d6ed890b6C284271AD27E7AbE8Fb5211D0739";
-        this.events = ["TokenBought"];
+        this.events = ["TokenBought", "TokenBidAccepted"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
         this.chunkSize = 6;
@@ -65,24 +65,22 @@ class NFTKey {
     };
 
     getBuyer = async event => {
-        const buyer = event.returnValues.owner;
-        if (event.event === "TokenBought") {
-            const txReceipt = await this.sdk.getTransactionReceipt(event.transactionHash);
-            if (txReceipt === null) {
-                return null;
-            }
-            return txReceipt.from;
+        if (event.event === "TokenBidAccepted") {
+            return event.returnValues.bid.bidder;
         }
-        return buyer;
+        return event.returnValues.buyer;
     };
 
-    _getPrice = async (event, block) => {
+    _getPrice = async (baseTx, block) => {
         if (!this.symbol.decimals) {
             return { price: null, priceUsd: null };
         }
 
         const po = await this.getPrice(block.timestamp);
-        const nativePrice = new BigNumber(event.returnValues.price).dividedBy(10 ** this.symbol.decimals);
+        let nativePrice = new BigNumber(0);
+        if (baseTx.value > 0) {
+            nativePrice = new BigNumber(baseTx.value).dividedBy(10 ** this.symbol.decimals);
+        }
 
         return {
             price: nativePrice.toNumber(),
@@ -93,12 +91,16 @@ class NFTKey {
     process = async event => {
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
+        const baseTx = await this.sdk.getTransaction(event.transactionHash);
+        if (baseTx.value == 0) {
+            return;
+        }
         const buyer = await this.getBuyer(event);
         if (!buyer) {
             return;
         }
 
-        const { price, priceUsd } = await this._getPrice(event, block);
+        const { price, priceUsd } = await this._getPrice(baseTx, block);
 
         const tokenId = event.returnValues.tokenId;
         const entity = {
