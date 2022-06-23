@@ -13,7 +13,7 @@ class NFTKEY {
         this.name = "nftkey";
         this.symbol = null;
         this.token = "0x0000000000000000000000000000000000000000";
-        this.protocol = "avalance";
+        this.protocol = "avalanche";
         this.block = 6421617;
         this.contract = "0x1A7d6ed890b6C284271AD27E7AbE8Fb5211D0739";
         this.events = ["NameRegistered", "NameRenewed"];
