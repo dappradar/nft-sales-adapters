@@ -71,16 +71,18 @@ class NFTKey {
         return event.returnValues.buyer;
     };
 
-    _getPrice = async (baseTx, block) => {
+    _getPrice = async (event, block) => {
         if (!this.symbol.decimals) {
             return { price: null, priceUsd: null };
         }
-
+        
         const po = await this.getPrice(block.timestamp);
-        let nativePrice = new BigNumber(0);
-        if (baseTx.value > 0) {
-            nativePrice = new BigNumber(baseTx.value).dividedBy(10 ** this.symbol.decimals);
+
+        let value = event.returnValues.listing.value;
+        if (event.event === "TokenBidAccepted") {
+            value = event.returnValues.bid.value;
         }
+        const nativePrice = new BigNumber(value).dividedBy(10 ** this.symbol.decimals);
 
         return {
             price: nativePrice.toNumber(),
@@ -91,16 +93,12 @@ class NFTKey {
     process = async event => {
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
-        const baseTx = await this.sdk.getTransaction(event.transactionHash);
-        if (baseTx.value == 0) {
-            return;
-        }
         const buyer = await this.getBuyer(event);
         if (!buyer) {
             return;
         }
 
-        const { price, priceUsd } = await this._getPrice(baseTx, block);
+        const { price, priceUsd } = await this._getPrice(event, block);
 
         const tokenId = event.returnValues.tokenId;
         const entity = {
