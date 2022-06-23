@@ -12,7 +12,7 @@ class NFTKey {
     constructor() {
         this.name = "nftkey";
         this.symbol = "AVAX";
-        this.token = "0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7";
+        this.token = "0x0000000000000000000000000000000000000000";
         this.protocol = "avalanche";
         this.block = 6421617;
         this.contract = "0x1A7d6ed890b6C284271AD27E7AbE8Fb5211D0739";
