@@ -11,12 +11,12 @@ const BigNumber = require("bignumber.js");
 class BombCrypto {
     constructor() {
         this.name = "bombcrypto";
-        this.symbol = null;
-        this.token = "0x154a9f9cbd3449ad22fdae23044319d6ef2a1fab";
+        this.symbol = 'BCOIN';
+        this.token = "0x0000000000000000000000000000000000000000";
         this.protocol = "binance-smart-chain";
-        this.block = 8114624;
-        this.contract = "0x90099da42806b21128a094c713347c7885af79e2";
-        this.events = ["PurchasedListing"];
+        this.block = 11103053;
+        this.contract = "0x00e1656e45f18ec6747F5a8496Fd39B50b38396D";
+        this.events = ["Transfer"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
         this.chunkSize = 6;
