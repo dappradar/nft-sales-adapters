@@ -92,6 +92,13 @@ class NFTKey {
         };
     };
 
+    getSeller = async event => {
+        if (event.event === "TokenBidAccepted") {
+            return event.returnValues.seller;
+        }
+        return event.returnValues.listing.seller;
+    };
+
     process = async event => {
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
@@ -103,6 +110,7 @@ class NFTKey {
         const { price, priceUsd } = await this._getPrice(event, block);
 
         const tokenId = event.returnValues.tokenId;
+        const seller = await this.getSeller(event);
         const entity = {
             provider_name: this.name,
             provider_contract: this.contract,
@@ -114,7 +122,7 @@ class NFTKey {
             amount: 1,
             price,
             price_usd: priceUsd,
-            seller: this.contract,
+            seller,
             buyer: buyer.toLowerCase(),
             sold_at: timestamp.format("YYYY-MM-DD HH:mm:ss"),
             block_number: event.blockNumber,
