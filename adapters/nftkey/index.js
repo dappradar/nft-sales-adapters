@@ -64,7 +64,7 @@ class NFTKey {
         this.sdk.stop();
     };
 
-    getBuyer = async event => {
+    getBuyer = event => {
         if (event.event === "TokenBidAccepted") {
             return event.returnValues.bid.bidder;
         }
@@ -92,7 +92,7 @@ class NFTKey {
         };
     };
 
-    getSeller = async event => {
+    getSeller = event => {
         if (event.event === "TokenBidAccepted") {
             return event.returnValues.seller;
         }
@@ -102,7 +102,7 @@ class NFTKey {
     process = async event => {
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
-        const buyer = await this.getBuyer(event);
+        const buyer = this.getBuyer(event);
         if (!buyer) {
             return;
         }
@@ -110,7 +110,7 @@ class NFTKey {
         const { price, priceUsd } = await this._getPrice(event, block);
 
         const tokenId = event.returnValues.tokenId;
-        const seller = await this.getSeller(event);
+        const seller = this.getSeller(event);
         const entity = {
             provider_name: this.name,
             provider_contract: this.contract,
