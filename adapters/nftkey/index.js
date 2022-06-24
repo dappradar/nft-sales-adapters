@@ -78,9 +78,11 @@ class NFTKey {
         
         const po = await this.getPrice(block.timestamp);
 
-        let value = event.returnValues.listing.value;
+        let value = 0;
         if (event.event === "TokenBidAccepted") {
             value = event.returnValues.bid.value;
+        } else {
+            value = event.returnValues.listing.value;
         }
         const nativePrice = new BigNumber(value).dividedBy(10 ** this.symbol.decimals);
 
