@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 const moment = require("moment");
-const Avalanche = require("../../sdk/EVMC");
+const Avalanche = require("../../sdk/avalanche");
 const axios = require("axios");
 const URL = "http://nft-sales-service.dappradar.com/open-source";
 const KEY = process.env.DAPPRADAR_API_KEY;
