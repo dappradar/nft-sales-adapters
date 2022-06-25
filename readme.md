@@ -98,4 +98,4 @@ _/sdk/metadata.js_ is our inner file and should not be updated in any way also a
 
 Metadata like price of token at that certain point is handled via axios call to `process.env.DAPPRADAR_META_URL`,
 each call is requested towards APIs limit, if the limit is hit you will get a faulty response.
-https://snowtrace.io/address/0x1A7d6ed890b6C284271AD27E7AbE8Fb5211D0739
+https://snowtrace.io/address/0x1A7d6ed890b6C284271AD27E7AbE8Fb5211D0739 
