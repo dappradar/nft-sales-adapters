@@ -15,7 +15,7 @@ class NFTKey {
         this.token = "avax";
         this.protocol = "avalanche";
         this.block = 6421617;
-        this.contract = "0x1A7d6ed890b6C284271AD27E7AbE8Fb5211D0739";
+        this.contract = "0x1a7d6ed890b6c284271ad27e7abe8fb5211d0739";
         this.events = ["TokenBought", "TokenBidAccepted"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
