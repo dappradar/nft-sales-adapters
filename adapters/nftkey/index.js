@@ -66,9 +66,9 @@ class NFTKey {
 
     getBuyer = event => {
         if (event.event === "TokenBidAccepted") {
-            return event.returnValues.bid.bidder;
+            return event.returnValues.bid.bidder.toLowerCase();
         }
-        return event.returnValues.buyer;
+        return event.returnValues.buyer.toLowerCase();
     };
 
     _getPrice = async (event, block) => {
@@ -94,9 +94,9 @@ class NFTKey {
 
     getSeller = event => {
         if (event.event === "TokenBidAccepted") {
-            return event.returnValues.seller;
+            return event.returnValues.seller.toLowerCase();
         }
-        return event.returnValues.listing.seller;
+        return event.returnValues.listing.seller.toLowerCase();
     };
 
     process = async event => {
