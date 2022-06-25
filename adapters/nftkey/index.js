@@ -122,7 +122,7 @@ class NFTKey {
             amount: 1,
             price,
             price_usd: priceUsd,
-            seller: sellerr.toLowerCase(),
+            seller: seller.toLowerCase(),
             buyer: buyer.toLowerCase(),
             sold_at: timestamp.format("YYYY-MM-DD HH:mm:ss"),
             block_number: event.blockNumber,
