@@ -16,7 +16,7 @@ class NFT_K {
         this.token = "0x0000000000000000000000000000000000000000";
         this.protocol = "AVAILABLE_PROTOCOLS.AVALANCHE";
         this.block = 12855192;
-        this.contract = "0x1A7d6ed890b6C284271AD27E7AbE8Fb5211D0739";
+        this.contract = "0x1a7d6ed890b6c284271ad27e7abe8fb5211d0739";
         this.events = struct Listing {
             uint256 tokenId;
             uint256 value;
