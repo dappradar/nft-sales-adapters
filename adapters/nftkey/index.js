@@ -118,7 +118,7 @@ class NFTKey {
 
         const tokenId = event.returnValues.tokenId;
         const seller = this.getSeller(event);
-        const nftContract = event.returnValues.erc721Address;
+        const nftContract = event.returnValues.erc721Address.toLowerCase();
         const entity = {
             provider_name: this.name,
             provider_contract: this.contract,
