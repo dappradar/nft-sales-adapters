@@ -59,7 +59,7 @@ cp .env.dist .env
 ### How to run services
 
 First update your _.env_ file to contain your key,
-after that create you adapter inside _adapters/my-adapter_, the naming should be lowercase
+after that create your adapter inside _adapters/my-adapter_, the naming should be lowercase
 with multiple words divided by `-`, for example: `my-adapter`
 
 To run & test your adapter simply while being in root write:
