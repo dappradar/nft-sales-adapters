@@ -106,7 +106,14 @@ class NFTKey {
         if (!buyer) {
             return;
         }
-
+        if (event.event === "TokenBidAccepted") {
+            const paymentToken = await this.sdk.callContractMethod('paymentToken');
+            this.token = paymentToken.toLowerCase();
+        } else {
+            this.token = 'avax';
+        }
+        const s = await this.getSymbol();
+        this.symbol = s;
         const { price, priceUsd } = await this._getPrice(event, block);
 
         const tokenId = event.returnValues.tokenId;
