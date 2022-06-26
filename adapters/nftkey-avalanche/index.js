@@ -10,7 +10,7 @@ const BigNumber = require("bignumber.js");
 
 class NFTKey {
     constructor() {
-        this.name = "nftkey";
+        this.name = "nftkey-avalanche";
         this.symbol = "AVAX";
         this.token = "avax";
         this.protocol = "avalanche";
