@@ -28,6 +28,6 @@ jobs:
           DEFAULT_BRANCH: "main"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JAVASCRIPT_DEFAULT_STYLE: prettier
-          JAVASCRIPT_ES_CONFIG_FILE: .eslintrc.js
+          JAVASCRIPT_ES_CONFIG_FILE: ${{ GITHUB_WORKSPACE }}.eslintrc.js
           TYPESCRIPT_DEFAULT_STYLE: prettier
           # TYPESCRIPT_ES_CONFIG_FILE: .eslintrc.js
