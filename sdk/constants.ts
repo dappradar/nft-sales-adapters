@@ -1,10 +1,10 @@
-const AVAILABLE_PROTOCOLS: { [key: string]: string } = {
-    ETH: "ethereum",
-    BSC: "binance-smart-chain",
-    POLYGON: "polygon",
-    AVALANCHE: "avalanche",
-    TEZOS: "tezos",
-};
+enum AVAILABLE_PROTOCOLS {
+    ETH = "ethereum",
+    BSC = "binance-smart-chain",
+    POLYGON = "polygon",
+    AVALANCHE = "avalanche",
+    TEZOS = "tezos",
+}
 
 const API_KEY = process.env.DAPPRADAR_API_KEY || "";
 const API_URL = process.env.DAPPRADAR_API_URL || "";

@@ -46,7 +46,7 @@ const tester = async (): Promise<void> => {
                 }
             }
 
-            if (!Object.values(AVAILABLE_PROTOCOLS).includes(entity.protocol)) {
+            if (!Object.values(AVAILABLE_PROTOCOLS).find(p => p === entity.protocol)) {
                 throw new Error(`Unsupported protocol "${entity.protocol}"`);
             }
         }
