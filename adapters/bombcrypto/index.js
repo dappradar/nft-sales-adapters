@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 const moment = require("moment");
-const BSC = require("../../sdk/EVMC");
+const BSC = require("../../sdk/binance");
 const axios = require("axios");
 const URL = "http://nft-sales-service.dappradar.com/open-source";
 const KEY = process.env.DAPPRADAR_API_KEY;
@@ -15,7 +15,7 @@ class BombCrypto {
         this.token = "0x0000000000000000000000000000000000000000";
         this.protocol = "binance-smart-chain";
         this.block = 11103053;
-        this.contract = "0x00e1656e45f18ec6747F5a8496Fd39B50b38396D";
+        this.contract = "0x00e1656e45f18ec6747f5a8496fd39b50b38396d";
         this.events = ["Transfer"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
