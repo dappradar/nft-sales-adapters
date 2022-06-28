@@ -11,7 +11,7 @@ const BigNumber = require("bignumber.js");
 class BombCrypto {
     constructor() {
         this.name = "bombcrypto";
-        this.symbol = 'BCOIN';
+        this.symbol = "BCOIN";
         this.token = "0x0000000000000000000000000000000000000000";
         this.protocol = "binance-smart-chain";
         this.block = 11103053;
@@ -99,20 +99,19 @@ class BombCrypto {
         }
 
         const { price, priceUsd } = await this._getPrice(event, block);
-
-        const tokenId = event.returnValues.nftID;
+        
         const entity = {
             provider_name: this.name,
             provider_contract: this.contract,
             protocol: this.protocol,
-            nft_contract: this.contract,
-            nft_id: tokenId,
+            nft_contract: null,
+            nft_id: null,
             token: this.token,
             token_symbol: this.symbol.symbol,
             amount: 1,
             price,
             price_usd: priceUsd,
-            seller: this.contract,
+            seller: event.returnValues.from,
             buyer: buyer.toLowerCase(),
             sold_at: timestamp.format("YYYY-MM-DD HH:mm:ss"),
             block_number: event.blockNumber,
