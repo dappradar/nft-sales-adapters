@@ -15,7 +15,7 @@ class RatAlert {
         this.token = "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619"; // WETH
         this.protocol = "polygon";
         this.block = 28184455;
-        this.contract = "0x3242CCF5d7f35BaB5A560e7ae2Fa64EfDCa9Cd1c"; // RATCAST
+        this.contract = "0x3242ccf5d7f35bab5a560e7ae2fa64efdca9cd1c"; // RATCAST
         this.events = ["Transfer"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.sdk = new Matic(this);
