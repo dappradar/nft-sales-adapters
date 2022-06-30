@@ -56,6 +56,7 @@ const tester = async () => {
             }
         });
     }
+    console.log("Test passed");
     process.exit(0);
 };
 
