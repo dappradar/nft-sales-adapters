@@ -8,9 +8,9 @@ const KEY = process.env.DAPPRADAR_API_KEY;
 const path = require("path");
 const BigNumber = require("bignumber.js");
 
-class kalao-avalanche {
+class kalao_avalanche {
     constructor() {
-        this.name = "kalao-avalanche";
+        this.name = "kalao_avalanche";
         this.symbol = "AVAX";
         this.token = "avax";
         this.protocol = "avalanche";
@@ -144,4 +144,4 @@ class kalao-avalanche {
     };
 }
 
-module.exports = kalao-avalanche;
+module.exports = kalao_avalanche;
