@@ -8,7 +8,7 @@ const KEY = process.env.DAPPRADAR_API_KEY;
 const path = require("path");
 const BigNumber = require("bignumber.js");
 
-class NFTKey {
+class kalao-avalanche {
     constructor() {
         this.name = "kalao-avalanche";
         this.symbol = "AVAX";
@@ -144,4 +144,4 @@ class NFTKey {
     };
 }
 
-module.exports = NFTKey;
+module.exports = kalao-avalanche;
