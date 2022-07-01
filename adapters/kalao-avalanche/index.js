@@ -10,12 +10,12 @@ const BigNumber = require("bignumber.js");
 
 class NFTKey {
     constructor() {
-        this.name = "nftkey-avalanche";
+        this.name = "kalao-avalanche";
         this.symbol = "AVAX";
         this.token = "avax";
         this.protocol = "avalanche";
         this.block = 6421617;
-        this.contract = "0x1a7d6ed890b6c284271ad27e7abe8fb5211d0739";
+        this.contract = "0x11AC3118309A7215c6d87c7C396e2DF333Ae3A9C";
         this.events = ["TokenBought", "TokenBidAccepted"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
