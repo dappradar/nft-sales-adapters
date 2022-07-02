@@ -15,7 +15,7 @@ class BombCrypto {
         this.token = "bnb";
         this.protocol = "binance";
         this.block = 8867059;
-        this.contract = "0xe29F0B490F0d89CA7ACAc1C7BeD2E07eCAD65201";
+        this.contract = "0xe29f0b490f0d89ca7acac1c7bed2e07ecad65201";
         this.events = ["TokenBought", "TokenBidAccepted"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
