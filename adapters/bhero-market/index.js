@@ -14,7 +14,7 @@ class BHeroMarket {
         this.symbol = "BCOIN";
         this.token = null; // Set later on
         this.protocol = "binance-smart-chain";
-        this.block = 18743562;
+        this.block = 14498601;
         this.contract = "0x376a10e7f125a4e0a567cc08043c695cd8edd704";
         this.events = ["Sold"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
