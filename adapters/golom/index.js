@@ -76,15 +76,25 @@ class GOLOM {
     };
 
     getNftId = async event =>{
+        
         if (event.event === "OrderFilled") {
             const txReceipt = await this.sdk.getTransactionReceipt(event.transactionHash);
             if (txReceipt === null) {
                 return null;
             }
-            const tokenidhex = txReceipt.logs[0].topics[3]
-            const tokenId = parseInt(tokenidhex, 16);
-            return tokenId;
+            const logs = txReceipt.logs
+            for (let i=0; i<logs.length; i++){
+                let topics=logs[i].topics
+                if (topics[0]==="0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"){  // transfer topics
+                    const tokenidhex = topics[3];
+                    const tokenId = parseInt(tokenidhex, 16);
+                    return tokenId
+                   
+                }
+            }
+            
         }
+        return null;
     }
 
     process = async event => {
