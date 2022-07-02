@@ -278,14 +278,14 @@ class EVMC {
      * @param params array
      * @returns {Promise<*>}
      */
-    callContractMethod = async (methodName, params = []) => {
+    callContractMethod = async (methodName, params = [], callOpts = []) => {
         let retries = 0;
         let error = null;
         while (10 > retries) {
             try {
                 this.ensureWeb3();
                 const contract = await this.getContract();
-                const response = await contract.methods[methodName](...params).call();
+                const response = await contract.methods[methodName](...params).call(...callOpts);
 
                 if (null === response) {
                     await asyncTimeout(60);
