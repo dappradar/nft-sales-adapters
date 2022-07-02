@@ -12,7 +12,7 @@ class BHeroMarket {
     constructor() {
         this.name = "bhero-market";
         this.symbol = "BCOIN";
-        this.token = "0x00e1656e45f18ec6747F5a8496Fd39B50b38396D";
+        this.token = null; // Set later on
         this.protocol = "binance-smart-chain";
         this.block = 18743562;
         this.contract = "0x376a10e7f125a4e0a567cc08043c695cd8edd704";

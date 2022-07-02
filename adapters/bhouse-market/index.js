@@ -12,7 +12,7 @@ class BHouseMarket {
     constructor() {
         this.name = "bhouse-market";
         this.symbol = "BCOIN";
-        this.token = "0x00e1656e45f18ec6747F5a8496Fd39B50b38396D";
+        this.token = null; // Set later on
         this.protocol = "binance-smart-chain";
         this.block = 14498666;
         this.contract = "0x049896f350c802cd5c91134e5f35ec55fa8f0108";
