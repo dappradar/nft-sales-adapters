@@ -9,13 +9,13 @@ const KEY = process.env.DAPPRADAR_API_KEY;
 const path = require("path");
 
 class GOLOM {
-    // stands for Ethereum name service
+
     constructor() {
         this.name = "golom";
         this.symbol = "eth";
-        this.token = "0x0000000000000000000000000000000000000000";
+        this.token = "eth";
         this.protocol = "ethereum";
-        this.block = 	15043970;
+        this.block = 14880514;
         this.contract = "0xd29e1FcB07e55eaceB122C63F8E50441C6acEdc9";
         this.events = ["OrderFilled"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
@@ -25,7 +25,6 @@ class GOLOM {
     }
 
     run = async () => {
-        console.log("run");
         const s = await this.getSymbol();
         this.sdk = this.loadSdk();
         this.symbol=s;
@@ -46,7 +45,6 @@ class GOLOM {
             },
         );
         const symbol = resp.data;
-        console.log(symbol);
         return symbol;
     };
     getPrice = async timestamp => {
@@ -59,7 +57,6 @@ class GOLOM {
                 },
             },
         );
-        console.log(resp.data, "getPrice");
         return resp.data;
     };
     stop = async () => {
@@ -67,8 +64,7 @@ class GOLOM {
     };
 
     getBuyer = async event => {
-        console.log("getBuyer");
-        const buyer = event.returnValues.owner;
+        const buyer = event.returnValues.taker;
         if (event.event === "OrderFilled") {
             const txReceipt = await this.sdk.getTransactionReceipt(event.transactionHash);
             if (txReceipt === null) {
@@ -79,31 +75,44 @@ class GOLOM {
         return buyer;
     };
 
+    getNftId = async event =>{
+        if (event.event === "OrderFilled") {
+            const txReceipt = await this.sdk.getTransactionReceipt(event.transactionHash);
+            if (txReceipt === null) {
+                return null;
+            }
+            const tokenidhex = txReceipt.logs[0].topics[3]
+            const tokenId = parseInt(tokenidhex, 16);
+            return tokenId;
+        }
+    }
+
     process = async event => {
-        console.log("process");
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
         const po = await this.getPrice(block.timestamp);
-        const nativePrice = new BigNumber(event.returnValues.cost).dividedBy(10 ** this.symbol.decimals);
+        const nativePrice = new BigNumber(event.returnValues.price).dividedBy(10 ** this.symbol.decimals);
         const buyer = await this.getBuyer(event);
         if (!buyer) {
             return;
         }
 
-        const labelHash = event.returnValues.label;
-        const tokenId = new BigNumber(labelHash, 16).toFixed();
+        const tokenId = await this.getNftId(event);
+        if (!tokenId) {
+            return;
+        }
         const entity = {
-            provider_name: this.name, // the name of the folder
-            provider_contract: this.contract, // the providers contract from which you get data
+            provider_name: this.name, 
+            provider_contract: this.contract, 
             protocol: this.protocol,
             nft_contract: this.contract,
-            nft_id: tokenId,
+            nft_id: tokenId.toString(),
             token: this.token,
             token_symbol: this.symbol.symbol,
             amount: 1,
             price: nativePrice.toNumber(),
             price_usd: nativePrice.multipliedBy(po.price).toNumber(),
-            seller: this.contract, // its bought from ens and transfered to the owner
+            seller: this.contract, 
             buyer,
             sold_at: timestamp.format("YYYY-MM-DD HH:mm:ss"),
             block_number: event.blockNumber,
