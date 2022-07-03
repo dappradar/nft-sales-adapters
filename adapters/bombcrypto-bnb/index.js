@@ -16,7 +16,7 @@ class BombCrypto {
         this.protocol = "binance";
         this.block = 8867059;
         this.contract = "0xe29f0b490f0d89ca7acac1c7bed2e07ecad65201"; // abi used for 0x5713Ae21F4Bb696A877c90CCcAE310eFF4c4652A(Proxy Contract abi) - https://bscscan.com/address/0xe29F0B490F0d89CA7ACAc1C7BeD2E07eCAD65201#readProxyContract
-        this.events = ["ItemListed", "ItemPriceUpdated", "OwnershipTransferred"];
+        this.events = ["OfferMatched", "ItemListed", "OwnershipTransferred"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
         this.chunkSize = 6;
@@ -82,7 +82,7 @@ class BombCrypto {
         if (event.event === "ItemListed") {
             value = event.returnValues.price;
         } else {
-            value = event.returnValues.listing.value;
+            value = event.returnValues.price;
         }
         const nativePrice = new BigNumber(value).dividedBy(10 ** this.symbol.decimals);
 
@@ -93,10 +93,7 @@ class BombCrypto {
     };
 
     getSeller = event => {
-        if (event.event === "OfferMatched") {
-            return event.returnValues.seller;
-        }
-        return event.returnValues.listing.seller;
+        return event.returnValues.seller;
     };
 
     process = async event => {
@@ -119,7 +116,7 @@ class BombCrypto {
 
         const tokenId = event.returnValues.tokenId;
         const seller = this.getSeller(event);
-        const nftContract = event.returnValues.erc721Address.toLowerCase();
+        const nftContract = this.contract.toLowerCase();
         const entity = {
             provider_name: this.name,
             provider_contract: this.contract,
