@@ -30,6 +30,10 @@ const tester = async () => {
     };
     await adapter.run();
 
+    if (array.length == 0) {
+        throw new Error("No entities were returned")
+    }
+    
     for (const entity of array) {
         // Should have all needed properties
         if (Object.keys(entity).length !== ENTITY_KEYS.length) {
