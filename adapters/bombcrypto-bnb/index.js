@@ -15,8 +15,8 @@ class BombCrypto {
         this.token = "bnb";
         this.protocol = "binance";
         this.block = 8867059;
-        this.contract = "0xe29f0b490f0d89ca7acac1c7bed2e07ecad65201";
-        this.events = ["TokenBought", "TokenBidAccepted"];
+        this.contract = "0x5713Ae21F4Bb696A877c90CCcAE310eFF4c4652A"; // Original Contract - 0xe29f0b490f0d89ca7acac1c7bed2e07ecad65201, here it's reading contract as proxy
+        this.events = ["ItemListed", "ItemPriceUpdated", "OwnershipTransferred"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
         this.chunkSize = 6;
@@ -65,8 +65,8 @@ class BombCrypto {
     };
 
     getBuyer = event => {
-        if (event.event === "TokenBidAccepted") {
-            return event.returnValues.bid.bidder;
+        if (event.event === "OwnershipTransferred") {
+            return event.returnValues.newOwner;
         }
         return event.returnValues.buyer;
     };
@@ -79,8 +79,8 @@ class BombCrypto {
         const po = await this.getPrice(block.timestamp);
 
         let value = 0;
-        if (event.event === "TokenBidAccepted") {
-            value = event.returnValues.bid.value;
+        if (event.event === "ItemListed") {
+            value = event.returnValues.price;
         } else {
             value = event.returnValues.listing.value;
         }
@@ -93,7 +93,7 @@ class BombCrypto {
     };
 
     getSeller = event => {
-        if (event.event === "TokenBidAccepted") {
+        if (event.event === "OfferMatched") {
             return event.returnValues.seller;
         }
         return event.returnValues.listing.seller;
@@ -106,11 +106,11 @@ class BombCrypto {
         if (!buyer) {
             return;
         }
-        if (event.event === "TokenBidAccepted") {
-            const paymentToken = await this.sdk.callContractMethod('paymentToken');
+        if (event.event === "ItemListed") {
+            const paymentToken = await this.sdk.callContractMethod("paymentToken");
             this.token = paymentToken.toLowerCase();
         } else {
-            this.token = 'avax';
+            this.token = "bnb";
         }
 
         const s = await this.getSymbol();
