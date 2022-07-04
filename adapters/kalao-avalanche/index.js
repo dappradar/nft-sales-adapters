@@ -4,7 +4,7 @@ const moment = require("moment");
 const Avalanche = require("../../sdk/avalanche");
 const axios = require("axios");
 const URL = "http://nft-sales-service.dappradar.com/open-source";
-const KEY = process.env.DAPPRADAR_API_KEY;
+const KEY = process.env.d0637e17-79c9-4430-b081-388061fe959b;
 const path = require("path");
 const BigNumber = require("bignumber.js");
 
