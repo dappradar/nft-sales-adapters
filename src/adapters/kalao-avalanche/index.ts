@@ -135,7 +135,7 @@ class Kalao {
             ...buyerInfo,
             seller,
         };
-        console.log(entity);
+
         await this.addToDatabase(entity);
     };
 
