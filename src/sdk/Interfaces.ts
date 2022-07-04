@@ -44,3 +44,5 @@ export interface IPriceAPIResponse {
 export interface IObjectStringAny {
     [key: string]: any;
 }
+
+export type EventSearchType = "events" | "topics";

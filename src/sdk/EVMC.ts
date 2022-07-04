@@ -202,11 +202,11 @@ class EVMC extends BasicSDK {
         });
     };
 
-    callContractMethod = async (methodName: string, params: any[] = []): Promise<any> => {
+    callContractMethod = async (methodName: string, params: any[] = [], callOpts: any[] = []): Promise<any> => {
         const callback = async () => {
             this.ensureWeb3();
             const contract = await this.getContract();
-            const response = await contract.methods[methodName](...params).call();
+            const response = await contract.methods[methodName](...params).call(...callOpts);
 
             if (null === response) {
                 await asyncTimeout(60);
