@@ -68,15 +68,15 @@ class Kalao {
     };
 
     getBuyerInfo = async (transaction: TransactionReceipt): Promise<BuyerInfo | undefined> => {
-        const pubrchaseLog = transaction.logs.find(
+        const purchaseLog = transaction.logs.find(
             l => l.topics[0] === "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", // Purchase Event Log
         );
-        if (!pubrchaseLog) {
+        if (!purchaseLog) {
             return;
         }
-        const nftContract = pubrchaseLog.address;
-        const buyer = "0x" + pubrchaseLog.topics[2].substring(26, 66);
-        const nftId = parseInt(pubrchaseLog.topics[3], 16).toString();
+        const nftContract = purchaseLog.address;
+        const buyer = "0x" + purchaseLog.topics[2].substring(26, 66);
+        const nftId = parseInt(purchaseLog.topics[3], 16).toString();
 
         return {
             nftContract,
