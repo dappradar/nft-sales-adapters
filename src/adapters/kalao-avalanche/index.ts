@@ -105,7 +105,7 @@ class Kalao {
         };
     };
 
-    process = async (event: Log) => {
+    process = async (event: Log): Promise<void> => {
         const dealId = parseInt(event.data.substring(0, 66), 16);
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp as number).utc();
