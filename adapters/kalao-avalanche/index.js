@@ -8,18 +8,17 @@ const KEY = process.env.DAPPRADAR_API_KEY;
 const path = require("path");
 const BigNumber = require("bignumber.js");
 
-class avalanche{
+class Kalao {
     constructor() {
-        this.name = "avalanche";
+        this.name = "kalao-avalanche";
         this.symbol = "AVAX";
         this.token = "avax";
         this.protocol = "avalanche";
-        this.block = 6421617;
-        this.contract = "0x11AC3118309A7215c6d87c7C396e2DF333Ae3A9C";
-        this.events = ["TokenBought", "TokenBidAccepted"];
+        this.block = 7369141;
+        this.contract = "0x11ac3118309a7215c6d87c7c396e2df333ae3a9c";
+        this.searchType = "topics";
+        this.eventsTopics = ["0x410787feaee69e25111c916ccc79ee0fb3dd27b169bcb00209efdd59c5148f36"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
-        this.range = 500;
-        this.chunkSize = 6;
         this.sdk = undefined;
     }
 
@@ -64,27 +63,37 @@ class avalanche{
         this.sdk.stop();
     };
 
-    getBuyer = event => {
-        if (event.event === "TokenBidAccepted") {
-            return event.returnValues.bid.bidder;
+    getBuyerInfo = async transaction => {
+        const pubrchaseLog = transaction.logs.find(
+            l => l.topics[0] === "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", // Purchase Event Log
+        );
+        if (!pubrchaseLog) {
+            return;
         }
-        return event.returnValues.buyer;
+        const nftContract = pubrchaseLog.address;
+        const buyer = "0x" + pubrchaseLog.topics[2].substr(-40, 40);
+        const tokenId = parseInt(pubrchaseLog.topics[3], 16);
+
+        return {
+            nftContract,
+            tokenId,
+            buyer,
+        };
     };
 
-    _getPrice = async (event, block) => {
+    getSeller = async (dealId, block) => {
+        const seller = await this.sdk.callContractMethod("getSeller", [dealId], [undefined, block.number]);
+        return seller;
+    };
+
+    _getPrice = async (dealId, block) => {
         if (!this.symbol.decimals) {
             return { price: null, priceUsd: null };
         }
-        
-        const po = await this.getPrice(block.timestamp);
 
-        let value = 0;
-        if (event.event === "TokenBidAccepted") {
-            value = event.returnValues.bid.value;
-        } else {
-            value = event.returnValues.listing.value;
-        }
-        const nativePrice = new BigNumber(value).dividedBy(10 ** this.symbol.decimals);
+        const price = await this.sdk.callContractMethod("getPrice", [dealId], [undefined, block.number]);
+        const po = await this.getPrice(block.timestamp);
+        const nativePrice = new BigNumber(price).dividedBy(10 ** this.symbol.decimals);
 
         return {
             price: nativePrice.toNumber(),
@@ -92,50 +101,39 @@ class avalanche{
         };
     };
 
-    getSeller = event => {
-        if (event.event === "TokenBidAccepted") {
-            return event.returnValues.seller;
-        }
-        return event.returnValues.listing.seller;
-    };
-
     process = async event => {
+        const dealId = parseInt(event.data.substr(0, 66), 16);
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
-        const buyer = this.getBuyer(event);
-        if (!buyer) {
+        const transaction = await this.sdk.getTransactionReceipt(event.transactionHash);
+        const buyerInfo = await this.getBuyerInfo(transaction);
+        if (!buyerInfo) {
             return;
         }
-        if (event.event === "TokenBidAccepted") {
-            const paymentToken = await this.sdk.callContractMethod('paymentToken');
-            this.token = paymentToken.toLowerCase();
-        } else {
-            this.token = 'avax';
+        const seller = await this.getSeller(dealId, block);
+        if (!seller) {
+            return;
         }
-        const s = await this.getSymbol();
-        this.symbol = s;
-        const { price, priceUsd } = await this._getPrice(event, block);
+        const { price, priceUsd } = await this._getPrice(dealId, block);
 
-        const tokenId = event.returnValues.tokenId;
-        const seller = this.getSeller(event);
-        const nftContract = event.returnValues.erc721Address.toLowerCase();
         const entity = {
             provider_name: this.name,
             provider_contract: this.contract,
             protocol: this.protocol,
-            nft_contract: nftContract,
-            nft_id: tokenId,
+            nft_contract: buyerInfo.nftContract,
+            nft_id: buyerInfo.tokenId,
             token: this.token,
             token_symbol: this.symbol.symbol,
             amount: 1,
             price,
             price_usd: priceUsd,
             seller: seller.toLowerCase(),
-            buyer: buyer.toLowerCase(),
+            buyer: buyerInfo.buyer.toLowerCase(),
             sold_at: timestamp.format("YYYY-MM-DD HH:mm:ss"),
             block_number: event.blockNumber,
             transaction_hash: event.transactionHash,
         };
+
         await this.addToDatabase(entity);
     };
 
@@ -144,4 +142,4 @@ class avalanche{
     };
 }
 
-module.exports =avalanche;
+module.exports = Kalao;
