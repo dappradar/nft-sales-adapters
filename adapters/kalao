@@ -1,0 +1,6 @@
+this.name = "Kalao";
+this.symbol = Kalao;
+this.token = "0x11AC3118309A7215c6d87c7C396e2DF333Ae3A9C";
+this.protocol = "ethereum";
+this.block = 12855192;
+this.contract = "0x8e472cEd4c84C05C50e08F1c6F7A61aaA7aF82C3"
