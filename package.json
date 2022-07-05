@@ -31,6 +31,7 @@
     "@typescript-eslint/eslint-plugin": "^5.29.0",
     "@typescript-eslint/parser": "^5.29.0",
     "babel-eslint": "^10.1.0",
+    "copyfiles": "^2.4.1",
     "eslint": "^8.18.0",
     "eslint-config-prettier": "^6.15.0",
     "eslint-nibble": "^5.1.0",
