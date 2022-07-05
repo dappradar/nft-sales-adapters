@@ -44,8 +44,7 @@
   "scripts": {
     "lint": "eslint . --ext .ts --fix",
     "prepare": "husky install",
-    "build": "rm -rf ./dist && tsc && npm run postbuild",
-    "postbuild": "copyfiles -u 1 ./src/**/*.json ./dist"
+    "build": "rm -rf ./dist && tsc && copyfiles -u 1 ./src/**/*.json ./dist"
   },
   "lint-staged": {
     "*.{js,json}": "eslint --fix"
