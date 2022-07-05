@@ -44,7 +44,7 @@ Inside adapter directory there should be at least 2 files
 Supported blockchain protocols
 
 -   Ethereum
--   Binance Smart Chain
+-   BNB Chain (Binance Smart Chain)
 -   Polygon
 -   Avalanche
 
@@ -65,7 +65,7 @@ with multiple words divided by `-`, for example: `my-adapter`
 To run & test your adapter simply while being in root write:
 
 ```shell
-node ./tester/test.js ../adapters/my-adapter/index.js
+ts-node ./src/tester/test.ts ../adapters/my-adapter/index.ts
 ```
 
 It should run a validator and your adapter if you pass make a pull request!
