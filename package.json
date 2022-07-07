@@ -31,6 +31,7 @@
     "@typescript-eslint/eslint-plugin": "^5.29.0",
     "@typescript-eslint/parser": "^5.29.0",
     "babel-eslint": "^10.1.0",
+    "copyfiles": "^2.4.1",
     "eslint": "^8.18.0",
     "eslint-config-prettier": "^6.15.0",
     "eslint-nibble": "^5.1.0",
@@ -43,8 +44,7 @@
   "scripts": {
     "lint": "eslint . --ext .ts --fix",
     "prepare": "husky install",
-    "build": "rm -rf ./dist && tsc && npm run postbuild",
-    "postbuild": "copyfiles -u 1 ./src/**/*.json ./dist"
+    "build": "rm -rf ./dist && tsc && copyfiles -u 1 ./src/**/*.json ./dist"
   },
   "lint-staged": {
     "*.{js,json}": "eslint --fix"
