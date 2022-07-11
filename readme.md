@@ -92,7 +92,7 @@ the block should be the starting block when the contract was released and the co
 The websocket for web3 is defined in _/sdk/util.js_, inside the headers please choose your supported blockchain,
 this file should not be committed, but feel free to change it while working on the adapter.
 
-_/sdk/metadata.js_ is our inner file and should not be updated in any way also as it's used by out internal tracking.
+_/sdk/metadata.js_ is our inner file and should not be updated in any way also as it's used by our internal tracking.
 
 ### Metadata and Symbols
 
