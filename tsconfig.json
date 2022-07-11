@@ -11,9 +11,11 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "useUnknownInCatchVariables": false
+    "useUnknownInCatchVariables": false,
+    "resolveJsonModule": true
   },
   "include": [
-    "**/*"
+    "**/*",
+    "src/**/*.json"
   ]
 }
