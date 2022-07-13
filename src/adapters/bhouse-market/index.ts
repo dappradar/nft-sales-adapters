@@ -75,7 +75,7 @@ class BHouseMarket {
         const timestamp = moment.unix(block.timestamp).utc();
         const po = await priceSdk.get(this.token || '', this.protocol, block.timestamp);
         const nativePrice = new BigNumber(event.returnValues.price).dividedBy(10 ** (this.symbol?.decimals || 0));
-        const buyer = await this.getBuyer(event);
+        const buyer = this.getBuyer(event);
         if (!buyer) {
             return;
         }
