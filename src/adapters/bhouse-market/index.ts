@@ -62,7 +62,7 @@ class BHouseMarket {
         this.sdk.stop();
     };
 
-    getBuyer = async (event: EventData): Promise<string | null> => {
+    getBuyer = (event: EventData): string | null => {
         return event.returnValues.buyer;
     };
 
