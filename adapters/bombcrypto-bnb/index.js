@@ -13,7 +13,7 @@ class BombCrypto {
         this.name = "bombcrypto-bnb";
         this.symbol = "BNB";
         this.token = "bnb";
-        this.protocol = "bsc";
+        this.protocol = "binance";
         this.block = 8867059;
         this.contract = "0xe29f0b490f0d89ca7acac1c7bed2e07ecad65201"; // abi used for 0x5713Ae21F4Bb696A877c90CCcAE310eFF4c4652A(Proxy Contract abi) - https://bscscan.com/address/0xe29F0B490F0d89CA7ACAc1C7BeD2E07eCAD65201#readProxyContract
         this.events = ["OfferMatched", "ItemListed", "OwnershipTransferred"];
