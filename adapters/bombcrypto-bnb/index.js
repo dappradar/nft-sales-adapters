@@ -102,12 +102,6 @@ class BombCrypto {
         if (!buyer) {
             return;
         }
-        if (event.event === "ItemListed") {
-            const paymentToken = await this.sdk.callContractMethod("paymentToken");
-            this.token = paymentToken.toLowerCase();
-        } else {
-            this.token = "bnb";
-        }
 
         const s = await this.getSymbol();
         this.symbol = s;
@@ -122,7 +116,7 @@ class BombCrypto {
             protocol: this.protocol,
             nft_contract: nftContract,
             nft_id: tokenId,
-            token: this.token,
+            token: "bnb",
             token_symbol: this.symbol.symbol,
             amount: 1,
             price,
