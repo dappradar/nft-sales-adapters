@@ -80,7 +80,7 @@ class BHeroMarket {
             return;
         }
         const tokenId = event.returnValues.tokenId;
-        const seller = await this.getSeller(event);
+        const seller = this.getSeller(event) || "";
         const nftContract = await this.sdk.callContractMethod('nftContract');
 
         const entity: ISaleEntity = {
