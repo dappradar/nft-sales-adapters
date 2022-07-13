@@ -66,7 +66,7 @@ class BHouseMarket {
         return event.returnValues.buyer;
     };
 
-    getSeller = async (event: EventData): Promise<string | null> => {
+    getSeller = (event: EventData): string | null => {
         return event.returnValues.seller;
     };
 
