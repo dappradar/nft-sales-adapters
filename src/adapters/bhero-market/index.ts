@@ -94,7 +94,7 @@ class BHeroMarket {
             amount: 1,
             price: nativePrice.toNumber(),
             priceUsd: nativePrice.multipliedBy(po.price).toNumber(),
-            seller: (seller || "").toLowerCase(),
+            seller: seller.toLowerCase(),
             buyer: buyer.toLowerCase(),
             soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),
             blockNumber: event.blockNumber,
