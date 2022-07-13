@@ -81,8 +81,9 @@ class BombCrypto {
         let value = 0;
         if (event.event === "ItemListed") {
             value = event.returnValues.price;
+        } else {
+            value = event.returnValues.price;
         }
-
         const nativePrice = new BigNumber(value).dividedBy(10 ** this.symbol.decimals);
 
         return {
