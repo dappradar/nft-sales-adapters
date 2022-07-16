@@ -32,7 +32,7 @@ class GOLOM {
         this.token = "eth";
         this.protocol = "ethereum";
         this.block = 14880514;
-        this.contract = "0xd29e1FcB07e55eaceB122C63F8E50441C6acEdc9";
+        this.contract = "0xd29e1fcb07e55eaceb122c63f8e50441c6acedc9";
         this.events = ["OrderFilled"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
