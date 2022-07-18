@@ -14,7 +14,7 @@ class BombCrypto {
         this.symbol = "BNB";
         this.token = "bnb";
         this.protocol = "binance-smart-chain";
-        this.block = 8867059;
+        this.block = 18867059;
         this.contract = "0xe29f0b490f0d89ca7acac1c7bed2e07ecad65201"; // abi used for 0x5713Ae21F4Bb696A877c90CCcAE310eFF4c4652A(Proxy Contract abi) - https://bscscan.com/address/0xe29F0B490F0d89CA7ACAc1C7BeD2E07eCAD65201#readProxyContract
         this.events = ["OfferMatched", "ItemListed", "OwnershipTransferred"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
@@ -65,9 +65,6 @@ class BombCrypto {
     };
 
     getBuyer = event => {
-        if (event.event === "OwnershipTransferred") {
-            return event.returnValues.newOwner;
-        }
         return event.returnValues.buyer;
     };
 
@@ -78,10 +75,7 @@ class BombCrypto {
 
         const po = await this.getPrice(block.timestamp);
 
-        let value = 0;
-        if (event.event === "ItemListed") {
-            value = event.returnValues.price;
-        }
+        value = event.returnValues.price;
 
         const nativePrice = new BigNumber(value).dividedBy(10 ** this.symbol.decimals);
 
