@@ -16,7 +16,7 @@ class ELEMENT {
         this.token = "eth";
         this.protocol = "ethereum";
         this.block = 14589163;
-        this.contract = "0x20F780A973856B93f63670377900C1d2a50a77c4";
+        this.contract = "0x20f780a973856b93f63670377900c1d2a50a77c4";
         this.events = [
             "ERC721SellOrderFilled",
             "ERC721BuyOrderFilled",
@@ -97,7 +97,7 @@ class ELEMENT {
         const tokenId = event.returnValues["erc721TokenId"] || event.returnValues["erc1155TokenId"];
         const erc20token = event.returnValues["erc20Token"];
         const token =
-            erc20token === "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+            erc20token.toLowerCase() === "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
                 ? "0x0000000000000000000000000000000000000000"
                 : erc20token;
         const entity = {
