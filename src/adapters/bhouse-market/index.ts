@@ -108,4 +108,4 @@ class BHouseMarket {
     };
 }
 
-module.exports = BHouseMarket;
+export default BHouseMarket;

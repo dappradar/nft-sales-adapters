@@ -108,4 +108,4 @@ class BHeroMarket {
     };
 }
 
-module.exports = BHeroMarket;
+export default BHeroMarket;
