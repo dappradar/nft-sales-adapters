@@ -25,7 +25,7 @@ class RadioCaca {
     sdk: any;
 
     constructor() {
-        this.name = "radio-caca";
+        this.name = "radiocaca";
         this.symbol = undefined;
         this.token = "0x0000000000000000000000000000000000000000";
         this.protocol = "bsc";
