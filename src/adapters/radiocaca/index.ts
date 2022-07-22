@@ -121,4 +121,4 @@ class RadioCaca {
     };
 }
 
-module.exports = RadioCaca;
+export default RadioCaca;
