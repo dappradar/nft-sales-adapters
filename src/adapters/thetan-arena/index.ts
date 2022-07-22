@@ -57,14 +57,14 @@ class ThetanArena {
         symbol: ISymbolAPIResponse,
         paymentToken: string,
     ): Promise<{ price: number | null; priceUsd: number | null }> => {
+        const po = await priceSdk.get(paymentToken, this.protocol, +block.timestamp);
+
         if (!symbol?.decimals) {
             return {
                 price: null,
                 priceUsd: null,
             };
         }
-
-        const po = await priceSdk.get(paymentToken, this.protocol, +block.timestamp);
 
         const amount = event.returnValues.price;
         const nativePrice = new BigNumber(amount).dividedBy(10 ** (symbol?.decimals || 0));
