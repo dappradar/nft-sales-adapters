@@ -28,7 +28,7 @@ class ThetanArena {
         this.name = "thetan-arena";
         this.symbol = undefined;
         this.token = "0x0000000000000000000000000000000000000000";
-        this.protocol = "binance-smart-chain";
+        this.protocol = "bsc";
         this.block = 14551809;
         this.contract = "0x7bf5d1dec7e36d5b4e9097b48a1b9771e6c96aa4";
         this.events = ["MatchTransaction"];
@@ -43,7 +43,7 @@ class ThetanArena {
     };
 
     run = async () => {
-        this.sdk = this.loadSdk();
+        this.sdk = await this.loadSdk();
         await this.sdk.run();
     };
 
