@@ -57,14 +57,14 @@ class RadioCaca {
         symbol: ISymbolAPIResponse,
         paymentToken: string,
     ): Promise<{ price: number | null; priceUsd: number | null }> => {
+        const po = await priceSdk.get(paymentToken, this.protocol, +block.timestamp);
+
         if (!symbol?.decimals) {
             return {
                 price: null,
                 priceUsd: null,
             };
         }
-
-        const po = await priceSdk.get(paymentToken, this.protocol, +block.timestamp);
 
         const amount = event.returnValues.bid;
         const nativePrice = new BigNumber(amount).dividedBy(10 ** (symbol?.decimals || 0));
@@ -86,7 +86,7 @@ class RadioCaca {
 
         const seller = auctionInfo[0];
         const count = auctionInfo[3];
-        const paymentToken = auctionInfo[4];
+        const paymentToken = auctionInfo[4].toLowerCase();
         const symbol = await symbolSdk.get(paymentToken, this.protocol);
 
         const buyer = event.returnValues.bidder;
