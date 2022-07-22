@@ -42,7 +42,7 @@ class CRYPTOPUNKS2 {
         if (!symbol) throw new Error(`Missing symbol metadata for provider ${this.name}`);
         this.symbol = symbol;
 
-        this.sdk = this.loadSdk();
+        this.sdk = await this.loadSdk();
 
         await this.sdk.run();
     };

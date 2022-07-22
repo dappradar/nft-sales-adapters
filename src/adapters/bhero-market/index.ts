@@ -1,4 +1,5 @@
 import * as dotenv from "dotenv";
+
 dotenv.config();
 
 import moment from "moment";
@@ -12,7 +13,6 @@ import { ISaleEntity, ISymbolAPIResponse } from "../../sdk/Interfaces";
 import { EventData } from "web3-eth-contract";
 
 class BHeroMarket {
-
     name: string;
     symbol: ISymbolAPIResponse | undefined;
     token: string | undefined;
@@ -29,7 +29,7 @@ class BHeroMarket {
         this.name = "bhero-market";
         this.symbol = undefined;
         this.token = undefined;
-        this.protocol = "binance-smart-chain";
+        this.protocol = "bsc";
         this.block = 15498601;
         this.contract = "0x376a10e7f125a4e0a567cc08043c695cd8edd704";
         this.events = ["Sold"];
@@ -40,15 +40,15 @@ class BHeroMarket {
     }
 
     run = async () => {
-        this.sdk = this.loadSdk();
+        this.sdk = await this.loadSdk();
 
-        const token = await this.sdk.callContractMethod('bcoinContract');
-        if (!token) throw new Error('Failed to fetch token address');
-        
-        const symbol = await symbolSdk.get(token, this.protocol);
+        const token = await this.sdk.callContractMethod("bcoinContract");
+        if (!token) throw new Error("Failed to fetch token address");
+        this.token = token.toLowerCase();
+
+        const symbol = await symbolSdk.get(this.token || "", this.protocol);
         if (!symbol) throw new Error(`Missing symbol metadata for provider ${this.name}`);
 
-        this.token = token.toLowerCase();
         this.symbol = symbol;
 
         await this.sdk.run();
@@ -73,7 +73,7 @@ class BHeroMarket {
     process = async (event: EventData): Promise<ISaleEntity | undefined> => {
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
-        const po = await priceSdk.get(this.token || '', this.protocol, block.timestamp);
+        const po = await priceSdk.get(this.token || "", this.protocol, block.timestamp);
         const nativePrice = new BigNumber(event.returnValues.price).dividedBy(10 ** (this.symbol?.decimals || 0));
         const buyer = this.getBuyer(event);
         if (!buyer) {
@@ -81,7 +81,7 @@ class BHeroMarket {
         }
         const tokenId = event.returnValues.tokenId;
         const seller = this.getSeller(event) || "";
-        const nftContract = await this.sdk.callContractMethod('nftContract');
+        const nftContract = await this.sdk.callContractMethod("nftContract");
 
         const entity: ISaleEntity = {
             providerName: this.name,
@@ -89,8 +89,8 @@ class BHeroMarket {
             protocol: this.protocol,
             nftContract: nftContract.toLowerCase(),
             nftId: tokenId,
-            token: this.token || '',
-            tokenSymbol: this.symbol?.symbol || '',
+            token: this.token || "",
+            tokenSymbol: this.symbol?.symbol || "",
             amount: 1,
             price: nativePrice.toNumber(),
             priceUsd: nativePrice.multipliedBy(po.price).toNumber(),

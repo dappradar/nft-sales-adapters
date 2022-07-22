@@ -10,10 +10,8 @@ import priceSdk from "../../sdk/price";
 
 import { ISaleEntity, ISymbolAPIResponse } from "../../sdk/Interfaces";
 import { EventData } from "web3-eth-contract";
-import { TransactionReceipt } from "web3-core";
 
 class GOLOM {
-
     name: string;
     symbol: ISymbolAPIResponse | undefined;
     token: string;
@@ -45,7 +43,7 @@ class GOLOM {
         if (!symbol) throw new Error(`Missing symbol metadata for provider ${this.name}`);
         this.symbol = symbol;
 
-        this.sdk = this.loadSdk();
+        this.sdk = await this.loadSdk();
 
         await this.sdk.run();
     };
@@ -58,34 +56,30 @@ class GOLOM {
         this.sdk.stop();
     };
 
-   
-
-    getNftId = async (event: EventData): Promise<string | null> =>{
-        
-       
+    getNftId = async (event: EventData): Promise<string | null> => {
         const txReceipt = await this.sdk.getTransactionReceipt(event.transactionHash);
         if (txReceipt === null) {
             return null;
         }
-        const logs = txReceipt.logs
-        for (let i=0; i<logs.length; i++){
-            let topics=logs[i].topics
-            if (topics[0]==="0x5ff9e72404463058acdc1a7367b634d29a9c3c5aa4d41dddf6321b586afb5aed" && topics.length==4){  
-                let transfer_topic=logs[i-1].topics
-                const nftContract=logs[i-1].address.toLowerCase();
+        const logs = txReceipt.logs;
+        for (let i = 0; i < logs.length; i++) {
+            const topics = logs[i].topics;
+            if (
+                topics[0] === "0x5ff9e72404463058acdc1a7367b634d29a9c3c5aa4d41dddf6321b586afb5aed" &&
+                topics.length == 4
+            ) {
+                const transfer_topic = logs[i - 1].topics;
+                const nftContract = logs[i - 1].address.toLowerCase();
                 const tokenidhex = transfer_topic[3];
                 const tokenId = parseInt(tokenidhex, 16);
-                return tokenId.toString()+"_"+nftContract
-                
+                return tokenId.toString() + "_" + nftContract;
             }
         }
-            
-        
+
         return null;
-    }
+    };
 
     process = async (event: any): Promise<ISaleEntity | undefined> => {
-        
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
         const po = await priceSdk.get(this.token, this.protocol, block.timestamp);
@@ -93,17 +87,16 @@ class GOLOM {
         const buyer = event.returnValues.taker.toLowerCase();
         const seller = event.returnValues.maker.toLowerCase();
         const orderType = event.returnValues.orderType;
-        
-        
+
         const token_symbol = orderType == 0 ? "eth" : "weth";
         const tokenId_nftContract = await this.getNftId(event);
-        
+
         if (!tokenId_nftContract) {
             return;
         }
-        let split_data=tokenId_nftContract.split("_")
-        const tokenId=split_data[0]
-        const nftContract=split_data[1]
+        const split_data = tokenId_nftContract.split("_");
+        const tokenId = split_data[0];
+        const nftContract = split_data[1];
         const entity: ISaleEntity = {
             providerName: this.name, // the name of the folder
             providerContract: this.contract, // the providers contract from which you get data
@@ -111,7 +104,7 @@ class GOLOM {
             nftContract: nftContract,
             nftId: tokenId,
             token: this.token,
-            tokenSymbol:token_symbol,
+            tokenSymbol: token_symbol,
             amount: 1,
             price: nativePrice.toNumber(),
             priceUsd: nativePrice.multipliedBy(po.price).toNumber(),

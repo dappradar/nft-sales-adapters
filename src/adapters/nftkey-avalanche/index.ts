@@ -40,7 +40,7 @@ class NFTKey {
     }
 
     run = async (): Promise<void> => {
-        this.sdk = this.loadSdk();
+        this.sdk = await this.loadSdk();
 
         await this.sdk.run();
     };
@@ -145,4 +145,4 @@ class NFTKey {
     };
 }
 
-module.exports = NFTKey;
+export default NFTKey;

@@ -25,10 +25,10 @@ class RadioCaca {
     sdk: any;
 
     constructor() {
-        this.name = "radio-caca";
+        this.name = "radiocaca";
         this.symbol = undefined;
         this.token = "0x0000000000000000000000000000000000000000";
-        this.protocol = "binance-smart-chain";
+        this.protocol = "bsc";
         this.block = 13219620;
         this.contract = "0xe97fdca0a3fc76b3046ae496c1502c9d8dfef6fc";
         this.events = ["AuctionExecuted"];
@@ -43,7 +43,7 @@ class RadioCaca {
     };
 
     run = async () => {
-        this.sdk = this.loadSdk();
+        this.sdk = await this.loadSdk();
         await this.sdk.run();
     };
 
@@ -57,14 +57,14 @@ class RadioCaca {
         symbol: ISymbolAPIResponse,
         paymentToken: string,
     ): Promise<{ price: number | null; priceUsd: number | null }> => {
+        const po = await priceSdk.get(paymentToken, this.protocol, +block.timestamp);
+
         if (!symbol?.decimals) {
             return {
                 price: null,
                 priceUsd: null,
             };
         }
-
-        const po = await priceSdk.get(paymentToken, this.protocol, +block.timestamp);
 
         const amount = event.returnValues.bid;
         const nativePrice = new BigNumber(amount).dividedBy(10 ** (symbol?.decimals || 0));
@@ -86,7 +86,7 @@ class RadioCaca {
 
         const seller = auctionInfo[0];
         const count = auctionInfo[3];
-        const paymentToken = auctionInfo[4];
+        const paymentToken = auctionInfo[4].toLowerCase();
         const symbol = await symbolSdk.get(paymentToken, this.protocol);
 
         const buyer = event.returnValues.bidder;
@@ -121,4 +121,4 @@ class RadioCaca {
     };
 }
 
-module.exports = RadioCaca;
+export default RadioCaca;

@@ -28,7 +28,7 @@ class ThetanArena {
         this.name = "thetan-arena";
         this.symbol = undefined;
         this.token = "0x0000000000000000000000000000000000000000";
-        this.protocol = "binance-smart-chain";
+        this.protocol = "bsc";
         this.block = 14551809;
         this.contract = "0x7bf5d1dec7e36d5b4e9097b48a1b9771e6c96aa4";
         this.events = ["MatchTransaction"];
@@ -43,7 +43,7 @@ class ThetanArena {
     };
 
     run = async () => {
-        this.sdk = this.loadSdk();
+        this.sdk = await this.loadSdk();
         await this.sdk.run();
     };
 
@@ -57,14 +57,14 @@ class ThetanArena {
         symbol: ISymbolAPIResponse,
         paymentToken: string,
     ): Promise<{ price: number | null; priceUsd: number | null }> => {
+        const po = await priceSdk.get(paymentToken, this.protocol, +block.timestamp);
+
         if (!symbol?.decimals) {
             return {
                 price: null,
                 priceUsd: null,
             };
         }
-
-        const po = await priceSdk.get(paymentToken, this.protocol, +block.timestamp);
 
         const amount = event.returnValues.price;
         const nativePrice = new BigNumber(amount).dividedBy(10 ** (symbol?.decimals || 0));
@@ -79,11 +79,11 @@ class ThetanArena {
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
 
-        const buyer = event.returnValues.buyer;
-        const seller = event.returnValues.seller;
+        const buyer = event.returnValues.buyer.toLowerCase();
+        const seller = event.returnValues.seller.toLowerCase();
         const tokenId = event.returnValues.tokenId;
-        const nftContract = event.returnValues.contractAddress;
-        const paymentToken = event.returnValues.paymentToken;
+        const nftContract = event.returnValues.contractAddress.toLowerCase();
+        const paymentToken = event.returnValues.paymentToken.toLowerCase();
         const symbol = await symbolSdk.get(paymentToken, this.protocol);
 
         const { price, priceUsd } = await this._getPrice(event, block, symbol, paymentToken);
@@ -92,15 +92,15 @@ class ThetanArena {
             providerName: this.name,
             providerContract: this.contract,
             protocol: this.protocol,
-            nftContract: nftContract.toLowerCase(),
+            nftContract: nftContract,
             nftId: tokenId,
-            token: paymentToken.toLowerCase(),
+            token: paymentToken,
             tokenSymbol: symbol?.symbol || "",
             amount: 1,
             price,
             priceUsd: priceUsd,
-            seller: seller.toLowerCase(),
-            buyer: buyer.toLowerCase(),
+            seller,
+            buyer,
             soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),
             blockNumber: event.blockNumber,
             transactionHash: event.transactionHash,
@@ -114,4 +114,4 @@ class ThetanArena {
     };
 }
 
-module.exports = ThetanArena;
+export default ThetanArena;
