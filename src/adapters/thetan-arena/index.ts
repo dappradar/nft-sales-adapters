@@ -114,4 +114,4 @@ class ThetanArena {
     };
 }
 
-module.exports = ThetanArena;
+export default ThetanArena;
