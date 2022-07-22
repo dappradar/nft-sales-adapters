@@ -145,4 +145,4 @@ class NFTKey {
     };
 }
 
-module.exports = NFTKey;
+export default NFTKey;
