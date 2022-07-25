@@ -15,7 +15,7 @@ class ELEMENT {
         this.symbol = "ETH";
         this.token = "eth";
         this.protocol = "ethereum";
-        this.block = 14589163;
+        this.block = 15080677;
         this.contract = "0x20f780a973856b93f63670377900c1d2a50a77c4";
         this.events = [
             "ERC721SellOrderFilled",
