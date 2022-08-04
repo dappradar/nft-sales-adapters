@@ -1,0 +1,82 @@
+[
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": true, "internalType": "address", "name": "taker", "type": "address" },
+            { "indexed": true, "internalType": "address", "name": "maker", "type": "address" },
+            { "indexed": true, "internalType": "address", "name": "strategy", "type": "address" },
+            { "indexed": false, "internalType": "bytes32", "name": "orderHash", "type": "bytes32" },
+            { "indexed": false, "internalType": "uint256", "name": "itemIdx", "type": "uint256" },
+            { "indexed": false, "internalType": "bytes32", "name": "orderItemHash", "type": "bytes32" },
+            {
+                "components": [
+                    { "internalType": "address", "name": "collection", "type": "address" },
+                    { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
+                    { "internalType": "uint256", "name": "amount", "type": "uint256" },
+                    { "internalType": "address", "name": "currency", "type": "address" },
+                    { "internalType": "uint256", "name": "price", "type": "uint256" }
+                ],
+                "indexed": false,
+                "internalType": "struct OrderTypes.Fulfillment",
+                "name": "fulfillment",
+                "type": "tuple"
+            },
+            { "indexed": false, "internalType": "bytes32", "name": "marketplace", "type": "bytes32" }
+        ],
+        "name": "TakerAsk",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": true, "internalType": "address", "name": "taker", "type": "address" },
+            { "indexed": true, "internalType": "address", "name": "maker", "type": "address" },
+            { "indexed": true, "internalType": "address", "name": "strategy", "type": "address" },
+            { "indexed": false, "internalType": "bytes32", "name": "orderHash", "type": "bytes32" },
+            { "indexed": false, "internalType": "uint256", "name": "itemIdx", "type": "uint256" },
+            { "indexed": false, "internalType": "bytes32", "name": "orderItemHash", "type": "bytes32" },
+            {
+                "components": [
+                    { "internalType": "address", "name": "collection", "type": "address" },
+                    { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
+                    { "internalType": "uint256", "name": "amount", "type": "uint256" },
+                    { "internalType": "address", "name": "currency", "type": "address" },
+                    { "internalType": "uint256", "name": "price", "type": "uint256" }
+                ],
+                "indexed": false,
+                "internalType": "struct OrderTypes.Fulfillment",
+                "name": "fulfillment",
+                "type": "tuple"
+            },
+            { "indexed": false, "internalType": "bytes32", "name": "marketplace", "type": "bytes32" }
+        ],
+        "name": "TakerBid",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": true, "internalType": "address", "name": "taker", "type": "address" },
+            { "indexed": true, "internalType": "address", "name": "maker", "type": "address" },
+            { "indexed": true, "internalType": "address", "name": "strategy", "type": "address" },
+            { "indexed": false, "internalType": "bytes32", "name": "orderHash", "type": "bytes32" },
+            { "indexed": false, "internalType": "uint256", "name": "itemIdx", "type": "uint256" },
+            { "indexed": false, "internalType": "bytes32", "name": "orderItemHash", "type": "bytes32" },
+            {
+                "components": [
+                    { "internalType": "address", "name": "collection", "type": "address" },
+                    { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
+                    { "internalType": "uint256", "name": "amount", "type": "uint256" },
+                    { "internalType": "address", "name": "currency", "type": "address" },
+                    { "internalType": "uint256", "name": "price", "type": "uint256" }
+                ],
+                "indexed": false,
+                "internalType": "struct OrderTypes.Fulfillment",
+                "name": "fulfillment",
+                "type": "tuple"
+            }
+        ],
+        "name": "TakerBid",
+        "type": "event"
+    }
+]
