@@ -102,17 +102,17 @@ class ELEMENT {
                 : erc20token;
         const entity = {
             provider_name: this.name, // the name of the folder
-            provider_contract: this.contract, // the providers contract from which you get data
+            provider_contract: this.contract.toLowerCase(), // the providers contract from which you get data
             protocol: this.protocol,
-            nft_contract, // : this.contract,
+            nft_contract: nft_contract.toLowerCase(),
             nft_id: tokenId,
-            token, // : this.token,
+            token: token.toLowerCase(),
             token_symbol: this.symbol.symbol,
             amount,
             price: nativePrice.toNumber(),
             price_usd: nativePrice.multipliedBy(po.price).toNumber(),
-            seller,
-            buyer,
+            seller: seller.toLowerCase(),
+            buyer: buyer.toLowerCase(),
             sold_at: timestamp.format("YYYY-MM-DD HH:mm:ss"),
             block_number: event.blockNumber,
             transaction_hash: event.transactionHash,
