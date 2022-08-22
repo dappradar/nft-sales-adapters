@@ -1701,7 +1701,6 @@
     "estraverse" "^5.2.0"
 
 "eslint-stats@github:ianvs/eslint-stats#cb1ff8251b50c7f0cb431a2b395431ebfdeb10c8":
-  "integrity" "sha512-YqURtG8CfUmxXJKPish9Owfa4rR9Wx1ReGRkSUKMIqkNQewPOwuQmqk+Zpyfwb1Zo0AG4RdKpA+SpQDeKmsnOg=="
   "resolved" "git+ssh://git@github.com/ianvs/eslint-stats.git#cb1ff8251b50c7f0cb431a2b395431ebfdeb10c8"
   "version" "1.0.0"
   dependencies:
@@ -4568,11 +4567,6 @@
   "version" "3.1.5"
   dependencies:
     "is-typedarray" "^1.0.0"
-
-"typescript@>=2.7", "typescript@>=2.8.0 || >= 3.2.0-dev || >= 3.3.0-dev || >= 3.4.0-dev || >= 3.5.0-dev || >= 3.6.0-dev || >= 3.6.0-beta || >= 3.7.0-dev || >= 3.7.0-beta":
-  "integrity" "sha512-C0WQT0gezHuw6AdY1M2jxUO83Rjf0HP7Sk1DtXj6j1EwkQNZrHAg2XPWlq62oqEhYvONq5pkC2Y9oPljWToLmQ=="
-  "resolved" "https://registry.npmjs.org/typescript/-/typescript-4.7.4.tgz"
-  "version" "4.7.4"
 
 "ultron@~1.1.0":
   "integrity" "sha512-UIEXBNeYmKptWH6z8ZnqTeS8fV74zG0/eRU9VGkpzz+LIJNs8W/zM/L+7ctCkRrgbNnnR0xxw4bKOr0cW0N0Og=="
