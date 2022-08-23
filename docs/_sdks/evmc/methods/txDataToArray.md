@@ -1,0 +1,26 @@
+### txDataToArray
+
+```
+await sdk.txDataToArray(input);
+```
+
+Parse array from data string.
+
+#### Parameters
+1. `input` - `String`: Data string
+
+#### Returns
+
+`Array`
+
+#### Example
+
+```
+const data = '0x0000000000000000000000001e0049783f008a0085193e00003d00cd54003c710000000000000000000000000000000000000000000000000000000000000001'
+console.log(sdk.txDataToArray(data));
+
+> [
+    '0000000000000000000000001e0049783f008a0085193e00003d00cd54003c71',
+    '0000000000000000000000000000000000000000000000000000000000000001'
+]
+```
