@@ -1,5 +1,5 @@
-* [Home](/)
-* [API key](api-key.md)
+* [General](general/index.md)
+
 [//]: # (* Naming conventions)
 * [Naming conventions](naming-conventions/index.md)
 * SDKs
@@ -9,4 +9,6 @@
 
 [//]: # (* Providers)
 * [Providers](providers/index.md)
-* [Testing](testing.md)
+* [Testing](testing/index.md)
+* [Examples](examples.md)
+* [Contact us](contact-us.md)

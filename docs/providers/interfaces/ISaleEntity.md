@@ -18,6 +18,14 @@
 | `blockNumber`      | `Number`           | ✅        | Block number of transaction                                                     |
 | `transactionHash`  | `String`           | ✅        | Transaction hash                                                                |
 
-!> **If provider is using `EVM` compatible chain (e.g.
+Properties `token` and `tokenSymbol` must be parsed using 
+our API, like in the example. Do not use third party 
+services.
+
+Property `priceUsd` must be calculated using token price
+that was parsed from our API. Do not use third party
+services.
+
+If provider is using `EVM` compatible chain (e.g.
 Ethereum, Avalanche, ...), all addresses must be in
-lowercase.**
+lowercase.

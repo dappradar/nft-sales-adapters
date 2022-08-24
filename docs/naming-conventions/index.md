@@ -10,6 +10,7 @@
 * Number providers (e.g. `opensea-1`, `opensea-2`, ...)
   Numeration is not shared across different marketplaces
   (e.g. `opensea-1`, `rarible-1`, `rarible-2`, ...)
+* Provider name must be the same as folder name
 
 |     | Example              | Note                                                                  |
 |-----|----------------------|-----------------------------------------------------------------------|
