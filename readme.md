@@ -77,7 +77,7 @@ please try to follow the example ENS adapter as close as possible in terms of fu
 
 Each adapter should import and use EVMC SDK, feel free to extend this SDK with different parameters.
 
-```
+```ts
 this.name = "ens";
 this.symbol = null;
 this.token = "0x0000000000000000000000000000000000000000";
