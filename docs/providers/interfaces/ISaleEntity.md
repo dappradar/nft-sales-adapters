@@ -1,6 +1,6 @@
 ### ISaleEntity
 
-| Param              | type               | Required | Description                                                                     |
+| Param              | Type               | Required | Description                                                                     |
 |--------------------|--------------------|----------|---------------------------------------------------------------------------------|
 | `providerName`     | `String`           | ✅        | Name of provider which is tracked. It must be the same as parameter `this.name` |
 | `providerContract` | `String`           | ✅        | Address of contract which is tracked                                            |
