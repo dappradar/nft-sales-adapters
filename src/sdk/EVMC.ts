@@ -140,6 +140,7 @@ class EVMC extends BasicSDK {
     };
 
     getPastEvents = async (eventName: string, options: PastEventOptions): Promise<EventData[]> => {
+        
         const callback = async () => {
             this.ensureWeb3();
             const contract = await this.getContract();
@@ -158,6 +159,44 @@ class EVMC extends BasicSDK {
             customParams: {
                 eventName,
                 options,
+            },
+        });
+    };
+
+    getPastTransactions = async (from: number, to: number): Promise<Transaction[]> => {
+        
+        const callback = async () => {
+            this.ensureWeb3();
+
+            const contract = this.provider.contract;
+            
+            const responseFinal = <Transaction[]>[];
+
+            for(let i = from; i < from + 5; i++) {
+                const response = await this.web3.eth.getBlock(i, true);
+
+                if (null === response) {
+                    throw new Error("NULL response");
+                }
+
+
+                const transactions = <Transaction[]>response.transactions;
+
+                const contractTransactions = <Transaction>transactions.find(({ to }) => to !== undefined && to?.toLowerCase() === contract)
+
+                if (contractTransactions !== undefined) {
+                    responseFinal.push(contractTransactions)
+                }
+            }
+
+            return responseFinal;
+        };
+
+        return this.retry({
+            callback,
+            customParams: {
+                from,
+                to,
             },
         });
     };
@@ -237,10 +276,14 @@ class EVMC extends BasicSDK {
         const block: number = +(await metadata.block(this.provider));
         const currentBlock: number = await this.getCurrentBlock();
 
-        if ("topics" === this.provider.searchType) {
-            await this.eventsByTopics(block, currentBlock);
+        if (this.provider.events) {
+            if ("topics" === this.provider.searchType) {
+                await this.eventsByTopics(block, currentBlock);
+            } else {
+                await this.events(block, currentBlock);
+            }
         } else {
-            await this.events(block, currentBlock);
+            await this.transactions(block, currentBlock);
         }
     };
 
@@ -406,6 +449,61 @@ class EVMC extends BasicSDK {
                 run = false;
                 await metadata.update(this.provider, currentBlock);
                 await this._subscribeEvents(currentBlock);
+            }
+        }
+        return;
+    };
+
+    /**
+     * Parse events by event name
+     */
+    transactions = async (block: number, currentBlock: number): Promise<void> => {
+        let run = true;
+        let from: number = block;
+        let to: number = block + this.range;
+        if (to > currentBlock) {
+            to = currentBlock;
+        }
+
+        while (run && this.running) {
+            console.log(`processing past blocks for ${this.provider.name} from block ${from} to block ${to}`);
+
+            const transactions: Transaction[] = await this.getPastTransactions(from, to);
+
+            if (transactions.length) {
+                console.log(
+                    `found ${transactions.length} transactions for ${this.provider.name} in range from block ${from} to ${to}`,
+                );
+
+                const chunks: Transaction[][] = _.chunk(transactions, this.chunkSize);
+
+                for (const chunk in chunks) {
+                    const promises: Promise<void>[] = [];
+                    for (const transaction of chunks[chunk]) {
+                        promises.push(this.provider.process(transaction));
+                    }
+
+                    await Promise.all(promises);
+                }
+            }
+            
+            await this.getPastTransactions(from, to)
+
+            await metadata.update(this.provider, to);
+
+            if (this.isDeprecated(to)) {
+                return;
+            }
+
+            from = to + 1;
+            to = to + this.range;
+            // If we don't update current block number, we'll always check with the same block.
+            // That might cause us trying to parse events from future.
+            currentBlock = await this.getCurrentBlock();
+
+            if (to >= currentBlock) {
+                run = false;
+                await metadata.update(this.provider, currentBlock);
             }
         }
         return;
