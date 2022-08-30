@@ -68,8 +68,8 @@ class SudoSwap {
         const transferLogs = receipt.logs.filter((log: any) => log.topics[0] === '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef')
 
         for (let transfer of transferLogs) {
-            const nftBuyer = transfer.topics[1].replace('0x000000000000000000000000', '0x')
-            const nftSeller = transfer.topics[2].replace('0x000000000000000000000000', '0x')
+            const nftBuyer = this.sdk.hexToAddress(transfer.topics[1])
+            const nftSeller = this.sdk.hexToAddress(transfer.topics[2])
             const nftNumber = this.sdk.web3.utils.hexToNumber(transfer.topics[3])
 
             const entity: ISaleEntity = {
