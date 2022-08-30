@@ -105,6 +105,4 @@ class SudoSwap {
     };
 }
 
-new SudoSwap().run()
-
 export default SudoSwap;
