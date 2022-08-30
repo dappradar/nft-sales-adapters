@@ -172,13 +172,12 @@ class EVMC extends BasicSDK {
             
             const responseFinal = <Transaction[]>[];
 
-            for(let i = from; i < from + 5; i++) {
+            for(let i = from; i < to; i++) {
                 const response = await this.web3.eth.getBlock(i, true);
 
                 if (null === response) {
                     throw new Error("NULL response");
                 }
-
 
                 const transactions = <Transaction[]>response.transactions;
 
@@ -455,7 +454,7 @@ class EVMC extends BasicSDK {
     };
 
     /**
-     * Parse events by event name
+     * Parse transactions from block x to block y
      */
     transactions = async (block: number, currentBlock: number): Promise<void> => {
         let run = true;
