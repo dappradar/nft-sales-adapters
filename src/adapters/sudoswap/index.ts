@@ -13,7 +13,51 @@ import symbolSdk from "../../sdk/symbol";
 import { Contract } from "web3-eth-contract";
 import { asyncTimeout } from "../../sdk/util";
 import { BlockTransactionString } from "web3-eth";
+import InputDataDecoder from "ethereum-input-data-decoder";
 import { ISaleEntity, ISymbolAPIResponse } from "../../sdk/Interfaces";
+
+export class PairData {
+    private _sdk: Ethereum;
+    private _data: Array<[[string, { type: string; hex: string }[]], object | null]>;
+    private _nftBuyer: string;
+    private _isAnyNFT: boolean;
+    private _isBuyCall: boolean;
+
+    constructor(
+        sdk: Ethereum,
+        data: Array<[[string, { type: string; hex: string }[]], object | null]>,
+        nftBuyer: string,
+        isBuyCall: boolean,
+        isAnyNFT: boolean,
+    ) {
+        this._sdk = sdk;
+        this._data = data;
+        this._nftBuyer = nftBuyer;
+        this._isAnyNFT = isAnyNFT;
+        this._isBuyCall = isBuyCall;
+    }
+
+    getNumberOfNFTs(idx: number): number {
+        if (this._isAnyNFT) {
+            return this._sdk.web3.utils.hexToNumber(this._data[idx][0][1][0].hex);
+        }
+        return this._data[idx][0][1].length;
+    }
+
+    get info(): { buyer: string; pairAddress: string; amount: number; isBuyCall: boolean }[] {
+        const pairInfo = [];
+        for (let idx = 0; idx < this._data.length; idx++) {
+            pairInfo.push({
+                buyer: this._nftBuyer,
+                pairAddress: this._sdk.hexToAddress(this._data[idx][0][0]),
+                amount: this.getNumberOfNFTs(idx),
+                isBuyCall: this._isBuyCall,
+            });
+        }
+
+        return pairInfo;
+    }
+}
 
 class SudoSwap {
     name: string;
@@ -29,6 +73,7 @@ class SudoSwap {
     chunkSize: number;
     sdk: Ethereum;
 
+    decoder: InputDataDecoder;
     ethAddress: string;
     pairFactoryAbi: string;
     pairFactoryAddress: string;
@@ -43,13 +88,15 @@ class SudoSwap {
         this.block = 14718842;
         this.contract = "0x2b2e8cda09bba9660dca5cb6233787738ad68329";
         this.pathToAbi = path.join(__dirname, "./abis/PairRouter.json");
-        this.range = 500;
+        this.range = 5;
 
         this.ethAddress = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
         this.pairFactoryAddress = "0xb16c1342E617A5B6E4b631EB114483FDB289c0A4";
         this.pairContractAbi = path.join(__dirname, "./abis/PairETH.json");
         this.bondingCurveContractAbi = path.join(__dirname, "./abis/BondingCurve.json");
         this.pairFactoryAbi = path.join(__dirname, "./abis/PairFactory.json");
+
+        this.decoder = new InputDataDecoder(JSON.parse(fs.readFileSync(this.pathToAbi, "utf8")));
 
         this.sdk = new Ethereum(this);
     }
@@ -114,6 +161,8 @@ class SudoSwap {
 
     _getPrice = async (
         pair_address: string,
+        amount: number,
+        isBuyCall: boolean,
         symbol: ISymbolAPIResponse,
         block: BlockTransactionString,
     ): Promise<{ price: number | null; priceUsd: number | null }> => {
@@ -139,18 +188,23 @@ class SudoSwap {
             block.number,
         );
         const factoryFeeMultiplier = await this._callExternalContractMethod(
-            pair_address,
+            this.pairFactoryAddress,
             this.pairFactoryAbi,
             "protocolFeeMultiplier",
             block.number,
         );
 
+        let functionCall = "getSellInfo";
+        if (isBuyCall) {
+            functionCall = "getBuyInfo";
+        }
+
         const buyInfo = await this._callExternalContractMethod(
             pairBondingCurve,
             this.bondingCurveContractAbi,
-            "spotPrice",
+            functionCall,
             block.number,
-            [pairSpotPrice, pairDelta, 1, pairFee, factoryFeeMultiplier],
+            [pairSpotPrice, pairDelta, amount, pairFee, factoryFeeMultiplier],
         );
 
         if (!symbol?.decimals) {
@@ -169,45 +223,132 @@ class SudoSwap {
         };
     };
 
+    _decodeData = async (input: string): Promise<PairData[] | null> => {
+        let pairData = null;
+
+        const data = this.decoder.decodeData(input);
+        console.log(`Decoded: ${JSON.stringify(data)}`);
+
+        switch (data.method) {
+            case "robustSwapNFTsForToken":
+                pairData = [new PairData(this.sdk, data.inputs[0], data.inputs[1], false, false)];
+                break;
+            case "robustSwapERC20ForAnyNFTs":
+                pairData = [new PairData(this.sdk, data.inputs[0], data.inputs[2], true, true)];
+                break;
+            case "robustSwapERC20ForSpecificNFTs":
+                pairData = [new PairData(this.sdk, data.inputs[0], data.inputs[3], true, false)];
+                break;
+            case "robustSwapERC20ForSpecificNFTsAndNFTsToToken":
+                pairData = [
+                    new PairData(this.sdk, data.inputs[0][0], data.inputs[3], true, false),
+                    new PairData(this.sdk, data.inputs[0][1], data.inputs[3], false, false),
+                ];
+                break;
+            case "robustSwapETHForAnyNFTs":
+                pairData = [new PairData(this.sdk, data.inputs[0], data.inputs[2], true, true)];
+                break;
+            case "robustSwapETHForSpecificNFTs":
+                pairData = [new PairData(this.sdk, data.inputs[0], data.inputs[2], true, false)];
+                break;
+            case "robustSwapETHForSpecificNFTsAndNFTsToToken":
+                pairData = [
+                    new PairData(this.sdk, data.inputs[0][0], data.inputs[0][3], true, false),
+                    new PairData(this.sdk, data.inputs[0][1], data.inputs[0][3], false, false),
+                ];
+                break;
+            case "swapERC20ForAnyNFTs":
+                pairData = [new PairData(this.sdk, [data.inputs[0]], data.inputs[2], true, true)];
+                break;
+            case "swapERC20ForSpecificNFTs":
+                pairData = [new PairData(this.sdk, [data.inputs[0]], data.inputs[2], true, false)];
+                break;
+            case "swapETHForAnyNFTs":
+                pairData = [new PairData(this.sdk, [data.inputs[0]], data.inputs[2], true, true)];
+                break;
+            case "swapETHForSpecificNFTs":
+                pairData = [new PairData(this.sdk, [data.inputs[0]], data.inputs[2], true, false)];
+                break;
+            case "swapNFTsForAnyNFTsThroughERC20":
+                pairData = [
+                    new PairData(this.sdk, data.inputs[0][0], data.inputs[3], false, false),
+                    new PairData(this.sdk, data.inputs[0][1], data.inputs[3], true, false),
+                ];
+                break;
+            case "swapNFTsForAnyNFTsThroughETH":
+                pairData = [
+                    new PairData(this.sdk, data.inputs[0][0], data.inputs[3], false, false),
+                    new PairData(this.sdk, data.inputs[0][1], data.inputs[3], true, true),
+                ];
+                break;
+            case "swapNFTsForSpecificNFTsThroughERC20":
+                pairData = [
+                    new PairData(this.sdk, data.inputs[0][0], data.inputs[3], false, false),
+                    new PairData(this.sdk, data.inputs[0][1], data.inputs[3], true, false),
+                ];
+                break;
+            case "swapNFTsForSpecificNFTsThroughETH":
+                pairData = [
+                    new PairData(this.sdk, data.inputs[0][0], data.inputs[2], false, false),
+                    new PairData(this.sdk, data.inputs[0][1], data.inputs[2], true, false),
+                ];
+                break;
+            case "swapNFTsForToken":
+                pairData = [new PairData(this.sdk, [data.inputs[0]], data.inputs[2], false, false)];
+                break;
+        }
+
+        return pairData;
+    };
+
     process = async (transaction: Transaction): Promise<ISaleEntity | undefined> => {
         if (!transaction.blockNumber) return;
 
         const block = await this.sdk.getBlock(transaction.blockNumber);
         const timestamp = moment.unix(block.timestamp as number).utc();
+        const symbol = await symbolSdk.get(this.ethAddress, this.protocol);
 
-        const receipt = await this.sdk.getTransactionReceipt(transaction.hash);
+        console.log(`transaction Hash: ${transaction.hash}`);
+        const pairData = await this._decodeData(transaction.input);
 
-        const transferLogs = receipt.logs.filter(
-            (log: any) => log.topics[0] === "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
-        );
+        if (!pairData) return;
 
-        for (const transfer of transferLogs) {
-            const nftBuyer = this.sdk.hexToAddress(transfer.topics[1]);
-            const pairAddress = this.sdk.hexToAddress(transfer.topics[2]);
-            const nftNumber = this.sdk.web3.utils.hexToNumber(transfer.topics[3]);
+        for (const pair of pairData) {
+            for (const pairInfo of pair.info) {
+                console.log(`PairInfo: ${JSON.stringify(pairInfo)}`);
+                const { price, priceUsd } = await this._getPrice(
+                    pairInfo.pairAddress,
+                    pairInfo.amount,
+                    pairInfo.isBuyCall,
+                    symbol,
+                    block,
+                );
 
-            const symbol = await symbolSdk.get(this.ethAddress, this.protocol);
-            const { price, priceUsd } = await this._getPrice(pairAddress, symbol, block);
+                console.log(
+                    `Price: ${price}, PriceUSD: ${priceUsd}, pair: ${pairInfo.pairAddress}, amount: ${pairInfo.amount}`,
+                );
+                console.log(`transaction Hash: ${transaction.hash}`);
 
-            const entity: ISaleEntity = {
-                providerName: this.name,
-                providerContract: this.contract,
-                protocol: this.protocol,
-                nftContract: transfer.address.toLowerCase(),
-                nftId: nftNumber,
-                token: this.token,
-                tokenSymbol: this.symbol?.symbol || "",
-                amount: 1,
-                price: price,
-                priceUsd: priceUsd,
-                seller: pairAddress.toLowerCase(),
-                buyer: nftBuyer.toLowerCase(),
-                soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),
-                blockNumber: <number>transaction.blockNumber,
-                transactionHash: transaction.hash,
-            };
+                const entity: ISaleEntity = {
+                    providerName: this.name,
+                    providerContract: this.contract,
+                    protocol: this.protocol,
+                    nftContract: this.contract.toLowerCase(),
+                    nftId: "1",
+                    token: this.token,
+                    tokenSymbol: this.symbol?.symbol || "",
+                    amount: pairInfo.amount,
+                    price: price,
+                    priceUsd: priceUsd,
+                    seller: pairInfo.pairAddress.toLowerCase(),
+                    buyer: pairInfo.buyer.toLowerCase(),
+                    soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),
+                    blockNumber: <number>transaction.blockNumber,
+                    transactionHash: transaction.hash,
+                };
 
-            await this.addToDatabase(entity);
+                await this.addToDatabase(entity);
+            }
         }
 
         return;
