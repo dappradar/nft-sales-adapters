@@ -227,7 +227,6 @@ class SudoSwap {
         let pairData = null;
 
         const data = this.decoder.decodeData(input);
-        console.log(`Decoded: ${JSON.stringify(data)}`);
 
         switch (data.method) {
             case "robustSwapNFTsForToken":
@@ -308,7 +307,6 @@ class SudoSwap {
         const timestamp = moment.unix(block.timestamp as number).utc();
         const symbol = await symbolSdk.get(this.ethAddress, this.protocol);
 
-        console.log(`transaction Hash: ${transaction.hash}`);
         const pairData = await this._decodeData(transaction.input);
 
         if (!pairData) return;
