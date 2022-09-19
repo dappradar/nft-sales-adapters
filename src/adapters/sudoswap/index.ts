@@ -44,13 +44,27 @@ export class PairData {
         return this._data[idx][0][1].length;
     }
 
-    get info(): { buyer: string; pairAddress: string; amount: number; isBuyCall: boolean }[] {
+    getNftIds(idx: number): number[] {
+        if (this._isAnyNFT) {
+            return [this._sdk.web3.utils.hexToNumber(this._data[idx][0][1][0])];
+        }
+
+        const nftIds = [];
+        for (let i = 0; i < this._data[idx][0][1].length; i++) {
+            nftIds.push(this._sdk.web3.utils.hexToNumber(this._data[idx][0][1][i]));
+        }
+
+        return nftIds;
+    }
+
+    get info(): { buyer: string; pairAddress: string; amount: number; isBuyCall: boolean; nftIds: number[] }[] {
         const pairInfo = [];
         for (let idx = 0; idx < this._data.length; idx++) {
             pairInfo.push({
                 buyer: this._nftBuyer,
                 pairAddress: this._sdk.hexToAddress(this._data[idx][0][0]),
                 amount: this.getNumberOfNFTs(idx),
+                nftIds: this.getNftIds(idx),
                 isBuyCall: this._isBuyCall,
             });
         }
@@ -81,16 +95,15 @@ class SudoSwap {
     bondingCurveContractAbi: string;
 
     constructor() {
-        this.name = "sudoswap";
+        this.name = "sudoswap-ethereum-1";
         this.symbol = undefined;
-        this.token = "0x0000000000000000000000000000000000000000";
+        this.token = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
         this.protocol = "ethereum";
-        this.block = 14718842;
+        this.block = 14718943;
         this.contract = "0x2b2e8cda09bba9660dca5cb6233787738ad68329";
         this.pathToAbi = path.join(__dirname, "./abis/PairRouter.json");
         this.range = 5;
 
-        this.ethAddress = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
         this.pairFactoryAddress = "0xb16c1342E617A5B6E4b631EB114483FDB289c0A4";
         this.pairContractAbi = path.join(__dirname, "./abis/PairETH.json");
         this.bondingCurveContractAbi = path.join(__dirname, "./abis/BondingCurve.json");
@@ -107,6 +120,12 @@ class SudoSwap {
 
     run = async (): Promise<void> => {
         this.sdk = await this.loadSdk();
+
+        const symbol = await symbolSdk.get(this.token, this.protocol);
+        if (!symbol) throw new Error(`Missing symbol metadata for provider ${this.name}`);
+
+        this.symbol = symbol;
+
         await this.sdk.run();
     };
 
@@ -163,10 +182,9 @@ class SudoSwap {
         pair_address: string,
         amount: number,
         isBuyCall: boolean,
-        symbol: ISymbolAPIResponse,
         block: BlockTransactionString,
     ): Promise<{ price: number | null; priceUsd: number | null }> => {
-        const po = await priceSdk.get(this.ethAddress, this.protocol, +block.timestamp);
+        const po = await priceSdk.get(this.token, this.protocol, +block.timestamp);
 
         const pairFee = await this._callExternalContractMethod(pair_address, this.pairContractAbi, "fee", block.number);
         const pairSpotPrice = await this._callExternalContractMethod(
@@ -207,15 +225,8 @@ class SudoSwap {
             [pairSpotPrice, pairDelta, amount, pairFee, factoryFeeMultiplier],
         );
 
-        if (!symbol?.decimals) {
-            return {
-                price: null,
-                priceUsd: null,
-            };
-        }
-
         const priceInEth = buyInfo[3];
-        const nativePrice = new BigNumber(priceInEth).dividedBy(10 ** (symbol?.decimals || 0));
+        const nativePrice = new BigNumber(priceInEth).dividedBy(10 ** (this.symbol?.decimals || 0));
 
         return {
             price: nativePrice.toNumber(),
@@ -305,7 +316,6 @@ class SudoSwap {
 
         const block = await this.sdk.getBlock(transaction.blockNumber);
         const timestamp = moment.unix(block.timestamp as number).utc();
-        const symbol = await symbolSdk.get(this.ethAddress, this.protocol);
 
         const pairData = await this._decodeData(transaction.input);
 
@@ -313,17 +323,17 @@ class SudoSwap {
 
         for (const pair of pairData) {
             for (const pairInfo of pair.info) {
-                console.log(`PairInfo: ${JSON.stringify(pairInfo)}`);
                 const { price, priceUsd } = await this._getPrice(
                     pairInfo.pairAddress,
                     pairInfo.amount,
                     pairInfo.isBuyCall,
-                    symbol,
                     block,
                 );
 
                 console.log(
-                    `Price: ${price}, PriceUSD: ${priceUsd}, pair: ${pairInfo.pairAddress}, amount: ${pairInfo.amount}`,
+                    `Price: ${price}, PriceUSD: ${priceUsd}, pair: ${pairInfo.pairAddress}, amount: ${
+                        pairInfo.amount
+                    }, NftId: ${pairInfo.nftIds.join(", ")}`,
                 );
                 console.log(`transaction Hash: ${transaction.hash}`);
 
@@ -331,8 +341,8 @@ class SudoSwap {
                     providerName: this.name,
                     providerContract: this.contract,
                     protocol: this.protocol,
-                    nftContract: this.contract.toLowerCase(),
-                    nftId: "1",
+                    nftContract: pairInfo.pairAddress.toLowerCase(),
+                    nftId: pairInfo.nftIds.join(", "),
                     token: this.token,
                     tokenSymbol: this.symbol?.symbol || "",
                     amount: pairInfo.amount,
