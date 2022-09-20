@@ -34,7 +34,7 @@ class NFTRADE {
         this.symbol = undefined;
         this.token = "avax";
         this.protocol = "avalanche";
-        this.block = 19958164;
+        this.block = 19984506;
         this.contract = "0xbf6bfe5d6b86308cf3b7f147dd03ef11f80bfde3";
         this.events = ["Fill"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
@@ -66,18 +66,21 @@ class NFTRADE {
     }
     
     getAssetDataAddress = (assetData: string) => {
-        return ("0x").concat(assetData.slice(34, 74));
+        const data = this.sdk.web3.eth.abi.decodeParameters(['address'], assetData.slice(10));
+        return data['0'];
     }
 
     decodeERC721AssetData = (assetData: string) => {
-        const address = this.getAssetDataAddress(assetData);
-        const id = parseInt(assetData.slice(74, assetData.length));
+        const data = this.sdk.web3.eth.abi.decodeParameters(['address', 'uint256'], assetData.slice(10));
+        const address = data['0'];
+        const id = data['1'];
         return { address, id };
     }
     
     decodeERC1155AssetData = (assetData: string) => {
-        const address = this.getAssetDataAddress(assetData);
-        const id = parseInt(assetData.slice(201, 264));
+        const data = this.sdk.web3.eth.abi.decodeParameters(['address', 'uint256[]', 'uint256[]', 'bytes'], assetData.slice(10));
+        const address = data['0'];
+        const id = data['1'][0];
         return { address, id };
     }
 
