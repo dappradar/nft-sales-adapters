@@ -7,7 +7,7 @@ import BigNumber from "bignumber.js";
 dotenv.config();
 
 import { ISymbolAPIResponse, ISaleEntity } from '../../sdk/Interfaces';
-import Avalanche from "../../sdk/avalanche";
+import BSC from "../../sdk/binance";
 import symbolSdk from "../../sdk/symbol";
 import priceSdk from "../../sdk/price";
 
@@ -30,11 +30,11 @@ class NFTRADE {
     chunkSize: number;
     sdk: any;
     constructor() {
-        this.name = "nftrade-avalanche";
+        this.name = "nftrade-binance-1";
         this.symbol = undefined;
-        this.token = "avax";
-        this.protocol = "avalanche";
-        this.block = 19958164;
+        this.token = "bnb";
+        this.protocol = "bsc";
+        this.block = 21416323;
         this.contract = "0xbf6bfe5d6b86308cf3b7f147dd03ef11f80bfde3";
         this.events = ["Fill"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
@@ -50,7 +50,7 @@ class NFTRADE {
     };
 
     loadSdk = (): any => {
-        return new Avalanche(this);
+        return new BSC(this);
     };
 
     stop = async (): Promise<void> => {
