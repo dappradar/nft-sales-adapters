@@ -30,7 +30,7 @@ class NFTRADE {
     chunkSize: number;
     sdk: any;
     constructor() {
-        this.name = "nftrade";
+        this.name = "nftrade-avalanche";
         this.symbol = undefined;
         this.token = "avax";
         this.protocol = "avalanche";

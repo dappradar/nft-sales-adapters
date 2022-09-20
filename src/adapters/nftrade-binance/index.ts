@@ -30,7 +30,7 @@ class NFTRADE {
     chunkSize: number;
     sdk: any;
     constructor() {
-        this.name = "nftrade";
+        this.name = "nftrade-binance";
         this.symbol = undefined;
         this.token = "bnb";
         this.protocol = "bsc";

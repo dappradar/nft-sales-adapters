@@ -30,7 +30,7 @@ class NFTRADE {
     chunkSize: number;
     sdk: any;
     constructor() {
-        this.name = "nftrade";
+        this.name = "nftrade-polygon";
         this.symbol = undefined;
         this.token = "matic";
         this.protocol = "polygon";

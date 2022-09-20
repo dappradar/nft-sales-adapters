@@ -30,7 +30,7 @@ class NFTRADE {
     chunkSize: number;
     sdk: any;
     constructor() {
-        this.name = "nftrade";
+        this.name = "nftrade-ethereum";
         this.symbol = undefined;
         this.token = "eth";
         this.protocol = "ethereum";
