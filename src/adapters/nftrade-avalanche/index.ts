@@ -1,17 +1,15 @@
 import * as dotenv from "dotenv";
+import { EventData } from 'web3-eth-contract';
+import moment from "moment";
+import path from "path";
+import BigNumber from "bignumber.js";
 
 dotenv.config();
 
-import { EventData } from 'web3-eth-contract';
-import { ISaleEntity } from './../../sdk/Interfaces';
-
-import moment from "moment";
+import { ISymbolAPIResponse, ISaleEntity } from '../../sdk/Interfaces';
 import Avalanche from "../../sdk/avalanche";
-import path from "path";
-import BigNumber from "bignumber.js";
 import symbolSdk from "../../sdk/symbol";
 import priceSdk from "../../sdk/price";
-import { ISymbolAPIResponse } from "../../sdk/Interfaces";
 
 const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000';
 
