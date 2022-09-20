@@ -140,4 +140,4 @@ class NFTRADE {
     };
 }
 
-module.exports = NFTRADE;
+export default NFTRADE;

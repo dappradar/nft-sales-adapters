@@ -33,7 +33,7 @@ class NFTRADE {
         this.name = "nftrade-polygon-1";
         this.symbol = undefined;
         this.token = "matic";
-        this.protocol = "polygon";
+        this.protocol = "matic";
         this.block = 33227140;
         this.contract = "0xbf6bfe5d6b86308cf3b7f147dd03ef11f80bfde3";
         this.events = ["Fill"];
@@ -140,4 +140,4 @@ class NFTRADE {
     };
 }
 
-module.exports = NFTRADE;
+export default NFTRADE;
