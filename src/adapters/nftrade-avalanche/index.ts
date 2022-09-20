@@ -107,7 +107,10 @@ class NFTRADE {
         const taker = event.returnValues["takerAddress"];
         const buyer = isOffer ? maker : taker;
         const seller = isOffer ? taker : maker;
-        const token = this.getAssetDataAddress(event.returnValues[isOffer ? "makerAssetData" : "takerAssetData"]);
+        let token = this.getAssetDataAddress(event.returnValues[isOffer ? "makerAssetData" : "takerAssetData"]);
+        if (ADDRESS_ZERO === token) {
+            token = 'avax';
+        }
         const po = await priceSdk.get(token, this.protocol, +block.timestamp);
         const symbol = await symbolSdk.get(token, this.protocol);
         const nativePrice = new BigNumber(price).dividedBy(10 ** symbol.decimals);
