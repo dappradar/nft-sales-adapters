@@ -4,6 +4,10 @@ enum AVAILABLE_PROTOCOLS {
     POLYGON = "polygon",
     AVALANCHE = "avalanche",
     TEZOS = "tezos",
+    AURORA = "aurora",
+    CELO = "celo",
+    MOONBEAM = "moonbeam",
+    MOONRIVER = "moonriver",
 }
 
 const API_KEY = process.env.DAPPRADAR_API_KEY || "";
