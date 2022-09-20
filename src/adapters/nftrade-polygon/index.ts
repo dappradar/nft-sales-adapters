@@ -7,7 +7,7 @@ import BigNumber from "bignumber.js";
 dotenv.config();
 
 import { ISymbolAPIResponse, ISaleEntity } from '../../sdk/Interfaces';
-import Ethereum from "../../sdk/EVMC";
+import Matic from "../../sdk/matic";
 import symbolSdk from "../../sdk/symbol";
 import priceSdk from "../../sdk/price";
 
@@ -34,7 +34,7 @@ class NFTRADE {
         this.symbol = undefined;
         this.token = "matic";
         this.protocol = "polygon";
-        this.block = 15554697;
+        this.block = 33227140;
         this.contract = "0xbf6bfe5d6b86308cf3b7f147dd03ef11f80bfde3";
         this.events = ["Fill"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
@@ -50,7 +50,7 @@ class NFTRADE {
     };
 
     loadSdk = (): any => {
-        return new Ethereum(this);
+        return new Matic(this);
     };
 
     stop = async (): Promise<void> => {
