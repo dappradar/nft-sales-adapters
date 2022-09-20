@@ -34,7 +34,7 @@ class NFTRADE {
         this.symbol = undefined;
         this.token = "avax";
         this.protocol = "avalanche";
-        this.block = 19984506;
+        this.block = 19958164;
         this.contract = "0xbf6bfe5d6b86308cf3b7f147dd03ef11f80bfde3";
         this.events = ["Fill"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
