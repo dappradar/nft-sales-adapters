@@ -1,11 +1,8 @@
 const ENTITY_KEYS = [
     "providerName",
     "providerContract",
-    "nftContract",
-    "nftId",
     "token",
     "tokenSymbol",
-    "amount",
     "price",
     "priceUsd",
     "seller",
