@@ -104,11 +104,15 @@ class CRYPTOPUNKS2 {
             providerName: this.name, // the name of the folder
             providerContract: this.contract, // the providers contract from which you get data
             protocol: this.protocol,
-            nftContract: this.contract,
-            nftId: tokenId,
+            nfts: [
+                {
+                    contract: this.contract,
+                    id: tokenId,
+                    amount: 1,
+                },
+            ],
             token: this.token,
             tokenSymbol: this.symbol?.symbol || "",
-            amount: 1,
             price: nativePrice.toNumber(),
             priceUsd: nativePrice.multipliedBy(po.price).toNumber(),
             seller: this.contract,
