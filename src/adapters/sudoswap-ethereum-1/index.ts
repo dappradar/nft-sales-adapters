@@ -44,27 +44,49 @@ export class PairData {
         return this._data[idx][0][1].length;
     }
 
-    getNftIds(idx: number): number[] {
+    getNfts(idx: number): { contract: string; id: string; amount: number }[] {
+        const pairAddress = this.pairAddress(idx);
+
         if (this._isAnyNFT) {
-            return [this._sdk.web3.utils.hexToNumber(this._data[idx][0][1][0])];
+            return [
+                {
+                    contract: pairAddress,
+                    id: this._sdk.web3.utils.hexToNumber(this._data[idx][0][1][0]),
+                    amount: 1,
+                },
+            ];
         }
 
         const nftIds = [];
         for (let i = 0; i < this._data[idx][0][1].length; i++) {
-            nftIds.push(this._sdk.web3.utils.hexToNumber(this._data[idx][0][1][i]));
+            nftIds.push({
+                contract: pairAddress,
+                id: this._sdk.web3.utils.hexToNumber(this._data[idx][0][1][i]),
+                amount: 1,
+            });
         }
 
         return nftIds;
     }
 
-    get info(): { buyer: string; pairAddress: string; amount: number; isBuyCall: boolean; nftIds: number[] }[] {
+    pairAddress(idx: number): string {
+        return this._sdk.hexToAddress(this._data[idx][0][0]);
+    }
+
+    get info(): {
+        buyer: string;
+        pairAddress: string;
+        nfts: { contract: string; id: string; amount: number }[];
+        amount: number;
+        isBuyCall: boolean;
+    }[] {
         const pairInfo = [];
         for (let idx = 0; idx < this._data.length; idx++) {
             pairInfo.push({
                 buyer: this._nftBuyer,
-                pairAddress: this._sdk.hexToAddress(this._data[idx][0][0]),
+                pairAddress: this.pairAddress(idx),
+                nfts: this.getNfts(idx),
                 amount: this.getNumberOfNFTs(idx),
-                nftIds: this.getNftIds(idx),
                 isBuyCall: this._isBuyCall,
             });
         }
@@ -330,22 +352,17 @@ class SudoSwap {
                     block,
                 );
 
-                console.log(
-                    `Price: ${price}, PriceUSD: ${priceUsd}, pair: ${pairInfo.pairAddress}, amount: ${
-                        pairInfo.amount
-                    }, NftId: ${pairInfo.nftIds.join(", ")}`,
-                );
+                console.log(`Price: ${price}, pair: ${pairInfo.pairAddress}, NftId: ${pairInfo.nfts}`);
                 console.log(`transaction Hash: ${transaction.hash}`);
 
                 const entity: ISaleEntity = {
                     providerName: this.name,
-                    providerContract: this.contract,
+                    providerContract: this.contract.toLowerCase(),
                     protocol: this.protocol,
                     nftContract: pairInfo.pairAddress.toLowerCase(),
-                    nftId: pairInfo.nftIds.join(", "),
-                    token: this.token,
+                    nfts: pairInfo.nfts,
+                    token: this.token.toLowerCase(),
                     tokenSymbol: this.symbol?.symbol || "",
-                    amount: pairInfo.amount,
                     price: price,
                     priceUsd: priceUsd,
                     seller: pairInfo.pairAddress.toLowerCase(),
