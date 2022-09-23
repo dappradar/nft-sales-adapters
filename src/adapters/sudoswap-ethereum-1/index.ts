@@ -359,7 +359,6 @@ class SudoSwap {
                     providerName: this.name,
                     providerContract: this.contract.toLowerCase(),
                     protocol: this.protocol,
-                    nftContract: pairInfo.pairAddress.toLowerCase(),
                     nfts: pairInfo.nfts,
                     token: this.token.toLowerCase(),
                     tokenSymbol: this.symbol?.symbol || "",
