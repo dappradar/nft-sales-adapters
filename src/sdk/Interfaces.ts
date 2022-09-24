@@ -1,19 +1,12 @@
-export interface ISaleEntityNFT {
-    contract: string;
-    id: string;
-    amount: number;
-}
-
 export interface ISaleEntity {
     providerName: string;
     providerContract: string;
     protocol: string;
-    nfts?: ISaleEntityNFT[];
-    nftId?: string;
-    nftContract?: string;
+    nftContract: string;
+    nftId: string;
     token: string;
     tokenSymbol: string;
-    amount?: number;
+    amount: number;
     price: number | null;
     priceUsd: number | null;
     seller: string;

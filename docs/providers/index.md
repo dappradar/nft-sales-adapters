@@ -64,8 +64,4 @@ export default Provider;
 
 ## Interfaces
 
-[ISaleEntityNFT interface](interfaces/ISaleEntityNFT.md ':include')
-
----
-
 [ISaleEntity interface](interfaces/ISaleEntity.md ':include')
