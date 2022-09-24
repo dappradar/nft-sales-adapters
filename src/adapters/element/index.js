@@ -1,18 +1,28 @@
-require("dotenv").config();
+import * as dotenv from "dotenv";
+dotenv.config();
+import path from "path";
+import BigNumber from "bignumber.js";
+import moment from "moment";
+import symbolSdk from "../../sdk/symbol";
+import { EventData } from "web3-eth-contract";
+import priceSdk from "../../sdk/price";
+import Ethereum from "../../sdk/EVMC";
+import { ISaleEntity, ISymbolAPIResponse } from "../../sdk/Interfaces";
 
-const moment = require("moment");
-const BigNumber = require("bignumber.js");
-const Ethereum = require("../../sdk/EVMC");
-const axios = require("axios");
-const URL = "http://nft-sales-service.dappradar.com/open-source";
-const KEY = process.env.DAPPRADAR_API_KEY;
-const path = require("path");
+class Element {
+    name: string;
+    token: string;
+    protocol: string;
+    block: number;
+    contract: string;
+    events: string[];
+    pathToAbi: string;
+    range: number;
+    chunkSize: number;
+    sdk: any;
 
-class ELEMENT {
-    // stands for Ethereum name service
-    constructor() {
+    constructor(){
         this.name = "element";
-        this.symbol = "ETH";
         this.token = "eth";
         this.protocol = "ethereum";
         this.block = 15080677;
@@ -26,104 +36,74 @@ class ELEMENT {
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
         this.chunkSize = 6;
-        this.sdk = new Ethereum(this);
     }
 
-    run = async () => {
-        const s = await this.getSymbol();
+    run = async (): Promise<void> => {
         this.sdk = this.loadSdk();
-        this.symbol = s;
+
         await this.sdk.run();
     };
 
-    loadSdk = () => {
+    loadSdk = (): any => {
         return new Ethereum(this);
     };
-    getSymbol = async () => {
-        const resp = await axios.get(
-            `${URL}/token-metadata?key=${KEY}&token_address=${this.token}&protocol=${this.protocol}`,
-            {
-                headers: {
-                    "User-Agent":
-                        "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4619.141 Safari/537.36",
-                },
-            },
-        );
-        const symbol = resp.data;
-        return symbol;
-    };
-    getPrice = async timestamp => {
-        const resp = await axios.get(
-            `${URL}/token-price?key=${KEY}&token_address=${this.token}&protocol=${this.protocol}&timestamp=${timestamp}`,
-            {
-                headers: {
-                    "User-Agent":
-                        "Mozilla/5.0 (Macintosh; Intel Mac OS X 11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4619.141 Safari/537.36",
-                },
-            },
-        );
-        return resp.data;
-    };
-    stop = async () => {
+
+    stop = async (): Promise<void> => {
         this.sdk.stop();
     };
 
-    // getBuyer = async event => {
-    //     const buyer = event.returnValues.owner;
-    //     if (event.event === "NameRenewed") {
-    //         const txReceipt = await this.sdk.getTransactionReceipt(event.transactionHash);
-    //         if (txReceipt === null) {
-    //             return null;
-    //         }
-    //         return txReceipt.from;
-    //     }
-    //     return buyer;
-    // };
+    _getToken = (event: EventData): string => {
+        let token = event.returnValues["erc20Token"].toLowerCase();
 
-    process = async event => {
+        if (token === "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee") {
+            token = "0x0000000000000000000000000000000000000000";
+        }
+        return token;
+        
+    };
+    process = async (event: EventData): Promise<void> => {
         const isER721 = event.event === "ERC721SellOrderFilled" || event.event === "ERC721BuyOrderFilled";
+        
         const isSellOrder = ["ERC721SellOrderFilled", "ERC1155SellOrderFilled"].includes(event.event);
+        
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
-        const po = await this.getPrice(block.timestamp);
+        const token = this._getToken(event);
+        const symbol: ISymbolAPIResponse = await symbolSdk.get(token, this.protocol);
+        const po = await priceSdk.get(token, this.protocol, block.timestamp);
         const amount = isER721 ? 1 : event.returnValues["erc1155FillAmount"];
         const price = isER721 ? event.returnValues["erc20TokenAmount"] : event.returnValues["erc20FillAmount"];
-        const nativePrice = new BigNumber(price).dividedBy(10 ** this.symbol.decimals);
+        const nativePrice = new BigNumber(price).dividedBy(10 ** (symbol?.decimals || 0));
         const maker = event.returnValues["maker"];
         const taker = event.returnValues["taker"];
         const buyer = isSellOrder ? taker : maker;
         const seller = isSellOrder ? maker : taker;
         const nft_contract = event.returnValues["erc721Token"] || event.returnValues["erc1155Token"];
         const tokenId = event.returnValues["erc721TokenId"] || event.returnValues["erc1155TokenId"];
-        const erc20token = event.returnValues["erc20Token"];
-        const token =
-            erc20token.toLowerCase() === "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
-                ? "0x0000000000000000000000000000000000000000"
-                : erc20token;
+
         const entity = {
-            provider_name: this.name, // the name of the folder
-            provider_contract: this.contract.toLowerCase(), // the providers contract from which you get data
+            providerName: this.name,
+            providerContract: this.contract,
             protocol: this.protocol,
-            nft_contract: nft_contract.toLowerCase(),
-            nft_id: tokenId,
+            nftContract: nft_contract.toLowerCase(),
+            nftId: tokenId,
             token: token.toLowerCase(),
-            token_symbol: this.symbol.symbol,
+            tokenSymbol: symbol?.symbol || " ",
             amount,
             price: nativePrice.toNumber(),
-            price_usd: nativePrice.multipliedBy(po.price).toNumber(),
+            priceUsd: nativePrice.multipliedBy(po.price).toNumber(),
             seller: seller.toLowerCase(),
             buyer: buyer.toLowerCase(),
-            sold_at: timestamp.format("YYYY-MM-DD HH:mm:ss"),
-            block_number: event.blockNumber,
-            transaction_hash: event.transactionHash,
+            soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),
+            blockNumber: event.blockNumber,
+            transactionHash: event.transactionHash,
         };
         await this.addToDatabase(entity);
     };
-
-    addToDatabase = async entity => {
-        console.log(`creating sale for ${entity.nft_contract} with id ${entity.nft_id}`);
+    addToDatabase = async (entity: ISaleEntity): Promise<ISaleEntity> => {
+        console.log(`creating sale for ${entity.nftContract} with id ${entity.nftId}`);
         return entity;
     };
 }
 
-module.exports = ELEMENT;
+module.exports = Element;
