@@ -117,7 +117,7 @@ class NFTRADE {
         const entity = {
             providerName: this.name, // the name of the folder
             providerContract: this.contract.toLowerCase(), // the providers contract from which you get data
-            protocol: this.protocol,
+            protocol: "binance-smart-chain",
             nftContract: nft.address.toLowerCase(),
             nftId: String(nft.id),
             token: token.toLowerCase(),
