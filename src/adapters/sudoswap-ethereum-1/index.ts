@@ -272,10 +272,6 @@ class SudoSwap {
                 pairData = [new PairData(this.sdk, data.inputs[0], data.inputs[3], true, false)];
                 break;
             case "robustSwapERC20ForSpecificNFTsAndNFTsToToken":
-                pairData = [
-                    new PairData(this.sdk, data.inputs[0][0], data.inputs[3], true, false),
-                    new PairData(this.sdk, data.inputs[0][1], data.inputs[3], false, false),
-                ];
                 break;
             case "robustSwapETHForAnyNFTs":
                 pairData = [new PairData(this.sdk, data.inputs[0], data.inputs[2], true, true)];
@@ -284,10 +280,6 @@ class SudoSwap {
                 pairData = [new PairData(this.sdk, data.inputs[0], data.inputs[2], true, false)];
                 break;
             case "robustSwapETHForSpecificNFTsAndNFTsToToken":
-                pairData = [
-                    new PairData(this.sdk, data.inputs[0][0], data.inputs[0][3], true, false),
-                    new PairData(this.sdk, data.inputs[0][1], data.inputs[0][3], false, false),
-                ];
                 break;
             case "swapERC20ForAnyNFTs":
                 pairData = [new PairData(this.sdk, [data.inputs[0]], data.inputs[2], true, true)];
@@ -302,28 +294,12 @@ class SudoSwap {
                 pairData = [new PairData(this.sdk, [data.inputs[0]], data.inputs[2], true, false)];
                 break;
             case "swapNFTsForAnyNFTsThroughERC20":
-                pairData = [
-                    new PairData(this.sdk, data.inputs[0][0], data.inputs[3], false, false),
-                    new PairData(this.sdk, data.inputs[0][1], data.inputs[3], true, false),
-                ];
                 break;
             case "swapNFTsForAnyNFTsThroughETH":
-                pairData = [
-                    new PairData(this.sdk, data.inputs[0][0], data.inputs[3], false, false),
-                    new PairData(this.sdk, data.inputs[0][1], data.inputs[3], true, true),
-                ];
                 break;
             case "swapNFTsForSpecificNFTsThroughERC20":
-                pairData = [
-                    new PairData(this.sdk, data.inputs[0][0], data.inputs[3], false, false),
-                    new PairData(this.sdk, data.inputs[0][1], data.inputs[3], true, false),
-                ];
                 break;
             case "swapNFTsForSpecificNFTsThroughETH":
-                pairData = [
-                    new PairData(this.sdk, data.inputs[0][0], data.inputs[2], false, false),
-                    new PairData(this.sdk, data.inputs[0][1], data.inputs[2], true, false),
-                ];
                 break;
             case "swapNFTsForToken":
                 pairData = [new PairData(this.sdk, [data.inputs[0]], data.inputs[2], false, false)];
