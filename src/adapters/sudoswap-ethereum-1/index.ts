@@ -105,7 +105,7 @@ class SudoSwap {
     searchType: string;
     events: string[];
     pathToAbi: string | undefined;
-    range: number;
+    blockRange: number;
     chunkSize: number;
     sdk: Ethereum;
 
@@ -124,7 +124,8 @@ class SudoSwap {
         this.block = 14718943;
         this.contract = "0x2b2e8cda09bba9660dca5cb6233787738ad68329";
         this.pathToAbi = path.join(__dirname, "./abis/PairRouter.json");
-        this.range = 5;
+        this.blockRange = 5;
+        this.searchType = "block-scan";
 
         this.pairFactoryAddress = "0xb16c1342E617A5B6E4b631EB114483FDB289c0A4";
         this.pairContractAbi = path.join(__dirname, "./abis/PairETH.json");
