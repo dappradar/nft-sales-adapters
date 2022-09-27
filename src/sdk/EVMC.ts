@@ -226,41 +226,42 @@ class EVMC extends BasicSDK {
     };
 
     getPastTransactions = async (from: number, to: number): Promise<Transaction[]> => {
-        const callback = async () => {
-            this.ensureWeb3();
+        this.ensureWeb3();
 
-            const contract = this.provider.contract;
+        const callback = async (blockNumber: number): Promise<Transaction | undefined> => {
+            const response = await this.web3.eth.getBlock(blockNumber, true);
 
-            const responseFinal = <Transaction[]>[];
-
-            for (let i = from; i < to; i++) {
-                const response = await this.web3.eth.getBlock(i, true);
-
-                if (null === response) {
-                    throw new Error("NULL response");
-                }
-
-                const transactions = <Transaction[]>response.transactions;
-
-                const contractTransactions = <Transaction>(
-                    transactions.find(({ to }) => to !== undefined && to?.toLowerCase() === contract)
-                );
-
-                if (contractTransactions !== undefined) {
-                    responseFinal.push(contractTransactions);
-                }
+            if (null === response) {
+                throw new Error("NULL response");
             }
 
-            return responseFinal;
+            const transactions = <Transaction[]>response.transactions;
+
+            const contractTransactions = <Transaction>(
+                transactions.find(({ to }) => to !== undefined && to?.toLowerCase() === this.provider.contract)
+            );
+
+            if (contractTransactions !== undefined) {
+                return contractTransactions;
+            }
+
+            return undefined;
         };
 
-        return this.retry({
-            callback,
-            customParams: {
-                from,
-                to,
-            },
-        });
+        const promises = [];
+        for (let i = from; i < to; i++) {
+            promises.push(
+                this.retry({
+                    callback: () => callback(i),
+                    action: "get block data",
+                    customParams: {
+                        blockNumber: i,
+                    },
+                }),
+            );
+        }
+
+        return (await Promise.all(promises)).filter(c => !!c);
     };
 
     /**
@@ -329,14 +330,12 @@ class EVMC extends BasicSDK {
         const block: number = +(await metadata.block(this.provider));
         const currentBlock: number = await this.getCurrentBlock();
 
-        if (this.provider.events) {
-            if ("topics" === this.provider.searchType) {
-                await this.eventsByTopics(block, currentBlock);
-            } else {
-                await this.events(block, currentBlock);
-            }
-        } else {
+        if ("topics" === this.provider.searchType) {
+            await this.eventsByTopics(block, currentBlock);
+        } else if ("block-scan" === this.provider.searchType) {
             await this.transactions(block, currentBlock);
+        } else {
+            await this.events(block, currentBlock);
         }
     };
 
