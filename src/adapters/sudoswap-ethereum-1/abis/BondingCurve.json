@@ -1,0 +1,158 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "uint128",
+        "name": "spotPrice",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint128",
+        "name": "delta",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint256",
+        "name": "numItems",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "feeMultiplier",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "protocolFeeMultiplier",
+        "type": "uint256"
+      }
+    ],
+    "name": "getBuyInfo",
+    "outputs": [
+      {
+        "internalType": "enum CurveErrorCodes.Error",
+        "name": "error",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint128",
+        "name": "newSpotPrice",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint128",
+        "name": "newDelta",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint256",
+        "name": "inputValue",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "protocolFee",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint128",
+        "name": "spotPrice",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint128",
+        "name": "delta",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint256",
+        "name": "numItems",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "feeMultiplier",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "protocolFeeMultiplier",
+        "type": "uint256"
+      }
+    ],
+    "name": "getSellInfo",
+    "outputs": [
+      {
+        "internalType": "enum CurveErrorCodes.Error",
+        "name": "error",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint128",
+        "name": "newSpotPrice",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint128",
+        "name": "newDelta",
+        "type": "uint128"
+      },
+      {
+        "internalType": "uint256",
+        "name": "outputValue",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "protocolFee",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint128",
+        "name": "delta",
+        "type": "uint128"
+      }
+    ],
+    "name": "validateDelta",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "valid",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint128",
+        "name": "newSpotPrice",
+        "type": "uint128"
+      }
+    ],
+    "name": "validateSpotPrice",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "valid",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
