@@ -40,7 +40,7 @@ const tester = async (): Promise<void> => {
         await adapter.run();
 
         if (entities.length == 0) {
-            throw new Error('No entities were returned');
+            throw new Error("No entities were returned");
         }
 
         for (const entity of entities) {

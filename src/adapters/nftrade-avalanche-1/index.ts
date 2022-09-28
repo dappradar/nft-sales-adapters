@@ -1,21 +1,21 @@
 import * as dotenv from "dotenv";
-import { EventData } from 'web3-eth-contract';
+import { EventData } from "web3-eth-contract";
 import moment from "moment";
 import path from "path";
 import BigNumber from "bignumber.js";
 
 dotenv.config();
 
-import { ISymbolAPIResponse, ISaleEntity } from '../../sdk/Interfaces';
+import { ISymbolAPIResponse, ISaleEntity } from "../../sdk/Interfaces";
 import Avalanche from "../../sdk/avalanche";
 import symbolSdk from "../../sdk/symbol";
 import priceSdk from "../../sdk/price";
 
-const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000';
+const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
 
-const ERC20ProxyId = '0xf47261b0';
-const ERC721ProxyId = '0x02571792';
-const ERC1155ProxyId = '0xa7cb5fb7';
+const ERC20ProxyId = "0xf47261b0";
+const ERC721ProxyId = "0x02571792";
+const ERC1155ProxyId = "0xa7cb5fb7";
 
 class NFTRADE {
     name: string;
@@ -59,42 +59,45 @@ class NFTRADE {
 
     getAssetProxyId = (assetData: string) => {
         return assetData.slice(0, 10);
-    }
+    };
 
     isOffer = (assetData: string) => {
         return this.getAssetProxyId(assetData) === ERC20ProxyId;
-    }
-    
+    };
+
     getAssetDataAddress = (assetData: string) => {
-        const data = this.sdk.web3.eth.abi.decodeParameters(['address'], assetData.slice(10));
-        return data['0'];
-    }
+        const data = this.sdk.web3.eth.abi.decodeParameters(["address"], assetData.slice(10));
+        return data["0"];
+    };
 
     decodeERC721AssetData = (assetData: string) => {
-        const data = this.sdk.web3.eth.abi.decodeParameters(['address', 'uint256'], assetData.slice(10));
-        const address = data['0'];
-        const id = data['1'];
+        const data = this.sdk.web3.eth.abi.decodeParameters(["address", "uint256"], assetData.slice(10));
+        const address = data["0"];
+        const id = data["1"];
         return { address, id };
-    }
-    
+    };
+
     decodeERC1155AssetData = (assetData: string) => {
-        const data = this.sdk.web3.eth.abi.decodeParameters(['address', 'uint256[]', 'uint256[]', 'bytes'], assetData.slice(10));
-        const address = data['0'];
-        const id = data['1'][0];
+        const data = this.sdk.web3.eth.abi.decodeParameters(
+            ["address", "uint256[]", "uint256[]", "bytes"],
+            assetData.slice(10),
+        );
+        const address = data["0"];
+        const id = data["1"][0];
         return { address, id };
-    }
+    };
 
     getNFTData = (assetData: string) => {
         const assetProxyId = this.getAssetProxyId(assetData);
-      
+
         if (assetProxyId == ERC721ProxyId) return this.decodeERC721AssetData(assetData);
         else if (assetProxyId == ERC1155ProxyId) return this.decodeERC1155AssetData(assetData);
-      
+
         return {
-          address: ADDRESS_ZERO,
-          id: 0,
+            address: ADDRESS_ZERO,
+            id: 0,
         };
-    }
+    };
 
     process = async (event: EventData): Promise<ISaleEntity | void> => {
         const isOffer = this.isOffer(event.returnValues["makerAssetData"]);
