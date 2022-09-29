@@ -109,4 +109,4 @@ class Element {
     };
 }
 
-export default new Element();
+export default Element;
