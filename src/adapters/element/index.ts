@@ -41,7 +41,7 @@ class Element {
     }
 
     run = async (): Promise<void> => {
-        this.sdk = this.loadSdk();
+        this.sdk = await this.loadSdk();
 
         await this.sdk.run();
     };
