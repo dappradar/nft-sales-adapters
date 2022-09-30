@@ -51,7 +51,7 @@ export class PairData {
             return [
                 {
                     contract: pairAddress,
-                    id: this._sdk.web3.utils.hexToNumber(this._data[idx][0][1][0]),
+                    id: new BigNumber(this._data[idx][0][1][0].hex, 16).toFixed(),
                     amount: 1,
                 },
             ];
@@ -61,7 +61,7 @@ export class PairData {
         for (let i = 0; i < this._data[idx][0][1].length; i++) {
             nftIds.push({
                 contract: pairAddress,
-                id: this._sdk.web3.utils.hexToNumber(this._data[idx][0][1][i]),
+                id: new BigNumber(this._data[idx][0][1][i].hex, 16).toFixed(),
                 amount: 1,
             });
         }
