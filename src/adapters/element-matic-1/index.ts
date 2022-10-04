@@ -25,7 +25,7 @@ class Element {
 
     constructor() {
         this.name = "element-matic-1";
-        this.protocol = "polygon";
+        this.protocol = "matic";
         this.block = 27168140;
         this.contract = "0xeaf5453b329eb38be159a872a6ce91c9a8fb0260";
         this.events = [
@@ -91,7 +91,7 @@ class Element {
             tokenSymbol: symbol?.symbol || "",
             amount,
             price: nativePrice.toNumber(),
-            priceUsd: nativePrice.multipliedBy(po.price).toNumber(),
+            priceUsd: null === symbol.decimals ? 0 : nativePrice.multipliedBy(po.price).toNumber(),
             seller: seller.toLowerCase(),
             buyer: buyer.toLowerCase(),
             soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),
