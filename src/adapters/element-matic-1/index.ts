@@ -25,7 +25,7 @@ class Element {
 
     constructor() {
         this.name = "element-matic-1";
-        this.protocol = "polygon";
+        this.protocol = "matic";
         this.block = 27168140;
         this.contract = "0xeaf5453b329eb38be159a872a6ce91c9a8fb0260";
         this.events = [
