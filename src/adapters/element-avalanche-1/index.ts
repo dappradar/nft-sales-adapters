@@ -7,7 +7,7 @@ import moment from "moment";
 import { EventData } from "web3-eth-contract";
 import path from "path";
 import priceSdk from "../../sdk/price";
-import Ethereum from "../../sdk/EVMC";
+import Avalanche from "../../sdk/avalanche";
 import symbolSdk from "../../sdk/symbol";
 import { ISaleEntity, ISymbolAPIResponse } from "../../sdk/Interfaces";
 
@@ -24,11 +24,10 @@ class Element {
     sdk: any;
 
     constructor() {
-        this.name = "element";
-        this.token = "eth";
-        this.protocol = "ethereum";
-        this.block = 15080677;
-        this.contract = "0x20f780a973856b93f63670377900c1d2a50a77c4";
+        this.name = "element-avalanche-1";
+        this.protocol = "avalanche";
+        this.block = 13749004;
+        this.contract = "0x18cd9270dbdca86d470cfb3be1b156241fffa9de";
         this.events = [
             "ERC721SellOrderFilled",
             "ERC721BuyOrderFilled",
@@ -47,7 +46,7 @@ class Element {
     };
 
     loadSdk = (): any => {
-        return new Ethereum(this);
+        return new Avalanche(this);
     };
 
     stop = async (): Promise<void> => {
@@ -58,7 +57,7 @@ class Element {
         let token = event.returnValues["erc20Token"].toLowerCase();
 
         if (token === "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee") {
-            token = "0x0000000000000000000000000000000000000000";
+            token = "avax";
         }
 
         return token;
@@ -79,14 +78,14 @@ class Element {
         const taker = event.returnValues["taker"];
         const buyer = isSellOrder ? taker : maker;
         const seller = isSellOrder ? maker : taker;
-        const nft_contract = event.returnValues["erc721Token"] || event.returnValues["erc1155Token"];
+        const nftContract = event.returnValues["erc721Token"] || event.returnValues["erc1155Token"];
         const tokenId = event.returnValues["erc721TokenId"] || event.returnValues["erc1155TokenId"];
 
         const entity = {
             providerName: this.name,
             providerContract: this.contract,
             protocol: this.protocol,
-            nftContract: nft_contract.toLowerCase(),
+            nftContract: nftContract.toLowerCase(),
             nftId: tokenId,
             token: token.toLowerCase(),
             tokenSymbol: symbol?.symbol || "",
