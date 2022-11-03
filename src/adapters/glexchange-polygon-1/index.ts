@@ -28,7 +28,7 @@ class GlExchange {
         this.protocol = "polygon";
 	this.token = "0xc2132d05d31c914a87c6611c10748aeb04b58e8f";
         this.block =  34825626;
-        this.contract = "0x8013bf7e0278891FB82b26FbD56628e12FEd112A";
+        this.contract = "0x8013bf7e0278891fb82b26fbd56628e12fed112a";
         this.events = ["OrderExecuted"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
