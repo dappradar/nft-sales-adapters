@@ -25,7 +25,7 @@ class GlExchange {
 
     constructor() {
         this.name = "glexchange-polygon-1";
-        this.protocol = "polygon";
+        this.protocol = "matic";
 	this.token = "0xc2132d05d31c914a87c6611c10748aeb04b58e8f";
         this.block =  34825626;
         this.contract = "0x8013bf7e0278891fb82b26fbd56628e12fed112a";
