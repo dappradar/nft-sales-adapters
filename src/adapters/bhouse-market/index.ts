@@ -86,7 +86,7 @@ class BHouseMarket {
         const entity: ISaleEntity = {
             providerName: this.name,
             providerContract: this.contract,
-            protocol: this.protocol,
+            protocol: "binance-smart-chain",
             nftContract: nftContract.toLowerCase(),
             nftId: tokenId,
             token: this.token || "",
