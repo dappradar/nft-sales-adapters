@@ -1,6 +1,6 @@
 enum AVAILABLE_PROTOCOLS {
     ETH = "ethereum",
-    BSC = "bsc",
+    BSC = "binance-smart-chain",
     POLYGON = "polygon",
     AVALANCHE = "avalanche",
     TEZOS = "tezos",

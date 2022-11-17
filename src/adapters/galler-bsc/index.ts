@@ -4,12 +4,11 @@ dotenv.config();
 import moment from "moment";
 import BigNumber from "bignumber.js";
 import BSC from "../../sdk/binance";
-import { AVAILABLE_PROTOCOLS } from "../../sdk/constants";
 import path from "path";
 import symbolSdk from "../../sdk/symbol";
 import priceSdk from "../../sdk/price";
 
-import { ISaleEntity, ISymbolAPIResponse, IObjectStringAny } from "../../sdk/Interfaces";
+import { ISaleEntity, ISymbolAPIResponse } from "../../sdk/Interfaces";
 import { EventData } from "web3-eth-contract";
 
 class GallerBSC {
@@ -26,7 +25,7 @@ class GallerBSC {
     constructor() {
         this.name = "galler-bsc";
         this.token = "bnb";
-        this.protocol = AVAILABLE_PROTOCOLS.BSC;
+        this.protocol = "binance-smart-chain";
         this.block = 14444440;
         this.pathToAbi = path.join(__dirname, "../galler/abi.json");
         this.contract = "0xb50a86874394f75d9388dd5bc47705145110d9a5";
@@ -107,7 +106,7 @@ class GallerBSC {
             soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),
             blockNumber: event.blockNumber,
             transactionHash: event.transactionHash,
-            protocol: "binance-smart-chain",
+            protocol: this.protocol,
         };
 
         return this.addToDatabase(entity);

@@ -29,7 +29,7 @@ class BHeroMarket {
         this.name = "bhero-market";
         this.symbol = undefined;
         this.token = undefined;
-        this.protocol = "bsc";
+        this.protocol = "binance-smart-chain";
         this.block = 15498601;
         this.contract = "0x376a10e7f125a4e0a567cc08043c695cd8edd704";
         this.events = ["Sold"];
@@ -86,7 +86,7 @@ class BHeroMarket {
         const entity: ISaleEntity = {
             providerName: this.name,
             providerContract: this.contract,
-            protocol: "binance-smart-chain",
+            protocol: this.protocol,
             nftContract: nftContract.toLowerCase(),
             nftId: tokenId,
             token: this.token || "",

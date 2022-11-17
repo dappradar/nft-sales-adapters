@@ -25,7 +25,7 @@ class Element {
 
     constructor() {
         this.name = "element-bsc-1";
-        this.protocol = "bsc";
+        this.protocol = "binance-smart-chain";
         this.block = 16968105;
         this.contract = "0xb3e3dfcb2d9f3dde16d78b9e6eb3538eb32b5ae1";
         this.events = [
@@ -84,7 +84,7 @@ class Element {
         const entity = {
             providerName: this.name,
             providerContract: this.contract,
-            protocol: "binance-smart-chain",
+            protocol: this.protocol,
             nftContract: nftContract.toLowerCase(),
             nftId: tokenId,
             token: token.toLowerCase(),

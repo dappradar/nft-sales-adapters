@@ -29,7 +29,7 @@ class BHouseMarket {
         this.name = "bhouse-market";
         this.symbol = undefined;
         this.token = undefined;
-        this.protocol = "bsc";
+        this.protocol = "binance-smart-chain";
         this.block = 14498666;
         this.contract = "0x049896f350c802cd5c91134e5f35ec55fa8f0108";
         this.events = ["Sold"];
@@ -86,7 +86,7 @@ class BHouseMarket {
         const entity: ISaleEntity = {
             providerName: this.name,
             providerContract: this.contract,
-            protocol: "binance-smart-chain",
+            protocol: this.protocol,
             nftContract: nftContract.toLowerCase(),
             nftId: tokenId,
             token: this.token || "",

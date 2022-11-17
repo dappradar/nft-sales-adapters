@@ -33,7 +33,7 @@ class NFTRADE {
         this.name = "nftrade-binance-1";
         this.symbol = undefined;
         this.token = "bnb";
-        this.protocol = "bsc";
+        this.protocol = "binance-smart-chain";
         this.block = 21416323;
         this.contract = "0xbf6bfe5d6b86308cf3b7f147dd03ef11f80bfde3";
         this.events = ["Fill"];
@@ -120,7 +120,7 @@ class NFTRADE {
         const entity = {
             providerName: this.name, // the name of the folder
             providerContract: this.contract.toLowerCase(), // the providers contract from which you get data
-            protocol: "binance-smart-chain",
+            protocol: this.protocol,
             nftContract: nft.address.toLowerCase(),
             nftId: String(nft.id),
             token: token.toLowerCase(),

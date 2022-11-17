@@ -28,7 +28,7 @@ class RadioCaca {
         this.name = "radiocaca";
         this.symbol = undefined;
         this.token = "0x0000000000000000000000000000000000000000";
-        this.protocol = "bsc";
+        this.protocol = "binance-smart-chain";
         this.block = 13219620;
         this.contract = "0xe97fdca0a3fc76b3046ae496c1502c9d8dfef6fc";
         this.events = ["AuctionExecuted"];
