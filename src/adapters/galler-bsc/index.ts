@@ -107,7 +107,7 @@ class GallerBSC {
             soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),
             blockNumber: event.blockNumber,
             transactionHash: event.transactionHash,
-            protocol: AVAILABLE_PROTOCOLS.BSC,
+            protocol: "binance-smart-chain",
         };
 
         return this.addToDatabase(entity);
