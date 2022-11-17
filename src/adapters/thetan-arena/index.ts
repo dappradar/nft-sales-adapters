@@ -91,7 +91,7 @@ class ThetanArena {
         const entity = {
             providerName: this.name,
             providerContract: this.contract,
-            protocol: this.protocol,
+            protocol: "binance-smart-chain",
             nftContract: nftContract,
             nftId: tokenId,
             token: paymentToken,
