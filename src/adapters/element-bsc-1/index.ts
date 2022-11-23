@@ -16,6 +16,7 @@ class Element {
     token: string;
     protocol: string;
     block: number;
+    deprecatedAtBlock: number;
     contract: string;
     events: string[];
     pathToAbi: string;
@@ -27,6 +28,7 @@ class Element {
         this.name = "element-bsc-1";
         this.protocol = "binance-smart-chain";
         this.block = 16968105;
+        this.deprecatedAtBlock = 22357101;
         this.contract = "0xb3e3dfcb2d9f3dde16d78b9e6eb3538eb32b5ae1";
         this.events = [
             "ERC721SellOrderFilled",

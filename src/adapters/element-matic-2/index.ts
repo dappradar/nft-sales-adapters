@@ -7,7 +7,7 @@ import moment from "moment";
 import { EventData } from "web3-eth-contract";
 import path from "path";
 import priceSdk from "../../sdk/price";
-import Avalanche from "../../sdk/avalanche";
+import Matic from "../../sdk/matic";
 import symbolSdk from "../../sdk/symbol";
 import { ISaleEntity, ISymbolAPIResponse } from "../../sdk/Interfaces";
 
@@ -25,17 +25,11 @@ class Element {
     sdk: any;
 
     constructor() {
-        this.name = "element-avalanche-1";
-        this.protocol = "avalanche";
-        this.block = 13749004;
-        this.deprecatedAtBlock = 21333894;
-        this.contract = "0x18cd9270dbdca86d470cfb3be1b156241fffa9de";
-        this.events = [
-            "ERC721SellOrderFilled",
-            "ERC721BuyOrderFilled",
-            "ERC1155SellOrderFilled",
-            "ERC1155BuyOrderFilled",
-        ];
+        this.name = "element-matic-2";
+        this.protocol = "matic";
+        this.block = 34601844;
+        this.contract = "0xeaf5453b329eb38be159a872a6ce91c9a8fb0260";
+        this.events = ["ERC1155SellOrderFilled", "ERC1155BuyOrderFilled"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
         this.chunkSize = 6;
@@ -48,7 +42,7 @@ class Element {
     };
 
     loadSdk = (): any => {
-        return new Avalanche(this);
+        return new Matic(this);
     };
 
     stop = async (): Promise<void> => {
@@ -59,29 +53,28 @@ class Element {
         let token = event.returnValues["erc20Token"].toLowerCase();
 
         if (token === "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee") {
-            token = "avax";
+            token = "matic";
         }
 
         return token;
     };
 
     process = async (event: EventData): Promise<void> => {
-        const isER721 = event.event === "ERC721SellOrderFilled" || event.event === "ERC721BuyOrderFilled";
-        const isSellOrder = ["ERC721SellOrderFilled", "ERC1155SellOrderFilled"].includes(event.event);
+        const isSellOrder = "ERC1155SellOrderFilled" === event.event;
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
         const token = this._getToken(event);
         const symbol: ISymbolAPIResponse = await symbolSdk.get(token, this.protocol);
         const po = await priceSdk.get(token, this.protocol, block.timestamp);
-        const amount = isER721 ? 1 : event.returnValues["erc1155FillAmount"];
-        const price = isER721 ? event.returnValues["erc20TokenAmount"] : event.returnValues["erc20FillAmount"];
+        const amount = event.returnValues["erc1155FillAmount"];
+        const price = event.returnValues["erc20FillAmount"];
         const nativePrice = new BigNumber(price).dividedBy(10 ** (symbol?.decimals || 0));
         const maker = event.returnValues["maker"];
         const taker = event.returnValues["taker"];
         const buyer = isSellOrder ? taker : maker;
         const seller = isSellOrder ? maker : taker;
-        const nftContract = event.returnValues["erc721Token"] || event.returnValues["erc1155Token"];
-        const tokenId = event.returnValues["erc721TokenId"] || event.returnValues["erc1155TokenId"];
+        const nftContract = event.returnValues["erc1155Token"];
+        const tokenId = event.returnValues["erc1155TokenId"];
 
         const entity = {
             providerName: this.name,

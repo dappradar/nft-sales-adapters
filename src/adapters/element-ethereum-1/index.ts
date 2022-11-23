@@ -16,6 +16,7 @@ class Element {
     token: string;
     protocol: string;
     block: number;
+    deprecatedAtBlock: number;
     contract: string;
     events: string[];
     pathToAbi: string;
@@ -27,6 +28,7 @@ class Element {
         this.name = "element-ethereum-1";
         this.protocol = "ethereum";
         this.block = 15080677;
+        this.deprecatedAtBlock = 15794002;
         this.contract = "0x20f780a973856b93f63670377900c1d2a50a77c4";
         this.events = [
             "ERC721SellOrderFilled",

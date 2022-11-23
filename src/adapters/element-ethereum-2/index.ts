@@ -7,7 +7,7 @@ import moment from "moment";
 import { EventData } from "web3-eth-contract";
 import path from "path";
 import priceSdk from "../../sdk/price";
-import Avalanche from "../../sdk/avalanche";
+import Ethereum from "../../sdk/EVMC";
 import symbolSdk from "../../sdk/symbol";
 import { ISaleEntity, ISymbolAPIResponse } from "../../sdk/Interfaces";
 
@@ -16,7 +16,6 @@ class Element {
     token: string;
     protocol: string;
     block: number;
-    deprecatedAtBlock: number;
     contract: string;
     events: string[];
     pathToAbi: string;
@@ -25,11 +24,10 @@ class Element {
     sdk: any;
 
     constructor() {
-        this.name = "element-avalanche-1";
-        this.protocol = "avalanche";
-        this.block = 13749004;
-        this.deprecatedAtBlock = 21333894;
-        this.contract = "0x18cd9270dbdca86d470cfb3be1b156241fffa9de";
+        this.name = "element-ethereum-2";
+        this.protocol = "ethereum";
+        this.block = 15794002;
+        this.contract = "0x20f780a973856b93f63670377900c1d2a50a77c4";
         this.events = [
             "ERC721SellOrderFilled",
             "ERC721BuyOrderFilled",
@@ -48,7 +46,7 @@ class Element {
     };
 
     loadSdk = (): any => {
-        return new Avalanche(this);
+        return new Ethereum(this);
     };
 
     stop = async (): Promise<void> => {
@@ -59,7 +57,7 @@ class Element {
         let token = event.returnValues["erc20Token"].toLowerCase();
 
         if (token === "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee") {
-            token = "avax";
+            token = "0x0000000000000000000000000000000000000000";
         }
 
         return token;

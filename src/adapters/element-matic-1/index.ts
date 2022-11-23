@@ -16,6 +16,7 @@ class Element {
     token: string;
     protocol: string;
     block: number;
+    deprecatedAtBlock: number;
     contract: string;
     events: string[];
     pathToAbi: string;
@@ -27,6 +28,7 @@ class Element {
         this.name = "element-matic-1";
         this.protocol = "matic";
         this.block = 27168140;
+        this.deprecatedAtBlock = 34601844;
         this.contract = "0xeaf5453b329eb38be159a872a6ce91c9a8fb0260";
         this.events = [
             "ERC721SellOrderFilled",

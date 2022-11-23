@@ -16,7 +16,6 @@ class Element {
     token: string;
     protocol: string;
     block: number;
-    deprecatedAtBlock: number;
     contract: string;
     events: string[];
     pathToAbi: string;
@@ -25,10 +24,9 @@ class Element {
     sdk: any;
 
     constructor() {
-        this.name = "element-avalanche-1";
+        this.name = "element-avalanche-2";
         this.protocol = "avalanche";
-        this.block = 13749004;
-        this.deprecatedAtBlock = 21333894;
+        this.block = 21333894;
         this.contract = "0x18cd9270dbdca86d470cfb3be1b156241fffa9de";
         this.events = [
             "ERC721SellOrderFilled",
