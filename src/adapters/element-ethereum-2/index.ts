@@ -28,12 +28,7 @@ class Element {
         this.protocol = "ethereum";
         this.block = 15794002;
         this.contract = "0x20f780a973856b93f63670377900c1d2a50a77c4";
-        this.events = [
-            "ERC721SellOrderFilled",
-            "ERC721BuyOrderFilled",
-            "ERC1155SellOrderFilled",
-            "ERC1155BuyOrderFilled",
-        ];
+        this.events = ["ERC721SellOrderFilled", "ERC721BuyOrderFilled"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
         this.chunkSize = 6;
@@ -64,22 +59,20 @@ class Element {
     };
 
     process = async (event: EventData): Promise<void> => {
-        const isER721 = event.event === "ERC721SellOrderFilled" || event.event === "ERC721BuyOrderFilled";
-        const isSellOrder = ["ERC721SellOrderFilled", "ERC1155SellOrderFilled"].includes(event.event);
+        const isSellOrder = "ERC721SellOrderFilled" === event.event;
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
         const token = this._getToken(event);
         const symbol: ISymbolAPIResponse = await symbolSdk.get(token, this.protocol);
         const po = await priceSdk.get(token, this.protocol, block.timestamp);
-        const amount = isER721 ? 1 : event.returnValues["erc1155FillAmount"];
-        const price = isER721 ? event.returnValues["erc20TokenAmount"] : event.returnValues["erc20FillAmount"];
+        const price = event.returnValues["erc20TokenAmount"];
         const nativePrice = new BigNumber(price).dividedBy(10 ** (symbol?.decimals || 0));
         const maker = event.returnValues["maker"];
         const taker = event.returnValues["taker"];
         const buyer = isSellOrder ? taker : maker;
         const seller = isSellOrder ? maker : taker;
-        const nftContract = event.returnValues["erc721Token"] || event.returnValues["erc1155Token"];
-        const tokenId = event.returnValues["erc721TokenId"] || event.returnValues["erc1155TokenId"];
+        const nftContract = event.returnValues["erc721Token"];
+        const tokenId = event.returnValues["erc721TokenId"];
 
         const entity = {
             providerName: this.name,
@@ -89,7 +82,7 @@ class Element {
             nftId: tokenId,
             token: token.toLowerCase(),
             tokenSymbol: symbol?.symbol || "",
-            amount,
+            amount: 1,
             price: nativePrice.toNumber(),
             priceUsd: null === symbol.decimals ? 0 : nativePrice.multipliedBy(po.price).toNumber(),
             seller: seller.toLowerCase(),
