@@ -28,12 +28,7 @@ class Element {
         this.protocol = "binance-smart-chain";
         this.block = 22357101;
         this.contract = "0xb3e3dfcb2d9f3dde16d78b9e6eb3538eb32b5ae1";
-        this.events = [
-            "ERC721SellOrderFilled",
-            "ERC721BuyOrderFilled",
-            "ERC1155SellOrderFilled",
-            "ERC1155BuyOrderFilled",
-        ];
+        this.events = ["ERC721SellOrderFilled", "ERC721BuyOrderFilled"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
         this.chunkSize = 6;
@@ -64,15 +59,13 @@ class Element {
     };
 
     process = async (event: EventData): Promise<void> => {
-        const isER721 = event.event === "ERC721SellOrderFilled" || event.event === "ERC721BuyOrderFilled";
-        const isSellOrder = ["ERC721SellOrderFilled", "ERC1155SellOrderFilled"].includes(event.event);
+        const isSellOrder = "ERC721SellOrderFilled" === event.event;
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
         const token = this._getToken(event);
         const symbol: ISymbolAPIResponse = await symbolSdk.get(token, this.protocol);
         const po = await priceSdk.get(token, this.protocol, block.timestamp);
-        const amount = isER721 ? 1 : event.returnValues["erc1155FillAmount"];
-        const price = isER721 ? event.returnValues["erc20TokenAmount"] : event.returnValues["erc20FillAmount"];
+        const price = event.returnValues["erc20TokenAmount"];
         const nativePrice = new BigNumber(price).dividedBy(10 ** (symbol?.decimals || 0));
         const maker = event.returnValues["maker"];
         const taker = event.returnValues["taker"];
@@ -89,7 +82,7 @@ class Element {
             nftId: tokenId,
             token: token.toLowerCase(),
             tokenSymbol: symbol?.symbol || "",
-            amount,
+            amount: 1,
             price: nativePrice.toNumber(),
             priceUsd: null === symbol.decimals ? 0 : nativePrice.multipliedBy(po.price).toNumber(),
             seller: seller.toLowerCase(),
