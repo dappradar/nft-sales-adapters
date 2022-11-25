@@ -26,9 +26,8 @@ class GlExchange {
     constructor() {
         this.name = "glexchange-polygon-1";
         this.protocol = "matic";
-	this.token = "0xc2132d05d31c914a87c6611c10748aeb04b58e8f";
-        this.block =  34825626;
-        this.contract = "0x8013bf7e0278891fb82b26fbd56628e12fed112a";
+        this.block =   36044498;
+        this.contract = "0x88cbb5881895d13fa3a35225b0fed9c81805f44b";
         this.events = ["OrderExecuted"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
@@ -52,7 +51,7 @@ class GlExchange {
     process = async (event: EventData): Promise<void> => {
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
-        const token = this.token;
+        const token = event.returnValues["paymentToken"].toLowerCase();
         const symbol: ISymbolAPIResponse = await symbolSdk.get(token, this.protocol);
         const po = await priceSdk.get(token, this.protocol, block.timestamp);
         const amount = event.returnValues["supply"];
