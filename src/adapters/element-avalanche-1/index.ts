@@ -10,6 +10,7 @@ import priceSdk from "../../sdk/price";
 import Avalanche from "../../sdk/avalanche";
 import symbolSdk from "../../sdk/symbol";
 import { ISaleEntity, ISymbolAPIResponse } from "../../sdk/Interfaces";
+import { BlockTransactionString } from "web3-eth";
 
 class Element {
     name: string;
@@ -28,12 +29,7 @@ class Element {
         this.protocol = "avalanche";
         this.block = 13749004;
         this.contract = "0x18cd9270dbdca86d470cfb3be1b156241fffa9de";
-        this.events = [
-            "ERC721SellOrderFilled",
-            "ERC721BuyOrderFilled",
-            "ERC1155SellOrderFilled",
-            "ERC1155BuyOrderFilled",
-        ];
+        this.events = ["TokenBought", "TokenBidAccepted"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
         this.chunkSize = 6;
@@ -63,22 +59,70 @@ class Element {
         return token;
     };
 
+    _getBuyer = (event: EventData): string => {
+        if (event.event === "TokenBidAccepted") {
+            return event.returnValues.bid.bidder;
+        }
+        return event.returnValues.buyer;
+    };
+
+    _getSeller = (event: EventData): string => {
+        if (event.event === "TokenBidAccepted") {
+            return event.returnValues.seller;
+        }
+        return event.returnValues.listing.seller;
+    };
+
+    _getPaymentToken = async (event: EventData): Promise<string> => {
+        if (event.event === "TokenBidAccepted") {
+            const paymentTokenCall = await this.sdk.callContractMethod("paymentToken");
+            return paymentTokenCall.toLowerCase();
+        }
+
+        return "avax";
+    };
+
+    _getPrice = async (
+        event: EventData,
+        block: BlockTransactionString,
+        symbol: ISymbolAPIResponse,
+        paymentToken: string,
+    ): Promise<{ price: number | null; priceUsd: number | null }> => {
+        if (!symbol?.decimals) {
+            return {
+                price: null,
+                priceUsd: null,
+            };
+        }
+
+        const po = await priceSdk.get(paymentToken, this.protocol, +block.timestamp);
+
+        let value: number;
+        if (event.event === "TokenBidAccepted") {
+            value = event.returnValues.bid.value;
+        } else {
+            value = event.returnValues.listing.value;
+        }
+        const nativePrice = new BigNumber(value).dividedBy(10 ** (symbol?.decimals || 0));
+
+        return {
+            price: nativePrice.toNumber(),
+            priceUsd: nativePrice.multipliedBy(po.price).toNumber(),
+        };
+    };
+
     process = async (event: EventData): Promise<void> => {
-        const isER721 = event.event === "ERC721SellOrderFilled" || event.event === "ERC721BuyOrderFilled";
-        const isSellOrder = ["ERC721SellOrderFilled", "ERC1155SellOrderFilled"].includes(event.event);
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
-        const token = this._getToken(event);
-        const symbol: ISymbolAPIResponse = await symbolSdk.get(token, this.protocol);
-        const po = await priceSdk.get(token, this.protocol, block.timestamp);
-        const amount = isER721 ? 1 : event.returnValues["erc1155FillAmount"];
-        const price = isER721 ? event.returnValues["erc20TokenAmount"] : event.returnValues["erc20FillAmount"];
-        const nativePrice = new BigNumber(price).dividedBy(10 ** (symbol?.decimals || 0));
-        const maker = event.returnValues["maker"];
-        const taker = event.returnValues["taker"];
-        const buyer = isSellOrder ? taker : maker;
-        const seller = isSellOrder ? maker : taker;
-        const nftContract = event.returnValues["erc721Token"] || event.returnValues["erc1155Token"];
+        const buyer = this._getBuyer(event).toLowerCase();
+        if (!buyer) {
+            return;
+        }
+        const paymentToken = await this._getPaymentToken(event);
+        const symbol = await symbolSdk.get(paymentToken, this.protocol);
+        const { price, priceUsd } = await this._getPrice(event, block, symbol, paymentToken);
+        const seller = this._getSeller(event).toLowerCase();
+        const nftContract = event.returnValues.erc721Address.toLowerCase();
         const tokenId = event.returnValues["erc721TokenId"] || event.returnValues["erc1155TokenId"];
 
         const entity = {
@@ -87,13 +131,13 @@ class Element {
             protocol: this.protocol,
             nftContract: nftContract.toLowerCase(),
             nftId: tokenId,
-            token: token.toLowerCase(),
+            token: this.token,
             tokenSymbol: symbol?.symbol || "",
-            amount,
-            price: nativePrice.toNumber(),
-            priceUsd: null === symbol.decimals ? 0 : nativePrice.multipliedBy(po.price).toNumber(),
-            seller: seller.toLowerCase(),
-            buyer: buyer.toLowerCase(),
+            amount: 1,
+            price,
+            priceUsd,
+            seller,
+            buyer,
             soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),
             blockNumber: event.blockNumber,
             transactionHash: event.transactionHash,
