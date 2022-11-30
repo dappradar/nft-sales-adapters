@@ -94,7 +94,7 @@ class NFTKey {
 
         return {
             price: nativePrice.toNumber(),
-            priceUsd: nativePrice.multipliedBy(po.price).toNumber(),
+            priceUsd: !symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
         };
     };
 
@@ -129,7 +129,7 @@ class NFTKey {
             tokenSymbol: symbol?.symbol || "",
             amount: 1,
             price,
-            priceUsd: priceUsd,
+            priceUsd,
             seller: seller.toLowerCase(),
             buyer: buyer.toLowerCase(),
             soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),

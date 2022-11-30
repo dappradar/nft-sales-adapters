@@ -27,7 +27,7 @@ class Element {
     constructor() {
         this.name = "element-matic-2";
         this.protocol = "matic";
-        this.block = 34601844;
+        this.block = 36047022;
         this.contract = "0xeaf5453b329eb38be159a872a6ce91c9a8fb0260";
         this.events = ["ERC1155SellOrderFilled", "ERC1155BuyOrderFilled"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
@@ -86,7 +86,7 @@ class Element {
             tokenSymbol: symbol?.symbol || "",
             amount,
             price: nativePrice.toNumber(),
-            priceUsd: null === symbol.decimals ? 0 : nativePrice.multipliedBy(po.price).toNumber(),
+            priceUsd: !symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
             seller: seller.toLowerCase(),
             buyer: buyer.toLowerCase(),
             soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),

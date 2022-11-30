@@ -127,7 +127,7 @@ class NFTRADE {
             tokenSymbol: symbol.symbol,
             amount,
             price: nativePrice.toNumber(),
-            priceUsd: nativePrice.multipliedBy(po.price).toNumber(),
+            priceUsd: !symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
             seller: seller.toLowerCase(),
             buyer: buyer.toLowerCase(),
             soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),
