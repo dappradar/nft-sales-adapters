@@ -1,4 +1,5 @@
 import * as dotenv from "dotenv";
+
 dotenv.config();
 
 import fs from "fs";
@@ -253,7 +254,7 @@ class SudoSwap {
 
         return {
             price: nativePrice.toNumber(),
-            priceUsd: nativePrice.multipliedBy(po.price).toNumber(),
+            priceUsd: !this.symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
         };
     };
 
@@ -339,8 +340,8 @@ class SudoSwap {
                     nfts: pairInfo.nfts,
                     token: this.token.toLowerCase(),
                     tokenSymbol: this.symbol?.symbol || "",
-                    price: price,
-                    priceUsd: priceUsd,
+                    price,
+                    priceUsd,
                     seller: pairInfo.pairAddress.toLowerCase(),
                     buyer: pairInfo.buyer.toLowerCase(),
                     soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),

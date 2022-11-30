@@ -114,7 +114,7 @@ class CRYPTOPUNKS2 {
             token: this.token,
             tokenSymbol: this.symbol?.symbol || "",
             price: nativePrice.toNumber(),
-            priceUsd: nativePrice.multipliedBy(po.price).toNumber(),
+            priceUsd: !this.symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
             seller: this.contract,
             buyer,
             soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),
