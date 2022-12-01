@@ -86,7 +86,7 @@ class Bazaar {
 
         return {
             price: nativePrice.toNumber(),
-            priceUsd: nativePrice.multipliedBy(po.price).toNumber(),
+            priceUsd: !this.symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
         };
     };
 
@@ -111,7 +111,7 @@ class Bazaar {
             tokenSymbol: this.symbol?.symbol || "",
             amount: 1,
             price,
-            priceUsd: priceUsd,
+            priceUsd,
             seller: this.contract,
             buyer: buyer.toLowerCase(),
             soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),

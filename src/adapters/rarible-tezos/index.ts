@@ -1,4 +1,5 @@
 import * as dotenv from "dotenv";
+
 dotenv.config();
 
 import moment from "moment";
@@ -96,7 +97,7 @@ class RaribleTezos {
             tokenSymbol: this.symbol?.symbol || "",
             amount: 1,
             price: nativePrice.toNumber(),
-            priceUsd: nativePrice.multipliedBy(po.price).toNumber(),
+            priceUsd: !this.symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
             seller,
             buyer,
             soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),

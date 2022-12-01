@@ -100,7 +100,7 @@ class GallerBSC {
             tokenSymbol: this.symbol?.symbol || "",
             amount,
             price: nativePrice.toNumber(),
-            priceUsd: nativePrice.multipliedBy(po.price).toNumber(),
+            priceUsd: !this.symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
             seller,
             buyer,
             soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),

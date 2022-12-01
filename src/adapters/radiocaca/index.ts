@@ -71,7 +71,7 @@ class RadioCaca {
 
         return {
             price: nativePrice.toNumber(),
-            priceUsd: nativePrice.multipliedBy(po.price).toNumber(),
+            priceUsd: !symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
         };
     };
 
@@ -105,7 +105,7 @@ class RadioCaca {
             tokenSymbol: symbol?.symbol || "",
             amount: count,
             price,
-            priceUsd: priceUsd,
+            priceUsd,
             seller: seller.toLowerCase(),
             buyer: buyer.toLowerCase(),
             soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),

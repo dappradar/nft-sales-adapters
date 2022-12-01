@@ -1,4 +1,5 @@
 import * as dotenv from "dotenv";
+
 dotenv.config();
 
 import path from "path";
@@ -71,7 +72,7 @@ class ThetanArena {
 
         return {
             price: nativePrice.toNumber(),
-            priceUsd: nativePrice.multipliedBy(po.price).toNumber(),
+            priceUsd: !symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
         };
     };
 
@@ -98,7 +99,7 @@ class ThetanArena {
             tokenSymbol: symbol?.symbol || "",
             amount: 1,
             price,
-            priceUsd: priceUsd,
+            priceUsd,
             seller,
             buyer,
             soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),

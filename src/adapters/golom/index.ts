@@ -107,7 +107,7 @@ class GOLOM {
             tokenSymbol: token_symbol,
             amount: 1,
             price: nativePrice.toNumber(),
-            priceUsd: nativePrice.multipliedBy(po.price).toNumber(),
+            priceUsd: !this.symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
             seller: seller, // its bought from ens and transfered to the owner
             buyer,
             soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),

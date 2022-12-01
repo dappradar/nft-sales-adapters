@@ -100,7 +100,7 @@ class ENS {
             token: this.token,
             tokenSymbol: this.symbol?.symbol || "",
             price: nativePrice.toNumber(),
-            priceUsd: nativePrice.multipliedBy(po.price).toNumber(),
+            priceUsd: !this.symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
             seller: this.contract, // its bought from ens and transfered to the owner
             buyer,
             soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),
