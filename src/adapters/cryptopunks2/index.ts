@@ -1,3 +1,5 @@
+// @todo use getPaymentDetails
+
 import * as dotenv from "dotenv";
 
 dotenv.config();
@@ -86,7 +88,7 @@ class CRYPTOPUNKS2 {
             }
         }
 
-        const po = await priceSdk.get(this.token, this.protocol, block.timestamp);
+        const po = await priceSdk.get(this.token, this.protocol, timestamp);
         let nativePrice = new BigNumber(0);
         if (baseTx.value > 0)
             nativePrice = new BigNumber(baseTx.value)

@@ -6,18 +6,15 @@ import moment from "moment";
 import BigNumber from "bignumber.js";
 import Ethereum from "../../sdk/EVMC";
 import path from "path";
-import symbolSdk from "../../sdk/symbol";
-import priceSdk from "../../sdk/price";
-
-import { ISaleEntity, ISymbolAPIResponse } from "../../sdk/Interfaces";
+import { ISaleEntity } from "../../sdk/Interfaces";
 import { EventData } from "web3-eth-contract";
 import { TransactionReceipt } from "web3-core";
+import getPaymentData from "../../sdk/utils/getPaymentData";
 
 class ENS {
     // stands for Ethereum name service
 
     name: string;
-    symbol: ISymbolAPIResponse | undefined;
     token: string;
     protocol: string;
     block: number;
@@ -30,7 +27,6 @@ class ENS {
 
     constructor() {
         this.name = "ens";
-        this.symbol = undefined;
         this.token = "0x0000000000000000000000000000000000000000";
         this.protocol = "ethereum";
         this.block = 12855192;
@@ -43,10 +39,6 @@ class ENS {
     }
 
     run = async (): Promise<void> => {
-        const symbol = await symbolSdk.get(this.token, this.protocol);
-        if (!symbol) throw new Error(`Missing symbol metadata for provider ${this.name}`);
-        this.symbol = symbol;
-
         this.sdk = await this.loadSdk();
 
         await this.sdk.run();
@@ -77,8 +69,6 @@ class ENS {
     process = async (event: any): Promise<ISaleEntity | undefined> => {
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
-        const po = await priceSdk.get(this.token, this.protocol, block.timestamp);
-        const nativePrice = new BigNumber(event.returnValues.cost).dividedBy(10 ** (this.symbol?.decimals || 0));
         const buyer = await this.getBuyer(event);
         if (!buyer) {
             return;
@@ -86,6 +76,13 @@ class ENS {
 
         const labelHash = event.returnValues.label;
         const tokenId = new BigNumber(labelHash, 16).toFixed();
+        const { paymentTokenSymbol, priceInCrypto, priceInUsd } = await getPaymentData(
+            this.protocol,
+            this.token,
+            event.returnValues.cost,
+            timestamp,
+        );
+
         const entity: ISaleEntity = {
             providerName: this.name, // the name of the folder
             providerContract: this.contract, // the providers contract from which you get data
@@ -98,9 +95,9 @@ class ENS {
                 },
             ],
             token: this.token,
-            tokenSymbol: this.symbol?.symbol || "",
-            price: nativePrice.toNumber(),
-            priceUsd: !this.symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
+            tokenSymbol: paymentTokenSymbol,
+            price: priceInCrypto,
+            priceUsd: priceInUsd,
             seller: this.contract, // its bought from ens and transfered to the owner
             buyer,
             soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),

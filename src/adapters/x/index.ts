@@ -1,3 +1,5 @@
+// @todo use getPaymentData
+
 import * as dotenv from "dotenv";
 dotenv.config();
 

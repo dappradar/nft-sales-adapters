@@ -14,8 +14,8 @@ export interface ISaleEntity {
     token: string;
     tokenSymbol: string;
     amount?: number;
-    price: number | null;
-    priceUsd: number | null;
+    price: string | number | null;
+    priceUsd: string | number | null;
     seller: string;
     buyer: string;
     soldAt: string;

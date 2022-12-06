@@ -2,18 +2,15 @@ import * as dotenv from "dotenv";
 
 dotenv.config();
 
-import BigNumber from "bignumber.js";
 import moment from "moment";
 import { EventData } from "web3-eth-contract";
 import path from "path";
-import priceSdk from "../../sdk/price";
 import Ethereum from "../../sdk/EVMC";
-import symbolSdk from "../../sdk/symbol";
-import { ISaleEntity, ISymbolAPIResponse } from "../../sdk/Interfaces";
+import { ISaleEntity } from "../../sdk/Interfaces";
+import getPaymentData from "../../sdk/utils/getPaymentData";
 
 class Element {
     name: string;
-    token: string;
     protocol: string;
     block: number;
     deprecatedAtBlock: number;
@@ -70,18 +67,21 @@ class Element {
         const isSellOrder = ["ERC721SellOrderFilled", "ERC1155SellOrderFilled"].includes(event.event);
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
-        const token = this._getToken(event);
-        const symbol: ISymbolAPIResponse = await symbolSdk.get(token, this.protocol);
-        const po = await priceSdk.get(token, this.protocol, block.timestamp);
+        const paymentToken = this._getToken(event);
         const amount = isER721 ? 1 : event.returnValues["erc1155FillAmount"];
-        const price = isER721 ? event.returnValues["erc20TokenAmount"] : event.returnValues["erc20FillAmount"];
-        const nativePrice = new BigNumber(price).dividedBy(10 ** (symbol?.decimals || 0));
+        const nativePrice = isER721 ? event.returnValues["erc20TokenAmount"] : event.returnValues["erc20FillAmount"];
         const maker = event.returnValues["maker"];
         const taker = event.returnValues["taker"];
         const buyer = isSellOrder ? taker : maker;
         const seller = isSellOrder ? maker : taker;
         const nftContract = event.returnValues["erc721Token"] || event.returnValues["erc1155Token"];
         const tokenId = event.returnValues["erc721TokenId"] || event.returnValues["erc1155TokenId"];
+        const { paymentTokenSymbol, priceInCrypto, priceInUsd } = await getPaymentData(
+            this.protocol,
+            paymentToken,
+            nativePrice,
+            timestamp,
+        );
 
         const entity = {
             providerName: this.name,
@@ -89,11 +89,11 @@ class Element {
             protocol: this.protocol,
             nftContract: nftContract.toLowerCase(),
             nftId: tokenId,
-            token: token.toLowerCase(),
-            tokenSymbol: symbol?.symbol || "",
+            token: paymentToken,
+            tokenSymbol: paymentTokenSymbol,
             amount,
-            price: nativePrice.toNumber(),
-            priceUsd: !symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
+            price: priceInCrypto,
+            priceUsd: priceInUsd,
             seller: seller.toLowerCase(),
             buyer: buyer.toLowerCase(),
             soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),

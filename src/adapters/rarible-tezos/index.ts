@@ -3,19 +3,16 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 import moment from "moment";
-import BigNumber from "bignumber.js";
 import Tezos from "../../sdk/tezos";
-import symbolSdk from "../../sdk/symbol";
-import priceSdk from "../../sdk/price";
 
 import { ISaleEntity, ISymbolAPIResponse, IObjectStringAny } from "../../sdk/Interfaces";
+import getPaymentData from "../../sdk/utils/getPaymentData";
 
 const PROTOCOL = "tezos";
-const TOKEN = "xtz";
+const PAYMENT_TOKEN = "xtz";
 
 class RaribleTezos {
     name: string;
-    token: string;
     protocol: string;
     block: number;
     contract: string;
@@ -25,7 +22,6 @@ class RaribleTezos {
 
     constructor() {
         this.name = "rarible-tezos";
-        this.token = TOKEN;
         this.protocol = PROTOCOL;
         this.block = 0;
         this.contract = "KT18pVpRXKPY2c4U2yFEGSH3ZnhB2kL8kwXS";
@@ -34,10 +30,6 @@ class RaribleTezos {
     }
 
     run = async (): Promise<void> => {
-        const symbol = await symbolSdk.get(this.token, this.protocol);
-        if (!symbol) throw new Error(`Missing symbol metadata for provider ${this.name}`);
-        this.symbol = symbol;
-
         this.sdk = await this.loadSdk();
 
         await this.sdk.run();
@@ -74,8 +66,12 @@ class RaribleTezos {
             return;
         }
         const timestamp = moment(call.timestamp, "YYYY-MM-DDTHH:mm:ssZ").utc();
-        const po = await priceSdk.get(this.token, this.protocol, timestamp.unix());
-        const nativePrice = new BigNumber(biggest.amount).dividedBy(10 ** (this.symbol?.decimals || 0));
+        const { paymentTokenSymbol, priceInCrypto, priceInUsd } = await getPaymentData(
+            PROTOCOL,
+            PAYMENT_TOKEN,
+            biggest.amount,
+            timestamp,
+        );
 
         const transferOp = operation.find((o: IObjectStringAny): boolean => {
             return o?.parameter?.entrypoint === "transfer" && o?.target?.address === this.contract;
@@ -93,11 +89,11 @@ class RaribleTezos {
             providerContract: this.contract,
             nftContract: nft_collection_address,
             nftId: nft_id,
-            token: TOKEN,
-            tokenSymbol: this.symbol?.symbol || "",
+            token: PAYMENT_TOKEN,
+            tokenSymbol: paymentTokenSymbol,
             amount: 1,
-            price: nativePrice.toNumber(),
-            priceUsd: !this.symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
+            price: priceInCrypto,
+            priceUsd: priceInUsd,
             seller,
             buyer,
             soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),

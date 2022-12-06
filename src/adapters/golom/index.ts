@@ -1,20 +1,16 @@
 import * as dotenv from "dotenv";
+
 dotenv.config();
 
 import moment from "moment";
-import BigNumber from "bignumber.js";
 import Ethereum from "../../sdk/EVMC";
 import path from "path";
-import symbolSdk from "../../sdk/symbol";
-import priceSdk from "../../sdk/price";
-
-import { ISaleEntity, ISymbolAPIResponse } from "../../sdk/Interfaces";
+import { ISaleEntity } from "../../sdk/Interfaces";
 import { EventData } from "web3-eth-contract";
+import getPaymentData from "../../sdk/utils/getPaymentData";
 
 class GOLOM {
     name: string;
-    symbol: ISymbolAPIResponse | undefined;
-    token: string;
     protocol: string;
     block: number;
     contract: string;
@@ -26,8 +22,6 @@ class GOLOM {
 
     constructor() {
         this.name = "golom";
-        this.symbol = undefined;
-        this.token = "eth";
         this.protocol = "ethereum";
         this.block = 14880514;
         this.contract = "0xd29e1fcb07e55eaceb122c63f8e50441c6acedc9";
@@ -39,10 +33,6 @@ class GOLOM {
     }
 
     run = async (): Promise<void> => {
-        const symbol = await symbolSdk.get(this.token, this.protocol);
-        if (!symbol) throw new Error(`Missing symbol metadata for provider ${this.name}`);
-        this.symbol = symbol;
-
         this.sdk = await this.loadSdk();
 
         await this.sdk.run();
@@ -82,13 +72,11 @@ class GOLOM {
     process = async (event: any): Promise<ISaleEntity | undefined> => {
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
-        const po = await priceSdk.get(this.token, this.protocol, block.timestamp);
-        const nativePrice = new BigNumber(event.returnValues.price).dividedBy(10 ** (this.symbol?.decimals || 0));
         const buyer = event.returnValues.taker.toLowerCase();
         const seller = event.returnValues.maker.toLowerCase();
         const orderType = event.returnValues.orderType;
 
-        const token_symbol = orderType == 0 ? "eth" : "weth";
+        const paymentToken = orderType == 0 ? "eth" : "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
         const tokenId_nftContract = await this.getNftId(event);
 
         if (!tokenId_nftContract) {
@@ -97,17 +85,24 @@ class GOLOM {
         const split_data = tokenId_nftContract.split("_");
         const tokenId = split_data[0];
         const nftContract = split_data[1];
+        const { paymentTokenSymbol, priceInCrypto, priceInUsd } = await getPaymentData(
+            this.protocol,
+            paymentToken,
+            event.returnValues.price,
+            timestamp,
+        );
+
         const entity: ISaleEntity = {
             providerName: this.name, // the name of the folder
             providerContract: this.contract, // the providers contract from which you get data
             protocol: this.protocol,
             nftContract: nftContract,
             nftId: tokenId,
-            token: this.token,
-            tokenSymbol: token_symbol,
+            token: paymentToken,
+            tokenSymbol: paymentTokenSymbol,
             amount: 1,
-            price: nativePrice.toNumber(),
-            priceUsd: !this.symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
+            price: priceInCrypto,
+            priceUsd: priceInUsd,
             seller: seller, // its bought from ens and transfered to the owner
             buyer,
             soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),

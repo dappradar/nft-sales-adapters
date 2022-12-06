@@ -1,7 +1,6 @@
+// @todo use getPaymentData
+
 import * as dotenv from "dotenv";
-
-dotenv.config();
-
 import fs from "fs";
 import path from "path";
 
@@ -9,13 +8,15 @@ import moment from "moment";
 import BigNumber from "bignumber.js";
 import Ethereum from "../../sdk/EVMC";
 import priceSdk from "../../sdk/price";
-import { Transaction } from "web3-core";
+import {Transaction} from "web3-core";
 import symbolSdk from "../../sdk/symbol";
-import { Contract } from "web3-eth-contract";
-import { asyncTimeout } from "../../sdk/util";
-import { BlockTransactionString } from "web3-eth";
+import {Contract} from "web3-eth-contract";
+import {asyncTimeout} from "../../sdk/util";
+import {BlockTransactionString} from "web3-eth";
 import InputDataDecoder from "ethereum-input-data-decoder";
-import { ISaleEntity, ISymbolAPIResponse } from "../../sdk/Interfaces";
+import {ISaleEntity, ISymbolAPIResponse} from "../../sdk/Interfaces";
+
+dotenv.config();
 
 export class PairData {
     private _sdk: Ethereum;
@@ -159,9 +160,7 @@ class SudoSwap {
 
     _getExternalAbi = async (pathToAbi: string): Promise<object> => {
         const stringifiedAbi: string = await fs.promises.readFile(pathToAbi, "utf8");
-        const abi: object = JSON.parse(stringifiedAbi || "[]");
-
-        return abi;
+        return JSON.parse(stringifiedAbi || "[]");
     };
 
     _getExternalContract = async (abi: object, contract_address: string): Promise<Contract> => {
@@ -208,7 +207,7 @@ class SudoSwap {
         isBuyCall: boolean,
         block: BlockTransactionString,
     ): Promise<{ price: number | null; priceUsd: number | null }> => {
-        const po = await priceSdk.get(this.token, this.protocol, +block.timestamp);
+        const po = await priceSdk.get(this.token, this.protocol, moment.unix(+block.timestamp));
 
         const pairFee = await this._callExternalContractMethod(pair_address, this.pairContractAbi, "fee", block.number);
         const pairSpotPrice = await this._callExternalContractMethod(

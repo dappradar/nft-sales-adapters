@@ -2,14 +2,12 @@ import * as dotenv from "dotenv";
 import { EventData } from "web3-eth-contract";
 import moment from "moment";
 import path from "path";
-import BigNumber from "bignumber.js";
 
 dotenv.config();
 
-import { ISymbolAPIResponse, ISaleEntity } from "../../sdk/Interfaces";
+import { ISaleEntity } from "../../sdk/Interfaces";
 import Avalanche from "../../sdk/avalanche";
-import symbolSdk from "../../sdk/symbol";
-import priceSdk from "../../sdk/price";
+import getPaymentData from "../../sdk/utils/getPaymentData";
 
 const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
 
@@ -19,7 +17,6 @@ const ERC1155ProxyId = "0xa7cb5fb7";
 
 class NFTRADE {
     name: string;
-    symbol: ISymbolAPIResponse | undefined;
     token: string;
     protocol: string;
     block: number;
@@ -29,9 +26,9 @@ class NFTRADE {
     range: number;
     chunkSize: number;
     sdk: any;
+
     constructor() {
         this.name = "nftrade-avalanche-1";
-        this.symbol = undefined;
         this.token = "avax";
         this.protocol = "avalanche";
         this.block = 19958164;
@@ -99,35 +96,48 @@ class NFTRADE {
         };
     };
 
+    _getPaymentToken = (event: EventData, isOffer: boolean): string => {
+        const paymentToken = this.getAssetDataAddress(
+            event.returnValues[isOffer ? "makerAssetData" : "takerAssetData"],
+        );
+
+        if (ADDRESS_ZERO === paymentToken) {
+            return this.token;
+        }
+
+        return paymentToken.toLowerCase();
+    };
+
     process = async (event: EventData): Promise<ISaleEntity | void> => {
         const isOffer = this.isOffer(event.returnValues["makerAssetData"]);
         const nft = this.getNFTData(event.returnValues[isOffer ? "takerAssetData" : "makerAssetData"]);
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
         const amount = 1;
-        const price = event.returnValues[isOffer ? "makerAssetAmount" : "takerAssetAmount"];
+        const nativePrice = event.returnValues[isOffer ? "makerAssetAmount" : "takerAssetAmount"];
         const maker = event.returnValues["makerAddress"];
         const taker = event.returnValues["takerAddress"];
         const buyer = isOffer ? maker : taker;
         const seller = isOffer ? taker : maker;
-        let token = this.getAssetDataAddress(event.returnValues[isOffer ? "makerAssetData" : "takerAssetData"]);
-        if (ADDRESS_ZERO === token) {
-            token = this.token;
-        }
-        const po = await priceSdk.get(token, this.protocol, +block.timestamp);
-        const symbol = await symbolSdk.get(token, this.protocol);
-        const nativePrice = new BigNumber(price).dividedBy(10 ** symbol.decimals);
+        const paymentToken = this._getPaymentToken(event, isOffer);
+        const { paymentTokenSymbol, priceInCrypto, priceInUsd } = await getPaymentData(
+            this.protocol,
+            paymentToken,
+            nativePrice,
+            timestamp,
+        );
+
         const entity = {
             providerName: this.name, // the name of the folder
             providerContract: this.contract.toLowerCase(), // the providers contract from which you get data
             protocol: this.protocol,
             nftContract: nft.address.toLowerCase(),
             nftId: String(nft.id),
-            token: token.toLowerCase(),
-            tokenSymbol: symbol.symbol,
+            token: paymentToken,
+            tokenSymbol: paymentTokenSymbol,
             amount,
-            price: nativePrice.toNumber(),
-            priceUsd: !symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
+            price: priceInCrypto,
+            priceUsd: priceInUsd,
             seller: seller.toLowerCase(),
             buyer: buyer.toLowerCase(),
             soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),

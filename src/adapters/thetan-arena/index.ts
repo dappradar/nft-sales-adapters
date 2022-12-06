@@ -5,16 +5,12 @@ dotenv.config();
 import path from "path";
 import moment from "moment";
 import BSC from "../../sdk/binance";
-import BigNumber from "bignumber.js";
-import priceSdk from "../../sdk/price";
-import symbolSdk from "../../sdk/symbol";
 import { EventData } from "web3-eth-contract";
-import { BlockTransactionString } from "web3-eth";
-import { ISaleEntity, ISymbolAPIResponse } from "../../sdk/Interfaces";
+import { ISaleEntity } from "../../sdk/Interfaces";
+import getPaymentData from "../../sdk/utils/getPaymentData";
 
 class ThetanArena {
     name: string;
-    symbol: ISymbolAPIResponse | undefined;
     token: string;
     protocol: string;
     block: number;
@@ -27,7 +23,6 @@ class ThetanArena {
 
     constructor() {
         this.name = "thetan-arena";
-        this.symbol = undefined;
         this.token = "0x0000000000000000000000000000000000000000";
         this.protocol = "binance-smart-chain";
         this.block = 14551809;
@@ -52,30 +47,6 @@ class ThetanArena {
         this.sdk.stop();
     };
 
-    _getPrice = async (
-        event: EventData,
-        block: BlockTransactionString,
-        symbol: ISymbolAPIResponse,
-        paymentToken: string,
-    ): Promise<{ price: number | null; priceUsd: number | null }> => {
-        const po = await priceSdk.get(paymentToken, this.protocol, +block.timestamp);
-
-        if (!symbol?.decimals) {
-            return {
-                price: null,
-                priceUsd: null,
-            };
-        }
-
-        const amount = event.returnValues.price;
-        const nativePrice = new BigNumber(amount).dividedBy(10 ** (symbol?.decimals || 0));
-
-        return {
-            price: nativePrice.toNumber(),
-            priceUsd: !symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
-        };
-    };
-
     process = async (event: EventData): Promise<ISaleEntity | void> => {
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
@@ -85,9 +56,13 @@ class ThetanArena {
         const tokenId = event.returnValues.tokenId;
         const nftContract = event.returnValues.contractAddress.toLowerCase();
         const paymentToken = event.returnValues.paymentToken.toLowerCase();
-        const symbol = await symbolSdk.get(paymentToken, this.protocol);
 
-        const { price, priceUsd } = await this._getPrice(event, block, symbol, paymentToken);
+        const { paymentTokenSymbol, priceInCrypto, priceInUsd } = await getPaymentData(
+            this.protocol,
+            paymentToken,
+            event.returnValues.price,
+            timestamp,
+        );
 
         const entity = {
             providerName: this.name,
@@ -96,10 +71,10 @@ class ThetanArena {
             nftContract: nftContract,
             nftId: tokenId,
             token: paymentToken,
-            tokenSymbol: symbol?.symbol || "",
+            tokenSymbol: paymentTokenSymbol,
             amount: 1,
-            price,
-            priceUsd,
+            price: priceInCrypto,
+            priceUsd: priceInUsd,
             seller,
             buyer,
             soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),
