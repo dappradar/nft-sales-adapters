@@ -116,7 +116,7 @@ class CRYPTOPUNKS2 {
             price: nativePrice.toNumber(),
             priceUsd: !this.symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
             seller: this.contract,
-            buyer,
+            buyer: buyer.toLowerCase(),
             soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),
             blockNumber: event.blockNumber,
             transactionHash: event.transactionHash,
