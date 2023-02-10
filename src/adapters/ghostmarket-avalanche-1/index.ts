@@ -7,7 +7,7 @@ import moment from "moment";
 import { EventData } from "web3-eth-contract";
 import path from "path";
 import priceSdk from "../../sdk/price";
-import Ethereum from "../../sdk/EVMC";
+import Avalanche from "../../sdk/avalanche";
 import symbolSdk from "../../sdk/symbol";
 import { ISaleEntity, ISymbolAPIResponse } from "../../sdk/Interfaces";
 
@@ -25,10 +25,10 @@ class Element {
     sdk: any;
 
     constructor() {
-        this.name = "ghostmarket-ethereum";
-        this.protocol = "ethereum";
-        this.block = 15080677;
-        this.contract = "0xfb2f452639cbb0850b46b20d24de7b0a9ccb665f";
+        this.name = "ghostmarket-avalanche";
+        this.protocol = "avalanche";
+        this.block = 15385077;
+        this.contract = "0xeb4aba7aeba732fc2fc92a673585d950ccfc1de0";
         this.events = ["OrderFilled"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
@@ -42,7 +42,7 @@ class Element {
     };
 
     loadSdk = (): any => {
-        return new Ethereum(this);
+        return new Avalanche(this);
     };
 
     stop = async (): Promise<void> => {
@@ -50,9 +50,9 @@ class Element {
     };
 
     _getToken = (event: EventData): string => {
-        let token = "0x0000000000000000000000000000000000000000";
+        let token = "avax";
         if (event.returnValues["rightAsset"]["data"] != "0x") {
-            token = this.sdk.web3.eth.abi.decodeParameter('address', event.returnValues["rightAsset"]["data"]).toLowerCase();
+            token = event.returnValues["rightAsset"]["data"][0].toLowerCase();
         }
 
         return token;

@@ -7,7 +7,7 @@ import moment from "moment";
 import { EventData } from "web3-eth-contract";
 import path from "path";
 import priceSdk from "../../sdk/price";
-import Avalanche from "../../sdk/avalanche";
+import Ethereum from "../../sdk/EVMC";
 import symbolSdk from "../../sdk/symbol";
 import { ISaleEntity, ISymbolAPIResponse } from "../../sdk/Interfaces";
 
@@ -25,10 +25,11 @@ class Element {
     sdk: any;
 
     constructor() {
-        this.name = "ghostmarket-avalanche";
-        this.protocol = "avalanche";
-        this.block = 15385077;
-        this.contract = "0xeb4aba7aeba732fc2fc92a673585d950ccfc1de0";
+        this.name = "ghostmarket-ethereum";
+        this.protocol = "ethereum";
+        //this.block = 15080677;
+        this.block = 15543441;
+        this.contract = "0xfb2f452639cbb0850b46b20d24de7b0a9ccb665f";
         this.events = ["OrderFilled"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
@@ -42,7 +43,7 @@ class Element {
     };
 
     loadSdk = (): any => {
-        return new Avalanche(this);
+        return new Ethereum(this);
     };
 
     stop = async (): Promise<void> => {
@@ -50,9 +51,15 @@ class Element {
     };
 
     _getToken = (event: EventData): string => {
-        let token = "avax";
-        if (event.returnValues["rightAsset"]["data"] != "0x") {
-            token = event.returnValues["rightAsset"]["data"][0].toLowerCase();
+        let token = "0x0000000000000000000000000000000000000000";
+        if (event.returnValues["leftAsset"]['assetClass'] == '0x73ad2146') {
+            if (event.returnValues["rightAsset"]["data"] != "0x") {
+                token = this.sdk.web3.eth.abi.decodeParameter('address', event.returnValues["rightAsset"]["data"]).toLowerCase();
+            }
+        } else {
+            if (event.returnValues["leftAsset"]["data"] != "0x") {
+                token = this.sdk.web3.eth.abi.decodeParameter('address', event.returnValues["leftAsset"]["data"]).toLowerCase();
+            }
         }
 
         return token;
@@ -64,12 +71,24 @@ class Element {
         const token = this._getToken(event);
         const symbol: ISymbolAPIResponse = await symbolSdk.get(token, this.protocol);
         const po = await priceSdk.get(token, this.protocol, block.timestamp);
-        const price = event.returnValues["newLeftFill"];
-        const nativePrice = new BigNumber(price).dividedBy(10 ** (symbol?.decimals || 0));
-        const seller = event.returnValues["leftMaker"];
-        const buyer = event.returnValues["rightMaker"];
-        const nftContract = event.returnValues["leftAsset"]["data"][0];
-        const tokenId = event.returnValues["leftAsset"]["data"][1];
+        let price = event.returnValues["newLeftFill"];
+        let nativePrice = new BigNumber(price).dividedBy(10 ** (symbol?.decimals || 0));
+        let seller = event.returnValues["leftMaker"].toLowerCase();
+        let buyer = event.returnValues["rightMaker"].toLowerCase();
+        let params = this.sdk.web3.eth.abi.decodeParameters(['address', 'uint256'], event.returnValues["leftAsset"]["data"]);
+        if (event.returnValues["leftAsset"]['assetClass'] != '0x73ad2146') {
+            price = event.returnValues["newRightFill"];
+            nativePrice = new BigNumber(price).dividedBy(10 ** (symbol?.decimals || 0));
+            seller = event.returnValues["rightMaker"];
+            buyer = event.returnValues["leftMaker"];
+            params = this.sdk.web3.eth.abi.decodeParameters(['address', 'uint256'], event.returnValues["rightAsset"]["data"]);
+        }
+        let nftContract = params[0];
+        let tokenId = params[1];
+        if (buyer == "0x2debb6ced142197bec08d76d3ecce828b3b261ee") {
+            const txInfo = await this.sdk.getTransactionReceipt(event.transactionHash);
+            buyer = txInfo.from.toLowerCase();
+        }
 
         const entity = {
             providerName: this.name,
@@ -82,8 +101,8 @@ class Element {
             amount: 1,
             price: nativePrice.toNumber(),
             priceUsd: !symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
-            seller: seller.toLowerCase(),
-            buyer: buyer.toLowerCase(),
+            seller: seller,
+            buyer: buyer,
             soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),
             blockNumber: event.blockNumber,
             transactionHash: event.transactionHash,
