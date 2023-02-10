@@ -7,7 +7,7 @@ import moment from "moment";
 import { EventData } from "web3-eth-contract";
 import path from "path";
 import priceSdk from "../../sdk/price";
-import Avalanche from "../../sdk/avalanche";
+import Matic from "../../sdk/matic";
 import symbolSdk from "../../sdk/symbol";
 import { ISaleEntity, ISymbolAPIResponse } from "../../sdk/Interfaces";
 
@@ -25,11 +25,10 @@ class Element {
     sdk: any;
 
     constructor() {
-        this.name = "ghostmarket-avalanche";
-        this.protocol = "avalanche";
-        this.block = 15385077;
-        this.deprecatedAtBlock = 25967158;
-        this.contract = "0xeb4aba7aeba732fc2fc92a673585d950ccfc1de0";
+        this.name = "ghostmarket-polygon";
+        this.protocol = "matic";
+        this.block = 39033114;
+        this.contract = "0x3b48563237c32a1f886fd19db6f5affd23855e2a";
         this.events = ["OrderFilled"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
@@ -43,7 +42,7 @@ class Element {
     };
 
     loadSdk = (): any => {
-        return new Avalanche(this);
+        return new Matic(this);
     };
 
     stop = async (): Promise<void> => {
@@ -51,7 +50,7 @@ class Element {
     };
 
     _getToken = (event: EventData): string => {
-        let token = "avax";
+        let token = "matic";
         if (event.returnValues["leftAsset"]['assetClass'] == '0x73ad2146') {
             if (event.returnValues["rightAsset"]["data"] != "0x") {
                 token = this.sdk.web3.eth.abi.decodeParameter('address', event.returnValues["rightAsset"]["data"]).toLowerCase();
@@ -85,7 +84,7 @@ class Element {
         }
         let nftContract = params[0];
         let tokenId = params[1];
-        if (buyer == "0x0c823cd09642864f495f0a474e1d26dea9a516f9") {
+        if (buyer == "0x09236d6b740ac67dca842d9db6fa4d067a684e76") {
             const txInfo = await this.sdk.getTransactionReceipt(event.transactionHash);
             buyer = txInfo.from.toLowerCase();
         }

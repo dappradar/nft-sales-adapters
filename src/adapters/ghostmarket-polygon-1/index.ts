@@ -28,6 +28,7 @@ class Element {
         this.name = "ghostmarket-polygon";
         this.protocol = "matic";
         this.block = 28962851;
+        this.deprecatedAtBlock = 39033113;
         this.contract = "0x3b48563237c32a1f886fd19db6f5affd23855e2a";
         this.events = ["OrderFilled"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
@@ -51,8 +52,14 @@ class Element {
 
     _getToken = (event: EventData): string => {
         let token = "matic";
-        if (event.returnValues["rightAsset"]["data"] != "0x") {
-            token = this.sdk.web3.eth.abi.decodeParameter('address', event.returnValues["rightAsset"]["data"]).toLowerCase();
+        if (event.returnValues["leftAsset"]['assetClass'] == '0x73ad2146') {
+            if (event.returnValues["rightAsset"]["data"] != "0x") {
+                token = this.sdk.web3.eth.abi.decodeParameter('address', event.returnValues["rightAsset"]["data"]).toLowerCase();
+            }
+        } else {
+            if (event.returnValues["leftAsset"]["data"] != "0x") {
+                token = this.sdk.web3.eth.abi.decodeParameter('address', event.returnValues["leftAsset"]["data"]).toLowerCase();
+            }
         }
 
         return token;
@@ -64,13 +71,24 @@ class Element {
         const token = this._getToken(event);
         const symbol: ISymbolAPIResponse = await symbolSdk.get(token, this.protocol);
         const po = await priceSdk.get(token, this.protocol, block.timestamp);
-        const price = event.returnValues["newLeftFill"];
-        const nativePrice = new BigNumber(price).dividedBy(10 ** (symbol?.decimals || 0));
-        const seller = event.returnValues["leftMaker"];
-        const buyer = event.returnValues["rightMaker"];
+        let price = event.returnValues["newLeftFill"];
+        let nativePrice = new BigNumber(price).dividedBy(10 ** (symbol?.decimals || 0));
+        let seller = event.returnValues["leftMaker"].toLowerCase();
+        let buyer = event.returnValues["rightMaker"].toLowerCase();
         let params = this.sdk.web3.eth.abi.decodeParameters(['address', 'uint256'], event.returnValues["leftAsset"]["data"]);
+        if (event.returnValues["leftAsset"]['assetClass'] != '0x73ad2146') {
+            price = event.returnValues["newRightFill"];
+            nativePrice = new BigNumber(price).dividedBy(10 ** (symbol?.decimals || 0));
+            seller = event.returnValues["rightMaker"];
+            buyer = event.returnValues["leftMaker"];
+            params = this.sdk.web3.eth.abi.decodeParameters(['address', 'uint256'], event.returnValues["rightAsset"]["data"]);
+        }
         let nftContract = params[0];
         let tokenId = params[1];
+        if (buyer == "0x09236d6b740ac67dca842d9db6fa4d067a684e76") {
+            const txInfo = await this.sdk.getTransactionReceipt(event.transactionHash);
+            buyer = txInfo.from.toLowerCase();
+        }
 
         const entity = {
             providerName: this.name,
@@ -83,8 +101,8 @@ class Element {
             amount: 1,
             price: nativePrice.toNumber(),
             priceUsd: !symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
-            seller: seller.toLowerCase(),
-            buyer: buyer.toLowerCase(),
+            seller: seller,
+            buyer: buyer,
             soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),
             blockNumber: event.blockNumber,
             transactionHash: event.transactionHash,

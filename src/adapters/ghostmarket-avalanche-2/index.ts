@@ -27,8 +27,7 @@ class Element {
     constructor() {
         this.name = "ghostmarket-avalanche";
         this.protocol = "avalanche";
-        this.block = 15385077;
-        this.deprecatedAtBlock = 25967158;
+        this.block = 25967159;
         this.contract = "0xeb4aba7aeba732fc2fc92a673585d950ccfc1de0";
         this.events = ["OrderFilled"];
         this.pathToAbi = path.join(__dirname, "./abi.json");

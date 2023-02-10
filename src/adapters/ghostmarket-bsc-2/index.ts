@@ -7,7 +7,7 @@ import moment from "moment";
 import { EventData } from "web3-eth-contract";
 import path from "path";
 import priceSdk from "../../sdk/price";
-import Avalanche from "../../sdk/avalanche";
+import Binance from "../../sdk/binance";
 import symbolSdk from "../../sdk/symbol";
 import { ISaleEntity, ISymbolAPIResponse } from "../../sdk/Interfaces";
 
@@ -25,11 +25,10 @@ class Element {
     sdk: any;
 
     constructor() {
-        this.name = "ghostmarket-avalanche";
-        this.protocol = "avalanche";
-        this.block = 15385077;
-        this.deprecatedAtBlock = 25967158;
-        this.contract = "0xeb4aba7aeba732fc2fc92a673585d950ccfc1de0";
+        this.name = "ghostmarket-bsc";
+        this.protocol = "binance-smart-chain";
+        this.block = 25471224;
+        this.contract = "0x388171f81fc91efc7338e07e52555a90c7d87972";
         this.events = ["OrderFilled"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
@@ -43,7 +42,7 @@ class Element {
     };
 
     loadSdk = (): any => {
-        return new Avalanche(this);
+        return new Binance(this);
     };
 
     stop = async (): Promise<void> => {
@@ -51,7 +50,7 @@ class Element {
     };
 
     _getToken = (event: EventData): string => {
-        let token = "avax";
+        let token = "bnb";
         if (event.returnValues["leftAsset"]['assetClass'] == '0x73ad2146') {
             if (event.returnValues["rightAsset"]["data"] != "0x") {
                 token = this.sdk.web3.eth.abi.decodeParameter('address', event.returnValues["rightAsset"]["data"]).toLowerCase();
@@ -85,7 +84,7 @@ class Element {
         }
         let nftContract = params[0];
         let tokenId = params[1];
-        if (buyer == "0x0c823cd09642864f495f0a474e1d26dea9a516f9") {
+        if (buyer == "0x32e0c20421c96ca4b423a7806e151e953c647c48") {
             const txInfo = await this.sdk.getTransactionReceipt(event.transactionHash);
             buyer = txInfo.from.toLowerCase();
         }
