@@ -25,7 +25,7 @@ class Element {
     sdk: any;
 
     constructor() {
-        this.name = "ghostmarket-polygon";
+        this.name = "ghostmarket-polygon-1";
         this.protocol = "matic";
         this.block = 28962851;
         this.deprecatedAtBlock = 39033113;

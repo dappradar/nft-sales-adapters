@@ -25,7 +25,7 @@ class Element {
     sdk: any;
 
     constructor() {
-        this.name = "ghostmarket-avalanche";
+        this.name = "ghostmarket-avalanche-2";
         this.protocol = "avalanche";
         this.block = 25967159;
         this.contract = "0xeb4aba7aeba732fc2fc92a673585d950ccfc1de0";
