@@ -7,7 +7,7 @@ import moment from "moment";
 import { EventData } from "web3-eth-contract";
 import path from "path";
 import priceSdk from "../../sdk/price";
-import Ethereum from "../../sdk/EVMC";
+import Matic from "../../sdk/matic";
 import symbolSdk from "../../sdk/symbol";
 import { ISaleEntity, ISymbolAPIResponse } from "../../sdk/Interfaces";
 
@@ -24,11 +24,11 @@ class OKX {
     sdk: any;
 
     constructor() {
-        this.name = "okx-ethereum-1";
-        this.protocol = "ethereum";
-        this.block = 16681307;
-        // this.deprecatedAtBlock = 16625257;
-        this.contract = "0x92701D42E1504ef9FCe6d66A2054218b048ddA43";
+        this.name = "okx-polygon-1";
+        this.protocol = "polygon";
+        this.block = 39574716;
+        // this.deprecatedAtBlock = 39539879;
+        this.contract = "0x954dab8830aD2B9C312Bb87aCe96f6Cce0F51E3a";
         this.events = ["MatchOrderResultsV3"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
@@ -41,21 +41,29 @@ class OKX {
     };
 
     loadSdk = (): any => {
-        return new Ethereum(this);
+        return new Matic(this);
     };
 
     stop = async (): Promise<void> => {
         this.sdk.stop();
     };
 
+    _getToken = (item: any): string => {
+        if (item[2] === "0x0000000000000000000000000000000000000000") {
+            return "matic";
+        }
+        return item[2];
+    };
+
     _processItem = async (event: EventData, item: any): Promise<void> => {
-        const [actionType, price, token, nftContract, tokenId, amount, tradeType, extraData] = item;
+        const [actionType, price, payToken, nftContract, tokenId, amount, tradeType, extraData] = item;
+        const token = this._getToken(item);
         const maker = extraData.substring(0, 42);
         const taker = `0x${extraData.substring(42, 82)}`;
         const isAceeptOffer = Number(actionType) === 3;
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
-        const symbol: ISymbolAPIResponse = await symbolSdk.get(token, this.protocol);
+        const symbol: ISymbolAPIResponse = await symbolSdk.get(token, "matic");
         const po = await priceSdk.get(token, this.protocol, block.timestamp);
         const nativePrice = new BigNumber(price).dividedBy(10 ** (symbol?.decimals || 0));
         const buyer = isAceeptOffer ? maker : taker;
@@ -72,7 +80,7 @@ class OKX {
                     contract: nftContract.toLowerCase(),
                 },
             ],
-            token: token.toLowerCase(),
+            token: payToken.toLowerCase(),
             tokenSymbol: symbol?.symbol || "",
             price: nativePrice.toNumber(),
             priceUsd: !symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
