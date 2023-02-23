@@ -80,7 +80,7 @@ class OKX {
                     contract: nftContract.toLowerCase(),
                 },
             ],
-            token: payToken.toLowerCase(),
+            token: token.toLowerCase(),
             tokenSymbol: symbol?.symbol || "",
             price: nativePrice.toNumber(),
             priceUsd: !symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
