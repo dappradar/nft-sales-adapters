@@ -28,7 +28,7 @@ class OKX {
         this.protocol = "ethereum";
         this.block = 16681307;
         // this.deprecatedAtBlock = 16625257;
-        this.contract = "0x92701D42E1504ef9FCe6d66A2054218b048ddA43";
+        this.contract = "0x92701d42e1504ef9fce6d66a2054218b048dda43";
         this.events = ["MatchOrderResultsV3"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;

@@ -28,7 +28,7 @@ class OKX {
         this.protocol = "binance-smart-chain";
         this.block = 25862299;
         // this.deprecatedAtBlock = 16625257;
-        this.contract = "0xcCE3E3F79cf9091386F84610bb06947E2fc232A3";
+        this.contract = "0xcce3e3f79cf9091386f84610bb06947e2fc232a3";
         this.events = ["MatchOrderResultsV3"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;

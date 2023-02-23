@@ -28,7 +28,7 @@ class OKX {
         this.protocol = "polygon";
         this.block = 39574716;
         // this.deprecatedAtBlock = 39539879;
-        this.contract = "0x954dab8830aD2B9C312Bb87aCe96f6Cce0F51E3a";
+        this.contract = "0x954dab8830ad2b9c312bb87ace96f6cce0f51e3a";
         this.events = ["MatchOrderResultsV3"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;

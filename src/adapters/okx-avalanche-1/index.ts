@@ -27,8 +27,8 @@ class OKX {
         this.name = "okx-avalanche-1";
         this.protocol = "avalanche";
         this.block = 26572369;
-        this.deprecatedAtBlock = 26572425;
-        this.contract = "0xA88BA7EA2912cde5d632C8De048A17f2ea3e75A0";
+        // this.deprecatedAtBlock = 26572425;
+        this.contract = "0xa88ba7ea2912cde5d632c8de048a17f2ea3e75a0";
         this.events = ["MatchOrderResultsV3"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
