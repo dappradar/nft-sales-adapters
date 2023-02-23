@@ -49,7 +49,8 @@ class OKX {
     };
 
     _processItem = async (event: EventData, item: any): Promise<void> => {
-        const [actionType, price, token, nftContract, tokenId, amount, tradeType, extraData] = item;
+        const [actionType, price, payToken, nftContract, tokenId, amount, tradeType, extraData] = item;
+        const token = payToken.toLowerCase();
         const maker = extraData.substring(0, 42);
         const taker = `0x${extraData.substring(42, 82)}`;
         const isAceeptOffer = Number(actionType) === 3;
@@ -72,7 +73,7 @@ class OKX {
                     contract: nftContract.toLowerCase(),
                 },
             ],
-            token: token.toLowerCase(),
+            token,
             tokenSymbol: symbol?.symbol || "",
             price: nativePrice.toNumber(),
             priceUsd: !symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),

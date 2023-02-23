@@ -52,7 +52,7 @@ class OKX {
         if (item[2] === "0x0000000000000000000000000000000000000000") {
             return "avax";
         }
-        return item[2];
+        return item[2].toLowerCase();
     };
 
     _processItem = async (event: EventData, item: any): Promise<void> => {
@@ -80,7 +80,7 @@ class OKX {
                     contract: nftContract.toLowerCase(),
                 },
             ],
-            token: token.toLowerCase(),
+            token,
             tokenSymbol: symbol?.symbol || "",
             price: nativePrice.toNumber(),
             priceUsd: !symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
