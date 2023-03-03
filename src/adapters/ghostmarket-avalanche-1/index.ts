@@ -71,18 +71,21 @@ class Element {
         const token = this._getToken(event);
         const symbol: ISymbolAPIResponse = await symbolSdk.get(token, this.protocol);
         const po = await priceSdk.get(token, this.protocol, block.timestamp);
-        let price = event.returnValues["newLeftFill"];
-        let nativePrice = new BigNumber(price).dividedBy(10 ** (symbol?.decimals || 0));
-        let seller = event.returnValues["leftMaker"].toLowerCase();
-        let buyer = event.returnValues["rightMaker"].toLowerCase();
-        let params = this.sdk.web3.eth.abi.decodeParameters(['address', 'uint256'], event.returnValues["leftAsset"]["data"]);
-        if (event.returnValues["leftAsset"]['assetClass'] != '0x73ad2146') {
-            price = event.returnValues["newRightFill"];
-            nativePrice = new BigNumber(price).dividedBy(10 ** (symbol?.decimals || 0));
-            seller = event.returnValues["rightMaker"];
-            buyer = event.returnValues["leftMaker"];
-            params = this.sdk.web3.eth.abi.decodeParameters(['address', 'uint256'], event.returnValues["rightAsset"]["data"]);
+        let nftSide = "leftMaker"
+        let moneySide = "rightMaker"
+        let priceField = "newLeftFill"
+        let nftData = "leftAsset"
+        if (event.returnValues["leftAsset"]['assetClass'] == '0xaaaebeba') { // != 0x73ad2146 or != 0x973bb640
+            nftSide = "rightMaker"
+            moneySide = "leftMaker"
+            priceField = "newRightFill"
+            nftData = "rightAsset"
         }
+        let price = event.returnValues[priceField];
+        let nativePrice = new BigNumber(price).dividedBy(10 ** (symbol?.decimals || 0));
+        let seller = event.returnValues[nftSide].toLowerCase();
+        let buyer = event.returnValues[moneySide].toLowerCase();
+        let params = this.sdk.web3.eth.abi.decodeParameters(['address', 'uint256'], event.returnValues[nftData]["data"]);
         let nftContract = params[0];
         let tokenId = params[1];
         if (buyer == "0x0c823cd09642864f495f0a474e1d26dea9a516f9") {
