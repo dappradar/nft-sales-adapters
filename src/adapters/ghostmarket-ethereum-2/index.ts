@@ -51,7 +51,7 @@ class Element {
 
     _getToken = (event: EventData): string => {
         let token = "0x0000000000000000000000000000000000000000";
-        if (event.returnValues["leftAsset"]['assetClass'] == '0x73ad2146') {
+        if (event.returnValues["leftAsset"]['assetClass'] != '0xaaaebeba') {
             if (event.returnValues["rightAsset"]["data"] != "0x") {
                 token = this.sdk.web3.eth.abi.decodeParameter('address', event.returnValues["rightAsset"]["data"]).toLowerCase();
             }
