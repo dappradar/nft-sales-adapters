@@ -5,6 +5,7 @@ dotenv.config();
 import moment from "moment";
 import { EventData } from "web3-eth-contract";
 import path from "path";
+import BigNumber from "bignumber.js";
 import priceSdk from "../../sdk/price";
 import Ethereum from "../../sdk/EVMC";
 import symbolSdk from "../../sdk/symbol";
@@ -60,7 +61,8 @@ class Alienswap {
         if (baseTx.value == 0) {
             return;
         }
-        const fillPrice = event.returnValues.consideration[0][3].dividedBy(10 ** (symbol?.decimals || 0));
+        const fillPriceWei = new BigNumber(event.returnValues.consideration[0][3]);
+        const fillPrice = fillPriceWei.dividedBy(10 ** (symbol?.decimals || 0));
         const entity = {
             providerName: this.name,
             providerContract: this.contract,
