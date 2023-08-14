@@ -113,8 +113,8 @@ class XCAD {
             price: totalAmount,
             tokenContract: nftAddress,
             tokenId: nftTransfer.value,
-            seller: nftTransfer.to,
-            buyer: userTransfer.to,
+            seller: `0x${userTransfer.to}`,
+            buyer: `0x${nftTransfer.to}`,
         };
     };
 
