@@ -43,8 +43,8 @@ class XCAD {
         this.symbol = undefined;
         this.token = "0xd069599e718f963bd84502b49ba8f8657faf5b3a";
         this.protocol = "binance-smart-chain";
-        this.block = 27292748;
-        this.contract = "0x6f9d68dd285fbd9fcacdf603b56695a2df352cf9";
+        this.block = 31085662;
+        this.contract = "0x48ca89f26A9f7588148e1051C3eC5a8E073cf407";
         this.events = ["AuctionSettled"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
