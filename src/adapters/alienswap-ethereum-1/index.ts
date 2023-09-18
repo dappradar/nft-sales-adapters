@@ -28,7 +28,7 @@ class Alienswap {
         this.name = "alienswap-ethereum-1";
         this.protocol = "ethereum";
         this.block = 17080133;
-        this.token = "ETH";
+        this.token = "eth";
         this.contract = "0x83746de31fc8de985ffe46c1c20ea6d7d8f4ed3a";
         this.events = ["OrderFulfilled"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
