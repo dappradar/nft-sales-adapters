@@ -1,69 +1,622 @@
 [
-    {
-        "anonymous": false,
-        "inputs": [
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "admin",
+        "type": "address"
+      }
+    ],
+    "name": "CallerIsNotAdmin",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "potentialOwnerAddr",
+        "type": "address"
+      }
+    ],
+    "name": "CallerIsNotNewPotentialOwner",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      }
+    ],
+    "name": "CallerIsNotOwner",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NewAdminIsZeroAddress",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "newPotentialOwner",
+        "type": "address"
+      }
+    ],
+    "name": "NewPotentialOwnerAlreadySet",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      }
+    ],
+    "name": "NewPotentialOwnerIsZeroAddress",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NoPotentialOwnerCurrentlySet",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ReentrancyCall",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ReturnDustExError",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes32[]",
+        "name": "orderHashes",
+        "type": "bytes32[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool[]",
+        "name": "results",
+        "type": "bool[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "extraData",
+        "type": "bytes"
+      }
+    ],
+    "name": "MatchOrderResults",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newPotentialOwner",
+        "type": "address"
+      }
+    ],
+    "name": "PotentialOwnerUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newAdmin",
+        "type": "address"
+      }
+    ],
+    "name": "SetAdmin",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "ADDRESS_MASK",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "CONDUIT",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "LOOKSRARE_TRANSFER_MANAGER",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "LOOKSRRE_MARKET_ID",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MANAGER",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "OKX_CONDUIT",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "OKX_MARKET_ID",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "OKX_OLD_MARKET_ID",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "SEAPORT_MARKET_ID",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
           {
-            "indexed": false,
-            "internalType": "bytes32[]",
-            "name": "orderHashes",
-            "type": "bytes32[]"
+            "internalType": "enum TokenTransferItemType",
+            "name": "itemType",
+            "type": "uint8"
           },
           {
-            "indexed": false,
-            "internalType": "bool[]",
-            "name": "results",
-            "type": "bool[]"
+            "internalType": "address",
+            "name": "token",
+            "type": "address"
           },
           {
-            "components": [
-              {
-                "internalType": "uint256",
-                "name": "actionType",
-                "type": "uint256"
-              },
-              {
-                "internalType": "uint256",
-                "name": "payAmount",
-                "type": "uint256"
-              },
-              {
-                "internalType": "address",
-                "name": "payToken",
-                "type": "address"
-              },
-              {
-                "internalType": "address",
-                "name": "tokenAddress",
-                "type": "address"
-              },
-              {
-                "internalType": "uint256",
-                "name": "tokenId",
-                "type": "uint256"
-              },
-              {
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-              },
-              {
-                "internalType": "uint256",
-                "name": "tradeType",
-                "type": "uint256"
-              },
-              {
-                "internalType": "bytes",
-                "name": "extraData",
-                "type": "bytes"
-              }
-            ],
-            "indexed": false,
-            "internalType": "struct OkxNFTMarketAggregator.AggregatorParamV3[]",
-            "name": "params",
-            "type": "tuple[]"
+            "internalType": "uint256",
+            "name": "identifier",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "approveAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "marketId",
+            "type": "uint256"
           }
         ],
-        "name": "MatchOrderResultsV3",
-        "type": "event"
+        "internalType": "struct TokenTransferInfoEx[]",
+        "name": "TokenTransferInput",
+        "type": "tuple[]"
+      },
+      {
+        "internalType": "bytes",
+        "name": "tradeData",
+        "type": "bytes"
+      },
+      {
+        "internalType": "bytes",
+        "name": "extraData",
+        "type": "bytes"
+      },
+      {
+        "internalType": "address[]",
+        "name": "returnTokenInfo",
+        "type": "address[]"
       }
+    ],
+    "name": "acceptOffer",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "enum TokenTransferItemType",
+            "name": "itemType",
+            "type": "uint8"
+          },
+          {
+            "internalType": "address",
+            "name": "token",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "identifier",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "approveAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "marketId",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct TokenTransferInfoEx[]",
+        "name": "TokenTransferInput",
+        "type": "tuple[]"
+      },
+      {
+        "internalType": "bytes",
+        "name": "tradeData",
+        "type": "bytes"
+      },
+      {
+        "internalType": "bytes",
+        "name": "extraData",
+        "type": "bytes"
+      },
+      {
+        "internalType": "address[]",
+        "name": "returnTokenInfo",
+        "type": "address[]"
+      },
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      }
+    ],
+    "name": "acceptOfferApproveLess",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "acceptOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "admin",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "enum TokenTransferItemType",
+            "name": "itemType",
+            "type": "uint8"
+          },
+          {
+            "internalType": "address",
+            "name": "token",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "identifier",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "approveAddress",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct TokenTransferInfo[]",
+        "name": "TokenTransferInput",
+        "type": "tuple[]"
+      },
+      {
+        "internalType": "bytes",
+        "name": "tradeData",
+        "type": "bytes"
+      },
+      {
+        "internalType": "bytes",
+        "name": "extraData",
+        "type": "bytes"
+      }
+    ],
+    "name": "buyWithERC20",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes",
+        "name": "tradeData",
+        "type": "bytes"
+      },
+      {
+        "internalType": "bytes",
+        "name": "extraData",
+        "type": "bytes"
+      }
+    ],
+    "name": "buyWithETH",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "cancelOwnershipTransfer",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "operator",
+        "type": "address"
+      }
+    ],
+    "name": "grantLooksrareV2",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "potentialOwner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "operator",
+        "type": "address"
+      }
+    ],
+    "name": "revokeLooksrareV2",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newAdmin",
+        "type": "address"
+      }
+    ],
+    "name": "setAdmin",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "enum TokenTransferItemType",
+            "name": "itemType",
+            "type": "uint8"
+          },
+          {
+            "internalType": "address",
+            "name": "token",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "identifier",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "approveAddress",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct TokenTransferInfo[]",
+        "name": "TokenTransferInput",
+        "type": "tuple[]"
+      },
+      {
+        "internalType": "bytes",
+        "name": "tradeData",
+        "type": "bytes"
+      },
+      {
+        "internalType": "bytes",
+        "name": "extraData",
+        "type": "bytes"
+      }
+    ],
+    "name": "trade",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
 ]
