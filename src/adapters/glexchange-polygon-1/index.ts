@@ -6,10 +6,8 @@ import BigNumber from "bignumber.js";
 import moment from "moment";
 import { EventData } from "web3-eth-contract";
 import path from "path";
-import priceSdk from "../../sdk/price";
 import Matic from "../../sdk/matic";
-import symbolSdk from "../../sdk/symbol";
-import { ISaleEntity, ISymbolAPIResponse } from "../../sdk/Interfaces";
+import { ISaleEntity } from "../../sdk/Interfaces";
 
 class GlExchange {
     name: string;
@@ -26,7 +24,7 @@ class GlExchange {
     constructor() {
         this.name = "glexchange-polygon-1";
         this.protocol = "matic";
-        this.block =   36044498;
+        this.block = 36044498;
         this.contract = "0x88cbb5881895d13fa3a35225b0fed9c81805f44b";
         this.events = ["OrderExecuted"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
@@ -52,11 +50,8 @@ class GlExchange {
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
         const token = event.returnValues["paymentToken"].toLowerCase();
-        const symbol: ISymbolAPIResponse = await symbolSdk.get(token, this.protocol);
-        const po = await priceSdk.get(token, this.protocol, block.timestamp);
         const amount = event.returnValues["supply"];
         const price = event.returnValues["price"];
-        const nativePrice = new BigNumber(price).dividedBy(10 ** (symbol?.decimals || 0));
         const seller = event.returnValues["seller"];
         const buyer = event.returnValues["buyer"];
         const nftContract = event.returnValues["nftAddress"];
@@ -68,15 +63,14 @@ class GlExchange {
             nftContract: nftContract.toLowerCase(),
             nftId: tokenId,
             token: token.toLowerCase(),
-            tokenSymbol: symbol?.symbol || "",
             amount,
-            price: nativePrice.toNumber(),
-            priceUsd: !symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
+            price: new BigNumber(price),
             seller: seller.toLowerCase(),
             buyer: buyer.toLowerCase(),
-            soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),
+            soldAt: timestamp,
             blockNumber: event.blockNumber,
             transactionHash: event.transactionHash,
+            chainId: this.sdk.chainId,
         };
 
         await this.addToDatabase(entity);

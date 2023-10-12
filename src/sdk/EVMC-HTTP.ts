@@ -4,16 +4,14 @@ import Web3 from "web3";
 import _ from "lodash";
 import fs from "fs";
 import {asyncTimeout} from "./utils";
-import {WS_PROXY_URL, AVAILABLE_PROTOCOLS, API_KEY} from "./constants";
+import {API_KEY, HTTP_PROXY_URL} from "./constants";
 import BasicSDK from "./basic-sdk";
-
-import {IDappRadarAPIHeaders} from "./Interfaces";
-import {Log, TransactionReceipt, Transaction, PastLogsOptions} from "web3-core";
+import {Log, PastLogsOptions, Transaction, TransactionReceipt} from "web3-core";
 import {BlockTransactionString} from "web3-eth";
-import {EventData, PastEventOptions, Contract} from "web3-eth-contract";
+import {Contract, EventData, PastEventOptions} from "web3-eth-contract";
 
 // Ethereum Virtual Machine compatible
-class EVMC extends BasicSDK {
+class EVMC_HTTP extends BasicSDK {
     web3: any;
     running: boolean;
     range: number;
@@ -37,50 +35,29 @@ class EVMC extends BasicSDK {
         this.running = false;
     };
 
-    private _getOptions = (): object => {
-        const headers: IDappRadarAPIHeaders = {
-            "x-api-key": API_KEY,
-            protocol: AVAILABLE_PROTOCOLS.ETH,
-        };
-
-        const customOptions = {
-            headers,
-            clientConfig: {
-                maxReceivedFrameSize: 100 * 1000 * 1000,
-                maxReceivedMessageSize: 100 * 1000 * 1000,
-            },
-            reconnect: {
-                auto: false,
-                delay: 5000,
-                maxAttempts: 1,
-                onTimeout: false,
-            },
-        };
-
-        if (this.protocol) {
-            customOptions.headers.protocol = this.protocol;
+    private getHeaders = (): { name: string, value: any }[] | undefined => {
+        if (this.node) {
+            return;
         }
 
-        return customOptions;
-    };
+        return [
+            {name: "x-api-key", value: API_KEY},
+            {name: "chain-id", value: this.chainId},
+        ]
+    }
+
+    private getNodeUrl = (): string => {
+        return this.node || HTTP_PROXY_URL;
+    }
 
     connect = (): void => {
         // @see https://web3js.readthedocs.io/en/v1.2.11/web3.html#configuration
-        const customOptions = this._getOptions();
-
-        const Web3ClientSocket = new Web3.providers.WebsocketProvider(WS_PROXY_URL, customOptions);
-        this.web3 = new Web3(Web3ClientSocket);
-        this.web3.currentProvider.on("connect", function () {
-            console.log("Websocket Provider connection established!");
-        });
-        this.web3.currentProvider.on("end", function () {
-            console.log("Websocket Provider connection ended!");
-            process.exit()
-        });
-        this.web3.currentProvider.on("error", (error: Error): void => {
-            console.error("Error in web3", error);
-            throw error;
-        });
+        this.web3 = new Web3(
+            new Web3.providers.HttpProvider(this.getNodeUrl(), {
+                headers: this.getHeaders(),
+                timeout: 20000,
+            }),
+        );
     };
 
     // Ensure Web3 connection established.
@@ -125,7 +102,7 @@ class EVMC extends BasicSDK {
                 }
 
                 return response;
-            }catch(err) {
+            } catch (err) {
                 console.log(err);
                 process.exit()
             }
@@ -348,8 +325,11 @@ class EVMC extends BasicSDK {
         const block: number = +(await metadata.block(this.provider));
         const currentBlock: number = await this.getCurrentBlock();
 
-        if ("topics" === this.provider.searchType) {
-            await this.eventsByTopics(block, currentBlock);
+        if (
+            this.provider.searchType &&
+            (this.provider.searchType.includes("topics") || this.provider.searchType.includes("address"))
+        ) {
+            await this.eventsByTopicsOrAddress(block, currentBlock);
         } else if ("block-scan" === this.provider.searchType) {
             await this.transactions(block, currentBlock);
         } else {
@@ -372,20 +352,49 @@ class EVMC extends BasicSDK {
 
     /**
      * Parse events by topics (signatures)
+     *
+     * @param block int
+     * @param currentBlock int
+     * @returns {Promise<void>}
      */
-    eventsByTopics = async (block: number, currentBlock: number): Promise<void> => {
-        let run = true;
+    eventsByTopicsOrAddress = async (block: number, currentBlock: number): Promise<void> => {
         let from: number = block;
-        console.log("range", this.range);
         let to: number = block + this.range;
+        let latestBlock = currentBlock;
 
-        while (run) {
-            console.log(`processing past blocks for ${this.provider.name} from block ${from}`);
+        while (true) {
+            latestBlock = await this.getCurrentBlock();
+
+            if (this.isDeprecated(from)) {
+                return;
+            }
+
+            if (from > latestBlock) {
+                await asyncTimeout();
+                continue;
+            }
+
+            if (to > latestBlock) {
+                to = latestBlock;
+            }
+
+            if (from >= to) {
+                await asyncTimeout();
+                continue;
+            }
+
+            console.log(`processing past blocks for ${this.provider.name} from block ${from} to ${to}`);
             const events: Log[] = await this.getPastLogs({
                 fromBlock: from,
                 toBlock: to,
-                address: this.provider.contract,
-                topics: this.provider.eventsTopics,
+                address:
+                    this.provider.searchType && this.provider.searchType.includes("address")
+                        ? this.provider.contract
+                        : undefined,
+                topics:
+                    this.provider.searchType && this.provider.searchType.includes("topics")
+                        ? this.provider.eventsTopics
+                        : undefined,
             });
 
             if (events.length) {
@@ -393,11 +402,20 @@ class EVMC extends BasicSDK {
                 const chunkedEvents: PastLogsOptions[][] = _.chunk(events, this.chunkSize);
 
                 for (const i in chunkedEvents) {
-                    const promises: Promise<void>[] = [];
+                    const salesToInsert: ISaleEntity[] = [];
+
+                    const promises: Promise<ISaleEntity | undefined>[] = [];
                     for (const event of chunkedEvents[i]) {
                         promises.push(this.provider.process(event));
                     }
-                    await Promise.all(promises);
+                    const sales: ISaleEntity[] = (await Promise.all(promises))
+                        .flat()
+                        .filter((item: ISaleEntity | undefined): item is ISaleEntity => !!item);
+                    if (Array.isArray(sales) && sales.length) {
+                        salesToInsert.push(...sales);
+                    }
+
+                    await InsertSales(salesToInsert, !!this.provider.resync);
                 }
             }
 
@@ -406,86 +424,91 @@ class EVMC extends BasicSDK {
                 return;
             }
 
-            from = to + 1;
+            from = to;
             to = to + this.range;
             // If we don't update current block number, we'll always check with the same block.
             // That might cause us trying to parse events from future.
-            currentBlock = await this.getCurrentBlock();
 
-            if (to > currentBlock) {
-                run = false;
-                await metadata.update(this.provider, currentBlock);
-                await this._subscribeEventsByTopics(currentBlock);
+            if (to > latestBlock) {
+                await metadata.update(this.provider, latestBlock);
+                await asyncTimeout();
             }
         }
     };
 
     /**
-     * Subscribe to events by topics (signatures) since specified block
-     */
-    private _subscribeEventsByTopics = async (block: number): Promise<void> => {
-        const callback = async () => {
-            await new Promise(() => {
-                const web3 = this.ensureWeb3();
-                web3.eth
-                    .subscribe(
-                        "logs",
-                        {
-                            address: this.provider.contract,
-                            topics: this.provider.eventsTopics,
-                        },
-                        (err: Error, log: Log) => {
-                            if (err) {
-                                console.log("ethereum event subscription error " + err, err);
-                                throw err;
-                            }
-
-                            if (log) {
-                                console.log(`event for ${this.provider.name} on block ${log.blockNumber}`);
-
-                                this.provider.process(log);
-                                metadata.update(this.provider, log.blockNumber - 1);
-                            }
-                        },
-                    )
-                    .on("connected", () => {
-                        console.log(`subscribed to ${this.provider.name} events by topics from block ${block}`);
-                    });
-            });
-        };
-
-        return this.retry({
-            callback,
-            customParams: {
-                blockNumber: block,
-                contract: this.provider.contract,
-                topics: this.provider.eventsTopics,
-            },
-        });
-    };
-
-    /**
      * Parse events by event name
+     *
+     * @param block int
+     * @param currentBlock int
+     * @returns {Promise<void>}
      */
     events = async (block: number, currentBlock: number): Promise<void> => {
-        let run = true;
         let from: number = block;
         let to: number = block + this.range;
-        if (to > currentBlock) {
-            to = currentBlock;
-        }
+        let latestBlock = currentBlock;
 
-        while (run && this.running) {
+        while (true) {
+            latestBlock = await this.getCurrentBlock();
+
+            if (this.isDeprecated(from)) {
+                return;
+            }
+
+            if (from > latestBlock) {
+                logger.info({
+                    providerName: this.provider.name,
+                    message: `"from" value is higher than "latestBlock' value`,
+                    fromBlock: from,
+                    toBlock: to,
+                    latestBlock,
+                });
+
+                await asyncTimeout();
+                continue;
+            }
+
+            if (to > latestBlock) {
+                to = latestBlock;
+            }
+
+            if (from === to) {
+                logger.info({
+                    providerName: this.provider.name,
+                    message: `"from" value is equal to "to' value`,
+                    fromBlock: from,
+                    toBlock: to,
+                    latestBlock,
+                });
+
+                to = from + this.range;
+
+                await asyncTimeout();
+                continue;
+            }
+
+            if (from >= to) {
+                logger.info({
+                    providerName: this.provider.name,
+                    message: `"from" value is higher or equal to "to' value`,
+                    fromBlock: from,
+                    toBlock: to,
+                    latestBlock,
+                });
+
+                await asyncTimeout();
+                continue;
+            }
+
             console.log(`processing past blocks for ${this.provider.name} from block ${from} to block ${to}`);
 
             for (const eventName of this.provider.events) {
-                if (!this.running) {
-                    break;
-                }
-                const events: EventData[] = await this.getPastEvents(eventName, {
+                const options = {
                     fromBlock: from,
                     toBlock: to,
-                });
+                    topics: this.provider.eventsTopics,
+                };
+                const events: EventData[] = await this.getPastEvents(eventName, options);
                 if (events.length) {
                     console.log(
                         `found ${events.length} events for ${this.provider.name} in range from block ${from} to ${to}`,
@@ -509,50 +532,13 @@ class EVMC extends BasicSDK {
                 return;
             }
 
-            from = to + 1;
+            from = to;
             to = to + this.range;
             // If we don't update current block number, we'll always check with the same block.
             // That might cause us trying to parse events from future.
-            currentBlock = await this.getCurrentBlock();
 
-            if (to >= currentBlock) {
-                run = false;
-                await metadata.update(this.provider, currentBlock);
-                await this._subscribeEvents(currentBlock);
-            }
-        }
-        return;
-    };
-
-    /**
-     * Subscribe to events by event names since specified block
-     */
-    private _subscribeEvents = async (block: number): Promise<void> => {
-        for (const name of this.provider.events) {
-            try {
-                const contract: Contract = await this.getContract();
-                contract.events[name]({fromBlock: block}, async (error: Error, event: EventData) => {
-                    if (error) {
-                        throw new Error();
-                    }
-
-                    if (event) {
-                        this.provider.process(event);
-                        metadata.update(this.provider, event.blockNumber - 1);
-                    }
-                }).on("connected", (id: number): void => {
-                    console.log(`subscribed to ${this.provider.name} event ${name} with ID ${id} from block ${block}`);
-                });
-            } catch (err) {
-                console.error({
-                    action: "Subscribe to events",
-                    error: err?.message || "n/a",
-                    provider: this.provider.name,
-                    sdk: this.constructor.name,
-                    function: "_subscribeEvents",
-                });
-                await asyncTimeout();
-                process.exit(1);
+            if (to >= latestBlock) {
+                await metadata.update(this.provider, latestBlock);
             }
         }
     };
@@ -603,4 +589,4 @@ class EVMC extends BasicSDK {
     };
 }
 
-export default EVMC;
+export default EVMC_HTTP;

@@ -6,16 +6,11 @@ import moment from "moment";
 import Avalanche from "../../sdk/avalanche";
 import path from "path";
 import BigNumber from "bignumber.js";
-import symbolSdk from "../../sdk/symbol";
-import priceSdk from "../../sdk/price";
-import { ISaleEntity, ISymbolAPIResponse } from "../../sdk/Interfaces";
-import { BlockTransactionString } from "web3-eth";
+import { ISaleEntity } from "../../sdk/Interfaces";
 import { EventData } from "web3-eth-contract";
 
 class NFTKey {
     name: string;
-    symbol: ISymbolAPIResponse | undefined;
-    token: string;
     protocol: string;
     block: number;
     contract: string;
@@ -27,8 +22,6 @@ class NFTKey {
 
     constructor() {
         this.name = "nftkey-avalanche";
-        this.symbol = undefined;
-        this.token = "avax";
         this.protocol = "avalanche";
         this.block = 6421617;
         this.contract = "0x1a7d6ed890b6c284271ad27e7abe8fb5211d0739";
@@ -69,33 +62,16 @@ class NFTKey {
         return "avax";
     };
 
-    _getPrice = async (
-        event: EventData,
-        block: BlockTransactionString,
-        symbol: ISymbolAPIResponse,
-        paymentToken: string,
-    ): Promise<{ price: number | null; priceUsd: number | null }> => {
-        if (!symbol?.decimals) {
-            return {
-                price: null,
-                priceUsd: null,
-            };
-        }
-
-        const po = await priceSdk.get(paymentToken, this.protocol, +block.timestamp);
-
+    _getPrice = (event: EventData): BigNumber => {
         let value: number;
+
         if (event.event === "TokenBidAccepted") {
             value = event.returnValues.bid.value;
         } else {
             value = event.returnValues.listing.value;
         }
-        const nativePrice = new BigNumber(value).dividedBy(10 ** (symbol?.decimals || 0));
 
-        return {
-            price: nativePrice.toNumber(),
-            priceUsd: !symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
-        };
+        return new BigNumber(value);
     };
 
     _getSeller = (event: EventData): string => {
@@ -113,8 +89,7 @@ class NFTKey {
             return;
         }
         const paymentToken = await this._getPaymentToken(event);
-        const symbol = await symbolSdk.get(paymentToken, this.protocol);
-        const { price, priceUsd } = await this._getPrice(event, block, symbol, paymentToken);
+        const price = this._getPrice(event);
         const tokenId = event.returnValues.tokenId;
         const seller = this._getSeller(event);
         const nftContract = event.returnValues.erc721Address.toLowerCase();
@@ -125,16 +100,15 @@ class NFTKey {
             protocol: this.protocol,
             nftContract: nftContract,
             nftId: tokenId,
-            token: this.token,
-            tokenSymbol: symbol?.symbol || "",
+            token: paymentToken,
             amount: 1,
             price,
-            priceUsd,
             seller: seller.toLowerCase(),
             buyer: buyer.toLowerCase(),
-            soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),
+            soldAt: timestamp,
             blockNumber: event.blockNumber,
             transactionHash: event.transactionHash,
+            chainId: this.sdk.chainId,
         };
 
         await this.addToDatabase(entity);

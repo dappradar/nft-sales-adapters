@@ -3,17 +3,14 @@ dotenv.config();
 
 import moment from "moment";
 import BigNumber from "bignumber.js";
-import Ethereum from "../../sdk/EVMC";
+import Ethereum from "../../sdk/ethereum";
 import path from "path";
-import symbolSdk from "../../sdk/symbol";
-import priceSdk from "../../sdk/price";
 
-import { ISaleEntity, ISymbolAPIResponse } from "../../sdk/Interfaces";
+import { ISaleEntity } from "../../sdk/Interfaces";
 import { EventData } from "web3-eth-contract";
 
 class GOLOM {
     name: string;
-    symbol: ISymbolAPIResponse | undefined;
     token: string;
     protocol: string;
     block: number;
@@ -26,7 +23,6 @@ class GOLOM {
 
     constructor() {
         this.name = "golom";
-        this.symbol = undefined;
         this.token = "eth";
         this.protocol = "ethereum";
         this.block = 14880514;
@@ -39,10 +35,6 @@ class GOLOM {
     }
 
     run = async (): Promise<void> => {
-        const symbol = await symbolSdk.get(this.token, this.protocol);
-        if (!symbol) throw new Error(`Missing symbol metadata for provider ${this.name}`);
-        this.symbol = symbol;
-
         this.sdk = await this.loadSdk();
 
         await this.sdk.run();
@@ -82,13 +74,9 @@ class GOLOM {
     process = async (event: any): Promise<ISaleEntity | undefined> => {
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
-        const po = await priceSdk.get(this.token, this.protocol, block.timestamp);
-        const nativePrice = new BigNumber(event.returnValues.price).dividedBy(10 ** (this.symbol?.decimals || 0));
         const buyer = event.returnValues.taker.toLowerCase();
         const seller = event.returnValues.maker.toLowerCase();
-        const orderType = event.returnValues.orderType;
 
-        const token_symbol = orderType == 0 ? "eth" : "weth";
         const tokenId_nftContract = await this.getNftId(event);
 
         if (!tokenId_nftContract) {
@@ -104,15 +92,14 @@ class GOLOM {
             nftContract: nftContract,
             nftId: tokenId,
             token: this.token,
-            tokenSymbol: token_symbol,
             amount: 1,
-            price: nativePrice.toNumber(),
-            priceUsd: !this.symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
+            price: new BigNumber(event.returnValues.price),
             seller: seller, // its bought from ens and transfered to the owner
             buyer,
-            soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),
+            soldAt: timestamp,
             blockNumber: event.blockNumber,
             transactionHash: event.transactionHash,
+            chainId: this.sdk.chainId,
         };
 
         return this.addToDatabase(entity);

@@ -11,6 +11,8 @@ class Celo extends EVMC {
         this.range = 500;
         this.chunkSize = 2;
         this.protocol = AVAILABLE_PROTOCOLS.CELO;
+        this.chainId = 43;
+        this.node = process.env.CELO_NODE_HTTP;
     }
 }
 

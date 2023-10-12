@@ -1,7 +1,17 @@
+import BigNumber from "bignumber.js";
+import { Moment } from "moment";
+
 export interface ISaleEntityNFT {
     contract: string;
     id: string;
     amount: number;
+}
+
+export interface ISaleEntityNFTTest {
+    contract: string;
+    id: string;
+    amount: number;
+    addressCaseSensitive: boolean;
 }
 
 export interface ISaleEntity {
@@ -12,31 +22,25 @@ export interface ISaleEntity {
     nftId?: string;
     nftContract?: string;
     token: string;
-    tokenSymbol: string;
     amount?: number;
-    price: number | null;
-    priceUsd: number | null;
+    price: BigNumber;
     seller: string;
     buyer: string;
-    soldAt: string;
+    soldAt: Moment;
     blockNumber: number;
     transactionHash: string;
+    chainId: number;
+}
+
+export interface ISaleEntityTest {
+    nfts?: ISaleEntityNFTTest[];
+    addressCaseSensitive: boolean;
 }
 
 export interface IDappRadarAPIHeaders {
     key: string;
     protocol: string;
     "content-type"?: string;
-}
-
-export interface ISymbolAPIResponse {
-    id: number;
-    address: string;
-    symbol: string;
-    protocol: string;
-    decimals: number;
-    created_at: string;
-    currency: string;
 }
 
 export interface IPriceAPIResponse {

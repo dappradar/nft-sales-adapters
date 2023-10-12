@@ -2,7 +2,7 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 import axios from "axios";
-import { asyncTimeout } from "./util";
+import { asyncTimeout } from "./utils";
 import { HTTP_PROXY_URL, API_KEY, AVAILABLE_PROTOCOLS } from "./constants";
 import _ from "lodash";
 import BasicSDK from "./basic-sdk";
@@ -79,12 +79,14 @@ class Tezos extends BasicSDK {
     provider: any;
     range: number;
     chunkSize: number;
+    chainId: number;
 
     constructor(provider: any) {
         super(provider);
 
         this.range = 500; // Maximum amount that API can handle is 500
         this.chunkSize = 10;
+        this.chainId = 21;
     }
 
     run = async (): Promise<void> => {

@@ -15,7 +15,9 @@ const API_URL = process.env.DAPPRADAR_API_URL || "";
 const WS_PROXY_URL = process.env.WS_PROXY_URL || "";
 const HTTP_PROXY_URL = process.env.HTTP_PROXY_URL || "";
 
-if (!API_KEY.length) throw new Error(`Missing "API_KEY" environment variable`);
+if (!API_KEY.length) {
+    console.error(`Missing "API_KEY" environment variable`);
+}
 if (!API_URL.length) throw new Error(`Missing "API_URL" environment variable`);
 if (!WS_PROXY_URL.length) throw new Error(`Missing "WS_PROXY_URL" environment variable`);
 if (!HTTP_PROXY_URL.length) throw new Error(`Missing "HTTP_PROXY_URL" environment variable`);
