@@ -6,10 +6,8 @@ import moment from "moment";
 import { EventData } from "web3-eth-contract";
 import path from "path";
 import BigNumber from "bignumber.js";
-import priceSdk from "../../sdk/price";
-import Ethereum from "../../sdk/EVMC";
-import symbolSdk from "../../sdk/symbol";
-import { ISaleEntity, ISymbolAPIResponse } from "../../sdk/Interfaces";
+import Ethereum from "../../sdk/ethereum";
+import { ISaleEntity } from "../../sdk/Interfaces";
 
 class Alienswap {
     name: string;
@@ -52,8 +50,6 @@ class Alienswap {
     process = async (event: EventData): Promise<void> => {
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
-        const symbol: ISymbolAPIResponse = await symbolSdk.get(this.token, this.protocol);
-        const po = await priceSdk.get(this.token, this.protocol, block.timestamp);
         const tokenId = event.returnValues.offer[0][2];
         const nftContract = event.returnValues.offer[0][1];
         const amount = event.returnValues.offer[0][3];
@@ -61,12 +57,11 @@ class Alienswap {
         if (baseTx.value == 0) {
             return;
         }
-        const fillPriceWei = new BigNumber(event.returnValues.consideration[0][3]);
-        const fillPrice = fillPriceWei.dividedBy(10 ** (symbol?.decimals || 0));
         const entity = {
             providerName: this.name,
             providerContract: this.contract,
             protocol: this.protocol,
+            chainId: this.sdk.chainId,
             nfts: [
                 {
                     id: tokenId,
@@ -75,12 +70,10 @@ class Alienswap {
                 },
             ],
             token: this.token,
-            tokenSymbol: symbol?.symbol || "",
-            price: fillPrice.toNumber(),
-            priceUsd: fillPrice.multipliedBy(po.price).toNumber(),
+            price: new BigNumber(event.returnValues.consideration[0][3]),
             seller: event.returnValues.offerer.toLowerCase(),
             buyer: event.returnValues.recipient.toLowerCase(),
-            soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),
+            soldAt: timestamp,
             blockNumber: event.blockNumber,
             transactionHash: event.transactionHash,
         };

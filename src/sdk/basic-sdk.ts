@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { asyncTimeout } from "./util";
+import { asyncTimeout } from "./utils";
 import { DEFAULT_MAX_RETRIES } from "./constants";
 
 export interface IBasicSDKRetryConfig {
@@ -103,7 +103,7 @@ abstract class BasicSDK {
                     state: "error",
                     duration: Date.now() - startDate,
                 };
-
+console.log(err);
                 console.info(error);
                 await asyncTimeout(config.retryAfter);
                 retries++;

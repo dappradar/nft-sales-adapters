@@ -7,11 +7,3 @@
 ---
 
 [environment configuration](environment-configuration.md ':include')
-
----
-
-[tokens data api](tokens-data-api.md ':include')
-
----
-
-[tokens prices api](tokens-prices-api.md ':include')

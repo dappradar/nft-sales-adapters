@@ -12,6 +12,8 @@ class Matic extends EVMC {
         this.range = 500;
         this.chunkSize = 2;
         this.protocol = AVAILABLE_PROTOCOLS.POLYGON;
+        this.chainId = 16;
+        this.node = process.env.MATIC_NODE_HTTP;
     }
 }
 

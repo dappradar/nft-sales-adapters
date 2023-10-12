@@ -6,10 +6,8 @@ import BigNumber from "bignumber.js";
 import moment from "moment";
 import { EventData } from "web3-eth-contract";
 import path from "path";
-import priceSdk from "../../sdk/price";
 import Matic from "../../sdk/matic";
-import symbolSdk from "../../sdk/symbol";
-import { ISaleEntity, ISymbolAPIResponse } from "../../sdk/Interfaces";
+import { ISaleEntity } from "../../sdk/Interfaces";
 
 class Element {
     name: string;
@@ -71,11 +69,8 @@ class Element {
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
         const token = this._getToken(event);
-        const symbol: ISymbolAPIResponse = await symbolSdk.get(token, this.protocol);
-        const po = await priceSdk.get(token, this.protocol, block.timestamp);
         const amount = isER721 ? 1 : event.returnValues["erc1155FillAmount"];
         const price = isER721 ? event.returnValues["erc20TokenAmount"] : event.returnValues["erc20FillAmount"];
-        const nativePrice = new BigNumber(price).dividedBy(10 ** (symbol?.decimals || 0));
         const maker = event.returnValues["maker"];
         const taker = event.returnValues["taker"];
         const buyer = isSellOrder ? taker : maker;
@@ -90,15 +85,14 @@ class Element {
             nftContract: nftContract.toLowerCase(),
             nftId: tokenId,
             token: token.toLowerCase(),
-            tokenSymbol: symbol?.symbol || "",
             amount,
-            price: nativePrice.toNumber(),
-            priceUsd: !symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
+            price: new BigNumber(price),
             seller: seller.toLowerCase(),
             buyer: buyer.toLowerCase(),
-            soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),
+            soldAt: timestamp,
             blockNumber: event.blockNumber,
             transactionHash: event.transactionHash,
+            chainId: this.sdk.chainId,
         };
 
         await this.addToDatabase(entity);
