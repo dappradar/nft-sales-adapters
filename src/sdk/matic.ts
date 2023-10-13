@@ -3,9 +3,9 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 import { AVAILABLE_PROTOCOLS } from "./constants";
-import EVMC from "./EVMC";
+import EVMC_HTTP from "./EVMC-HTTP";
 
-class Matic extends EVMC {
+class Matic extends EVMC_HTTP {
     constructor(props: any) {
         super(props);
 
