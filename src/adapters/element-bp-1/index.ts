@@ -1,63 +1,30 @@
-import * as dotenv from "dotenv";
-
-dotenv.config();
-
 import BigNumber from "bignumber.js";
 import moment from "moment";
-import { EventData } from "web3-eth-contract";
-import path from "path";
-import Ethereum from "../../sdk/ethereum";
-import { ISaleEntity } from "../../sdk/Interfaces";
+import {EventData} from "web3-eth-contract";
+import {ISaleEntity} from "../../sdk/Interfaces";
+import BasicProvider, {IBasicProviderOptions} from "../../sdk/basic-provider";
 
-class Element {
-    name: string;
-    token: string;
-    protocol: string;
-    block: number;
-    deprecatedAtBlock: number;
-    contract: string;
-    events: string[];
-    pathToAbi: string;
-    range: number;
-    chunkSize: number;
-    sdk: any;
+class Element extends BasicProvider {
+    constructor(options: IBasicProviderOptions) {
+        super(options);
 
-    constructor() {
-        this.name = "element-ethereum-1";
-        this.protocol = "ethereum";
-        this.block = 15080677;
-        this.deprecatedAtBlock = 15794002;
-        this.contract = "0x20f780a973856b93f63670377900c1d2a50a77c4";
+        if (!this.defaultPaymentToken) {
+            throw new Error(`Missing default payment token for provider "${this.name}"`);
+        }
+
         this.events = [
             "ERC721SellOrderFilled",
             "ERC721BuyOrderFilled",
             "ERC1155SellOrderFilled",
             "ERC1155BuyOrderFilled",
         ];
-        this.pathToAbi = path.join(__dirname, "./abi.json");
-        this.range = 500;
-        this.chunkSize = 6;
     }
 
-    run = async (): Promise<void> => {
-        this.sdk = await this.loadSdk();
-
-        await this.sdk.run();
-    };
-
-    loadSdk = (): any => {
-        return new Ethereum(this);
-    };
-
-    stop = async (): Promise<void> => {
-        this.sdk.stop();
-    };
-
-    _getToken = (event: EventData): string => {
+    private getToken = (event: EventData): string => {
         let token = event.returnValues["erc20Token"].toLowerCase();
 
         if (token === "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee") {
-            token = "0x0000000000000000000000000000000000000000";
+            token = this.defaultPaymentToken;
         }
 
         return token;
@@ -68,7 +35,6 @@ class Element {
         const isSellOrder = ["ERC721SellOrderFilled", "ERC1155SellOrderFilled"].includes(event.event);
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
-        const token = this._getToken(event);
         const amount = isER721 ? 1 : event.returnValues["erc1155FillAmount"];
         const price = isER721 ? event.returnValues["erc20TokenAmount"] : event.returnValues["erc20FillAmount"];
         const maker = event.returnValues["maker"];
@@ -81,11 +47,14 @@ class Element {
         const entity = {
             providerName: this.name,
             providerContract: this.contract,
-            protocol: this.protocol,
-            nftContract: nftContract.toLowerCase(),
-            nftId: tokenId,
-            token: token.toLowerCase(),
-            amount,
+            nfts: [
+                {
+                    contract: nftContract.toLowerCase(),
+                    id: tokenId,
+                    amount
+                }
+            ],
+            token: this.getToken(event),
             price: new BigNumber(price),
             seller: seller.toLowerCase(),
             buyer: buyer.toLowerCase(),

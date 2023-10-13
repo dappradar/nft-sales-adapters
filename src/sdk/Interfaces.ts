@@ -17,7 +17,6 @@ export interface ISaleEntityNFTTest {
 export interface ISaleEntity {
     providerName: string;
     providerContract: string;
-    protocol: string;
     nfts?: ISaleEntityNFT[];
     nftId?: string;
     nftContract?: string;
@@ -43,15 +42,10 @@ export interface IDappRadarAPIHeaders {
     "content-type"?: string;
 }
 
-export interface IPriceAPIResponse {
-    protocol: string;
-    token: string;
-    date: string;
-    price: number;
-    decimals: number | null;
-    currency: string;
-}
-
 export interface IObjectStringAny {
     [key: string]: any;
+}
+
+export interface IObjectNumberString {
+    [key: number]: string
 }

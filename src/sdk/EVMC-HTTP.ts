@@ -569,7 +569,7 @@ class EVMC_HTTP extends BasicSDK {
         return "0x" + string.slice(string.length - 64);
     };
 
-    getAbi = async (): Promise<object> => {
+    getAbi = async (): Promise<IObjectStringAny> => {
         if (this.provider.hasOwnProperty("getAbi")) {
             return await this.provider.getAbi();
         }
@@ -578,12 +578,16 @@ class EVMC_HTTP extends BasicSDK {
             return this.provider.abi;
         }
 
-        if (!this.provider.hasOwnProperty("pathToAbi")) {
-            throw new Error("invalid path to abi, must provider full path");
+        let path: string;
+        if (this.provider.hasOwnProperty("pathToAbi")) {
+            path = this.provider.pathToAbi;
+        } else {
+            const dirName = this.provider.basicProvider ?? this.provider.name;
+            path = `${__dirname}/../adapters/${dirName}/abi.json`;
         }
 
-        const stringifiedAbi: string = await fs.promises.readFile(this.provider.pathToAbi, "utf8");
-        const abi: object = JSON.parse(stringifiedAbi || "[]");
+        const stringifiedAbi: string = await fs.promises.readFile(path, "utf8");
+        const abi: IObjectStringAny = JSON.parse(stringifiedAbi || "[]");
         this.provider.abi = abi;
         return abi;
     };
