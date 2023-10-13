@@ -7,8 +7,7 @@ import moment from "moment";
 import { EventData } from "web3-eth-contract";
 import path from "path";
 import Avalanche from "../../sdk/avalanche";
-import symbolSdk from "../../sdk/symbol";
-import { ISaleEntity, ISymbolAPIResponse } from "../../sdk/Interfaces";
+import { ISaleEntity } from "../../sdk/Interfaces";
 import { handleExtraData } from "../okx-polygon-1";
 
 class OKX {
@@ -70,9 +69,6 @@ class OKX {
         const isAceeptOffer = Number(actionType) === 3;
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
-        const symbol: ISymbolAPIResponse = await symbolSdk.get(token, this.protocol);
-        const po = await priceSdk.get(token, this.protocol, block.timestamp);
-        const nativePrice = new BigNumber(paymentTokenAmount).dividedBy(10 ** (symbol?.decimals || 0));
         const buyer = isAceeptOffer ? maker : taker;
         const seller = isAceeptOffer ? taker : maker;
 
@@ -88,7 +84,7 @@ class OKX {
                 },
             ],
             token,
-            price: new BigNumber(price),
+            price: new BigNumber(paymentTokenAmount),
             seller: seller.toLowerCase(),
             buyer: buyer.toLowerCase(),
             soldAt: timestamp,

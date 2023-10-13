@@ -146,9 +146,6 @@ class OKX {
         const isAceeptOffer = Number(actionType) === 3;
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
-        const symbol: ISymbolAPIResponse = await symbolSdk.get(token, "matic");
-        const po = await priceSdk.get(token, this.protocol, block.timestamp);
-        const nativePrice = new BigNumber(paymentTokenAmount).dividedBy(10 ** (symbol?.decimals || 0));
         const buyer = isAceeptOffer ? maker : taker;
         const seller = isAceeptOffer ? taker : maker;
         const entity = {
@@ -163,7 +160,7 @@ class OKX {
                 },
             ],
             token,
-            price: new BigNumber(price),
+            price: new BigNumber(paymentTokenAmount),
             seller: seller.toLowerCase(),
             buyer: buyer.toLowerCase(),
             soldAt: timestamp,
