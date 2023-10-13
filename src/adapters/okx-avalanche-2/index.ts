@@ -47,11 +47,11 @@ class OKX {
         this.sdk.stop();
     };
 
-    _getToken = (item: any): string => {
-        if (item[2] === "0x0000000000000000000000000000000000000000") {
+    _getToken = (paymentTokenContract: any): string => {
+        if (paymentTokenContract === "0x0000000000000000000000000000000000000000") {
             return "avax";
         }
-        return item[2].toLowerCase();
+        return paymentTokenContract.toLowerCase();
     };
 
     _processItem = async (event: EventData, item: any): Promise<void> => {
