@@ -18,7 +18,7 @@ src
 ```
 import AvalancheSDK from '../../sdk/avalanche';
 // Dependencies imports
-import { ISaleEntity, ISymbolAPIResponse } from "../../sdk/Interfaces";
+import { ISaleEntity } from "../../sdk/Interfaces";
 import { EventData } from "web3-eth-contract";
 
 // Interfaces

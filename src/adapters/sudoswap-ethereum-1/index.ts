@@ -7,15 +7,13 @@ import path from "path";
 
 import moment from "moment";
 import BigNumber from "bignumber.js";
-import Ethereum from "../../sdk/EVMC";
-import priceSdk from "../../sdk/price";
+import Ethereum from "../../sdk/ethereum";
 import { Transaction } from "web3-core";
-import symbolSdk from "../../sdk/symbol";
 import { Contract } from "web3-eth-contract";
-import { asyncTimeout } from "../../sdk/util";
+import { asyncTimeout } from "../../sdk/utils";
 import { BlockTransactionString } from "web3-eth";
 import InputDataDecoder from "ethereum-input-data-decoder";
-import { ISaleEntity, ISymbolAPIResponse } from "../../sdk/Interfaces";
+import { ISaleEntity } from "../../sdk/Interfaces";
 
 export class PairData {
     private _sdk: Ethereum;
@@ -98,7 +96,6 @@ export class PairData {
 
 class SudoSwap {
     name: string;
-    symbol: ISymbolAPIResponse | undefined;
     token: string;
     protocol: string;
     block: number;
@@ -111,7 +108,6 @@ class SudoSwap {
     sdk: Ethereum;
 
     decoder: InputDataDecoder;
-    ethAddress: string;
     pairFactoryAbi: string;
     pairFactoryAddress: string;
     pairContractAbi: string;
@@ -119,7 +115,6 @@ class SudoSwap {
 
     constructor() {
         this.name = "sudoswap-ethereum-1";
-        this.symbol = undefined;
         this.token = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
         this.protocol = "ethereum";
         this.block = 14718943;
@@ -144,11 +139,6 @@ class SudoSwap {
 
     run = async (): Promise<void> => {
         this.sdk = await this.loadSdk();
-
-        const symbol = await symbolSdk.get(this.token, this.protocol);
-        if (!symbol) throw new Error(`Missing symbol metadata for provider ${this.name}`);
-
-        this.symbol = symbol;
 
         await this.sdk.run();
     };
@@ -207,9 +197,7 @@ class SudoSwap {
         amount: number,
         isBuyCall: boolean,
         block: BlockTransactionString,
-    ): Promise<{ price: number | null; priceUsd: number | null }> => {
-        const po = await priceSdk.get(this.token, this.protocol, +block.timestamp);
-
+    ): Promise<BigNumber> => {
         const pairFee = await this._callExternalContractMethod(pair_address, this.pairContractAbi, "fee", block.number);
         const pairSpotPrice = await this._callExternalContractMethod(
             pair_address,
@@ -249,13 +237,7 @@ class SudoSwap {
             [pairSpotPrice, pairDelta, amount, pairFee, factoryFeeMultiplier],
         );
 
-        const priceInEth = buyInfo[3];
-        const nativePrice = new BigNumber(priceInEth).dividedBy(10 ** (this.symbol?.decimals || 0));
-
-        return {
-            price: nativePrice.toNumber(),
-            priceUsd: !this.symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
-        };
+        return new BigNumber(buyInfo[3]);
     };
 
     _decodeData = async (input: string): Promise<PairData[] | null> => {
@@ -323,12 +305,7 @@ class SudoSwap {
 
         for (const pair of pairData) {
             for (const pairInfo of pair.info) {
-                const { price, priceUsd } = await this._getPrice(
-                    pairInfo.pairAddress,
-                    pairInfo.amount,
-                    pairInfo.isBuyCall,
-                    block,
-                );
+                const price = await this._getPrice(pairInfo.pairAddress, pairInfo.amount, pairInfo.isBuyCall, block);
 
                 console.log(`Price: ${price}, pair: ${pairInfo.pairAddress}, NftId: ${pairInfo.nfts}`);
                 console.log(`transaction Hash: ${transaction.hash}`);
@@ -339,14 +316,13 @@ class SudoSwap {
                     protocol: this.protocol,
                     nfts: pairInfo.nfts,
                     token: this.token.toLowerCase(),
-                    tokenSymbol: this.symbol?.symbol || "",
                     price,
-                    priceUsd,
                     seller: pairInfo.pairAddress.toLowerCase(),
                     buyer: pairInfo.buyer.toLowerCase(),
-                    soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),
+                    soldAt: timestamp,
                     blockNumber: <number>transaction.blockNumber,
                     transactionHash: transaction.hash,
+                    chainId: this.sdk.chainId,
                 };
 
                 await this.addToDatabase(entity);

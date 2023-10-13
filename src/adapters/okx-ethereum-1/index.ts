@@ -11,6 +11,7 @@ import Ethereum from "../../sdk/EVMC";
 import symbolSdk from "../../sdk/symbol";
 import { ISaleEntity, ISymbolAPIResponse } from "../../sdk/Interfaces";
 import { handleExtraData } from "../okx-polygon-1";
+import Ethereum from "../../sdk/ethereum";
 
 class OKX {
     name: string;
@@ -82,14 +83,13 @@ class OKX {
                 },
             ],
             token,
-            tokenSymbol: symbol?.symbol || "",
-            price: nativePrice.toNumber(),
-            priceUsd: !symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
+            price: new BigNumber(price),
             seller: seller.toLowerCase(),
             buyer: buyer.toLowerCase(),
-            soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),
+            soldAt: timestamp,
             blockNumber: event.blockNumber,
             transactionHash: event.transactionHash,
+            chainId: this.sdk.chainId,
         };
         await this.addToDatabase(entity);
     };

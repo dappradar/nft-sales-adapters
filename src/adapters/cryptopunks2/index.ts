@@ -6,15 +6,12 @@ import moment from "moment";
 import BigNumber from "bignumber.js";
 import Matic from "../../sdk/matic";
 import path from "path";
-import symbolSdk from "../../sdk/symbol";
-import priceSdk from "../../sdk/price";
 
-import { ISaleEntity, ISymbolAPIResponse } from "../../sdk/Interfaces";
+import { ISaleEntity } from "../../sdk/Interfaces";
 import { EventData } from "web3-eth-contract";
 
 class CRYPTOPUNKS2 {
     name: string;
-    symbol: ISymbolAPIResponse | undefined;
     token: string;
     protocol: string;
     block: number;
@@ -38,10 +35,6 @@ class CRYPTOPUNKS2 {
     }
 
     run = async (): Promise<void> => {
-        const symbol = await symbolSdk.get(this.token, this.protocol);
-        if (!symbol) throw new Error(`Missing symbol metadata for provider ${this.name}`);
-        this.symbol = symbol;
-
         this.sdk = await this.loadSdk();
 
         await this.sdk.run();
@@ -86,12 +79,7 @@ class CRYPTOPUNKS2 {
             }
         }
 
-        const po = await priceSdk.get(this.token, this.protocol, block.timestamp);
-        let nativePrice = new BigNumber(0);
-        if (baseTx.value > 0)
-            nativePrice = new BigNumber(baseTx.value)
-                .dividedBy(10 ** (this.symbol?.decimals || 0))
-                .dividedBy(numberOfTokens);
+        const price = new BigNumber(baseTx.value).dividedBy(numberOfTokens);
 
         const buyer = baseTx.from;
 
@@ -112,14 +100,13 @@ class CRYPTOPUNKS2 {
                 },
             ],
             token: this.token,
-            tokenSymbol: this.symbol?.symbol || "",
-            price: nativePrice.toNumber(),
-            priceUsd: !this.symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
+            price,
             seller: this.contract,
             buyer: buyer.toLowerCase(),
-            soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),
+            soldAt: timestamp,
             blockNumber: event.blockNumber,
             transactionHash: event.transactionHash,
+            chainId: 16,
         };
 
         await this.addToDatabase(entity);

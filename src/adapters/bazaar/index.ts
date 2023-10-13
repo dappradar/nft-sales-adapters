@@ -6,21 +6,12 @@ import path from "path";
 import moment from "moment";
 import BSC from "../../sdk/binance";
 import BigNumber from "bignumber.js";
-import symbolSdk from "../../sdk/symbol";
-import priceSdk from "../../sdk/price";
 
-import { ISaleEntity, ISymbolAPIResponse } from "../../sdk/Interfaces";
-import { BlockTransactionString } from "web3-eth";
+import { ISaleEntity } from "../../sdk/Interfaces";
 import { EventData } from "web3-eth-contract";
-
-interface IPricesResponse {
-    price: number | null;
-    priceUsd: number | null;
-}
 
 class Bazaar {
     name: string;
-    symbol: ISymbolAPIResponse | undefined;
     token: string;
     protocol: string;
     block: number;
@@ -45,10 +36,6 @@ class Bazaar {
     }
 
     run = async (): Promise<void> => {
-        const symbol = await symbolSdk.get(this.token, this.protocol);
-        if (!symbol) throw new Error(`Missing symbol metadata for provider ${this.name}`);
-        this.symbol = symbol;
-
         this.sdk = await this.loadSdk();
 
         await this.sdk.run();
@@ -76,20 +63,6 @@ class Bazaar {
         return buyer;
     };
 
-    _getPrice = async (event: EventData, block: BlockTransactionString): Promise<IPricesResponse> => {
-        if (!this.symbol?.decimals) {
-            return { price: null, priceUsd: null };
-        }
-
-        const po = await priceSdk.get(this.token, this.protocol, +block.timestamp);
-        const nativePrice = new BigNumber(event.returnValues.price).dividedBy(10 ** (this.symbol?.decimals || 0));
-
-        return {
-            price: nativePrice.toNumber(),
-            priceUsd: !this.symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
-        };
-    };
-
     process = async (event: EventData): Promise<ISaleEntity | undefined> => {
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
@@ -97,8 +70,6 @@ class Bazaar {
         if (!buyer) {
             return;
         }
-
-        const { price, priceUsd } = await this._getPrice(event, block);
 
         const tokenId = event.returnValues.nftID;
         const entity = {
@@ -108,15 +79,14 @@ class Bazaar {
             nftContract: this.contract,
             nftId: tokenId,
             token: this.token,
-            tokenSymbol: this.symbol?.symbol || "",
             amount: 1,
-            price,
-            priceUsd,
+            price: new BigNumber(event.returnValues.price),
             seller: this.contract,
             buyer: buyer.toLowerCase(),
-            soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),
+            soldAt: timestamp,
             blockNumber: event.blockNumber,
             transactionHash: event.transactionHash,
+            chainId: this.sdk.chainId,
         };
 
         await this.addToDatabase(entity);

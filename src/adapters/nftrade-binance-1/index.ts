@@ -6,10 +6,8 @@ import BigNumber from "bignumber.js";
 
 dotenv.config();
 
-import { ISymbolAPIResponse, ISaleEntity } from "../../sdk/Interfaces";
+import { ISaleEntity } from "../../sdk/Interfaces";
 import BSC from "../../sdk/binance";
-import symbolSdk from "../../sdk/symbol";
-import priceSdk from "../../sdk/price";
 
 const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
 
@@ -19,7 +17,6 @@ const ERC1155ProxyId = "0xa7cb5fb7";
 
 class NFTRADE {
     name: string;
-    symbol: ISymbolAPIResponse | undefined;
     token: string;
     protocol: string;
     block: number;
@@ -32,7 +29,6 @@ class NFTRADE {
 
     constructor() {
         this.name = "nftrade-binance-1";
-        this.symbol = undefined;
         this.token = "bnb";
         this.protocol = "binance-smart-chain";
         this.block = 21416323;
@@ -115,9 +111,6 @@ class NFTRADE {
         if (ADDRESS_ZERO === token) {
             token = this.token;
         }
-        const po = await priceSdk.get(token, this.protocol, +block.timestamp);
-        const symbol = await symbolSdk.get(token, this.protocol);
-        const nativePrice = new BigNumber(price).dividedBy(10 ** symbol.decimals);
         const entity = {
             providerName: this.name, // the name of the folder
             providerContract: this.contract.toLowerCase(), // the providers contract from which you get data
@@ -125,15 +118,14 @@ class NFTRADE {
             nftContract: nft.address.toLowerCase(),
             nftId: String(nft.id),
             token: token.toLowerCase(),
-            tokenSymbol: symbol.symbol,
             amount,
-            price: nativePrice.toNumber(),
-            priceUsd: !symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
+            price: new BigNumber(price),
             seller: seller.toLowerCase(),
             buyer: buyer.toLowerCase(),
-            soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),
+            soldAt: timestamp,
             blockNumber: event.blockNumber,
             transactionHash: event.transactionHash,
+            chainId: this.sdk.chainId,
         };
         await this.addToDatabase(entity);
     };

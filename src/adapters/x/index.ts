@@ -1,19 +1,16 @@
 import * as dotenv from "dotenv";
+
 dotenv.config();
 
 import moment from "moment";
 import BigNumber from "bignumber.js";
-import Ethereum from "../../sdk/EVMC";
+import Ethereum from "../../sdk/ethereum";
 import path from "path";
-import symbolSdk from "../../sdk/symbol";
-import priceSdk from "../../sdk/price";
 
-import { ISaleEntity, ISymbolAPIResponse } from "../../sdk/Interfaces";
+import { ISaleEntity } from "../../sdk/Interfaces";
 
 class X {
     name: string;
-    symbols: Map<string, ISymbolAPIResponse>;
-    token: string;
     protocol: string;
     block: number;
     contract: string;
@@ -25,7 +22,6 @@ class X {
 
     constructor() {
         this.name = "x";
-        this.symbols = new Map<string, ISymbolAPIResponse>();
         this.protocol = "ethereum";
         this.block = 15127333;
         this.contract = "0xb4a2e49818dd8a5cdd818f22ab99263b62ddeb6c";
@@ -41,7 +37,6 @@ class X {
     }
 
     run = async (): Promise<void> => {
-        await this.ensureSymbol("0x0000000000000000000000000000000000000000");
         this.sdk = this.loadSdk();
         await this.sdk.run();
     };
@@ -52,12 +47,6 @@ class X {
 
     stop = async (): Promise<void> => {
         this.sdk.stop();
-    };
-
-    ensureSymbol = async (address: string) => {
-        const symbol = await symbolSdk.get(address, this.protocol);
-        if (!symbol) throw new Error(`Missing symbol metadata for provider ${this.name}`);
-        this.symbols.set(address, symbol);
     };
 
     process = async (event: any): Promise<ISaleEntity | undefined> => {
@@ -72,11 +61,6 @@ class X {
         }
 
         const { collection, tokenId, amount, currency, price } = event.returnValues.fulfillment;
-        await this.ensureSymbol(currency);
-        const symbol = this.symbols.get(currency)!;
-        const priceInfo = await priceSdk.get(currency, this.protocol, block.timestamp);
-        const displayPrice = new BigNumber(price).dividedBy(10 ** (symbol.decimals || 0));
-        const priceInUsd = displayPrice.multipliedBy(priceInfo.price);
 
         const entity: ISaleEntity = {
             providerName: this.name,
@@ -85,15 +69,14 @@ class X {
             nftContract: collection.toLowerCase(),
             nftId: tokenId,
             token: currency.toLowerCase(),
-            tokenSymbol: symbol.symbol,
             amount: amount,
-            price: displayPrice.toNumber(),
-            priceUsd: priceInUsd.toNumber(),
+            price: new BigNumber(price),
             seller: seller.toLowerCase(),
             buyer: buyer.toLowerCase(),
-            soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),
+            soldAt: timestamp,
             blockNumber: event.blockNumber,
             transactionHash: event.transactionHash,
+            chainId: this.sdk.chainId,
         };
 
         return this.addToDatabase(entity);

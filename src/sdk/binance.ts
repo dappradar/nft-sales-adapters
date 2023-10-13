@@ -11,6 +11,8 @@ class BSC extends EVMC {
         this.range = 500;
         this.chunkSize = 2;
         this.protocol = AVAILABLE_PROTOCOLS.BSC;
+        this.chainId = 15;
+        this.node = process.env.BSC_NODE_HTTP;
     }
 }
 

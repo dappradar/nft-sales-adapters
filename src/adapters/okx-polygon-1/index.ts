@@ -6,10 +6,8 @@ import BigNumber from "bignumber.js";
 import moment from "moment";
 import { EventData } from "web3-eth-contract";
 import path from "path";
-import priceSdk from "../../sdk/price";
 import Matic from "../../sdk/matic";
-import symbolSdk from "../../sdk/symbol";
-import { ISaleEntity, ISymbolAPIResponse } from "../../sdk/Interfaces";
+import { ISaleEntity } from "../../sdk/Interfaces";
 
 const gap = 2;
 
@@ -165,14 +163,13 @@ class OKX {
                 },
             ],
             token,
-            tokenSymbol: symbol?.symbol || "",
-            price: nativePrice.toNumber(),
-            priceUsd: !symbol?.decimals ? null : nativePrice.multipliedBy(po.price).toNumber(),
+            price: new BigNumber(price),
             seller: seller.toLowerCase(),
             buyer: buyer.toLowerCase(),
-            soldAt: timestamp.format("YYYY-MM-DD HH:mm:ss"),
+            soldAt: timestamp,
             blockNumber: event.blockNumber,
             transactionHash: event.transactionHash,
+            chainId: this.sdk.chainId,
         };
         await this.addToDatabase(entity);
     };
