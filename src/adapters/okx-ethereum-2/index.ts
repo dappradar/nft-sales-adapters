@@ -23,7 +23,7 @@ class OKX {
     sdk: any;
 
     constructor() {
-        this.name = "okx-ethereum-1";
+        this.name = "okx-ethereum-2";
         this.protocol = "ethereum";
         this.block = 18311795;
         // this.deprecatedAtBlock = 16625257;

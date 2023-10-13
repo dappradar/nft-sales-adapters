@@ -23,7 +23,7 @@ class OKX {
     sdk: any;
 
     constructor() {
-        this.name = "okx-bsc-1";
+        this.name = "okx-bsc-2";
         this.protocol = "binance-smart-chain";
         this.block = 32526441;
         // this.deprecatedAtBlock = 16625257;

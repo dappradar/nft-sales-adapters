@@ -99,7 +99,7 @@ class OKX {
     sdk: any;
 
     constructor() {
-        this.name = "okx-polygon-1";
+        this.name = "okx-polygon-2";
         this.protocol = "polygon";
         this.block = 48612325;
         // this.deprecatedAtBlock = 39539879;

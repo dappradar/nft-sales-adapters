@@ -23,7 +23,7 @@ class OKX {
     sdk: any;
 
     constructor() {
-        this.name = "okx-avalanche-1";
+        this.name = "okx-avalanche-2";
         this.protocol = "avalanche";
         this.block = 36224739;
         // this.deprecatedAtBlock = 26572425;
