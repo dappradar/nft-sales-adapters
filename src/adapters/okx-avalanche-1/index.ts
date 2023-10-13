@@ -8,7 +8,6 @@ import { EventData } from "web3-eth-contract";
 import path from "path";
 import Avalanche from "../../sdk/avalanche";
 import { ISaleEntity } from "../../sdk/Interfaces";
-import { handleExtraData } from "../okx-polygon-1";
 
 class OKX {
     name: string;
@@ -25,10 +24,10 @@ class OKX {
     constructor() {
         this.name = "okx-avalanche-1";
         this.protocol = "avalanche";
-        this.block = 36224739;
+        this.block = 26572369;
         // this.deprecatedAtBlock = 26572425;
-        this.contract = "0xa7FD99748cE527eAdC0bDAc60cba8a4eF4090f7c";
-        this.events = ["MatchOrderResults"];
+        this.contract = "0xa88ba7ea2912cde5d632c8de048a17f2ea3e75a0";
+        this.events = ["MatchOrderResultsV3"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
         this.chunkSize = 6;
@@ -55,17 +54,10 @@ class OKX {
     };
 
     _processItem = async (event: EventData, item: any): Promise<void> => {
-        const {
-            actionType,
-            paymentTokenAmount,
-            paymentTokenContract,
-            nftContract,
-            tokenId,
-            taker,
-            maker,
-            amount,
-        } = item;
-        const token = this._getToken(paymentTokenContract);
+        const [actionType, price, payToken, nftContract, tokenId, amount, tradeType, extraData] = item;
+        const token = this._getToken(item);
+        const maker = extraData.substring(0, 42);
+        const taker = `0x${extraData.substring(42, 82)}`;
         const isAceeptOffer = Number(actionType) === 3;
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
@@ -84,7 +76,7 @@ class OKX {
                 },
             ],
             token,
-            price: new BigNumber(paymentTokenAmount),
+            price: new BigNumber(price),
             seller: seller.toLowerCase(),
             buyer: buyer.toLowerCase(),
             soldAt: timestamp,
@@ -96,8 +88,7 @@ class OKX {
     };
 
     process = async (event: EventData): Promise<void> => {
-        const extraData = event.returnValues.extraData;
-        const params = handleExtraData(extraData);
+        const params = event.returnValues.params;
         for (let i = 0; i < params.length; i++) {
             await this._processItem(event, params[i]);
         }

@@ -9,84 +9,6 @@ import path from "path";
 import Matic from "../../sdk/matic";
 import { ISaleEntity } from "../../sdk/Interfaces";
 
-const gap = 2;
-
-const extraDataConfig = [
-    {
-        name: "version",
-        unit: 2,
-    },
-    {
-        name: "tradeType",
-        unit: 1,
-    },
-    {
-        name: "actionType",
-        unit: 1,
-    },
-    {
-        name: "taker",
-        unit: 20,
-        address: true,
-    },
-    {
-        name: "maker",
-        unit: 20,
-        address: true,
-    },
-    {
-        name: "nftContract",
-        unit: 20,
-        address: true,
-    },
-    {
-        name: "tokenId",
-        unit: 32,
-    },
-    {
-        name: "amount",
-        unit: 32,
-    },
-    {
-        name: "paymentTokenAmount",
-        unit: 32,
-    },
-    {
-        name: "paymentTokenContract",
-        unit: 20,
-        address: true,
-    },
-];
-
-export const handleExtraData = (data: any) => {
-    const extraData = data.slice(2);
-    const singleOrderLength = extraDataConfig.reduce((pre, cur) => pre + cur.unit, 0) * gap;
-    let groupCursor = 0;
-    // split multiple order
-    const orderGroup = new Array(extraData.length / singleOrderLength).fill("").map((_, i) => {
-        let res = "";
-        res = extraData.substring(groupCursor, singleOrderLength * (i + 1));
-        groupCursor += singleOrderLength;
-        return res;
-    });
-    // handle orders data
-    const params: any = [];
-    orderGroup.forEach((order: any) => {
-        let gapCursor = 0;
-        const res: any = {};
-        extraDataConfig.forEach(configItem => {
-            const prefix = configItem.address ? "0x" : "";
-            const toHexString = configItem.address
-                ? order.substring(gapCursor, gapCursor + configItem.unit * 2)
-                : parseInt(order.substring(gapCursor, gapCursor + configItem.unit * 2), 16);
-            res[configItem.name] = prefix + toHexString;
-            gapCursor += configItem.unit * gap;
-        });
-        params.push(res);
-    });
-    return params;
-};
-
 class OKX {
     name: string;
     protocol: string;
@@ -102,10 +24,10 @@ class OKX {
     constructor() {
         this.name = "okx-polygon-1";
         this.protocol = "polygon";
-        this.block = 48612325;
+        this.block = 39574716;
         // this.deprecatedAtBlock = 39539879;
-        this.contract = "0xa7FD99748cE527eAdC0bDAc60cba8a4eF4090f7c";
-        this.events = ["MatchOrderResults"];
+        this.contract = "0x954dab8830ad2b9c312bb87ace96f6cce0f51e3a";
+        this.events = ["MatchOrderResultsV3"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
         this.chunkSize = 6;
@@ -124,30 +46,24 @@ class OKX {
         this.sdk.stop();
     };
 
-    _getToken = (paymentTokenContract: any): string => {
-        if (paymentTokenContract === "0x0000000000000000000000000000000000000000") {
+    _getToken = (item: any): string => {
+        if (item[2] === "0x0000000000000000000000000000000000000000") {
             return "matic";
         }
-        return paymentTokenContract.toLowerCase();
+        return item[2].toLowerCase();
     };
 
     _processItem = async (event: EventData, item: any): Promise<void> => {
-        const {
-            actionType,
-            paymentTokenAmount,
-            paymentTokenContract,
-            nftContract,
-            tokenId,
-            taker,
-            maker,
-            amount,
-        } = item;
-        const token = this._getToken(paymentTokenContract);
+        const [actionType, price, payToken, nftContract, tokenId, amount, tradeType, extraData] = item;
+        const token = this._getToken(item);
+        const maker = extraData.substring(0, 42);
+        const taker = `0x${extraData.substring(42, 82)}`;
         const isAceeptOffer = Number(actionType) === 3;
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
         const buyer = isAceeptOffer ? maker : taker;
         const seller = isAceeptOffer ? taker : maker;
+
         const entity = {
             providerName: this.name,
             providerContract: this.contract,
@@ -160,7 +76,7 @@ class OKX {
                 },
             ],
             token,
-            price: new BigNumber(paymentTokenAmount),
+            price: new BigNumber(price),
             seller: seller.toLowerCase(),
             buyer: buyer.toLowerCase(),
             soldAt: timestamp,
@@ -172,8 +88,7 @@ class OKX {
     };
 
     process = async (event: EventData): Promise<void> => {
-        const extraData = event.returnValues.extraData;
-        const params = handleExtraData(extraData);
+        const params = event.returnValues.params;
         for (let i = 0; i < params.length; i++) {
             await this._processItem(event, params[i]);
         }

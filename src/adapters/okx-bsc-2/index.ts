@@ -8,6 +8,7 @@ import { EventData } from "web3-eth-contract";
 import path from "path";
 import Binance from "../../sdk/binance";
 import { ISaleEntity } from "../../sdk/Interfaces";
+import { handleExtraData } from "../okx-polygon-2";
 
 class OKX {
     name: string;
@@ -24,10 +25,10 @@ class OKX {
     constructor() {
         this.name = "okx-bsc-1";
         this.protocol = "binance-smart-chain";
-        this.block = 25862299;
+        this.block = 32526441;
         // this.deprecatedAtBlock = 16625257;
-        this.contract = "0xcce3e3f79cf9091386f84610bb06947e2fc232a3";
-        this.events = ["MatchOrderResultsV3"];
+        this.contract = "0xa7FD99748cE527eAdC0bDAc60cba8a4eF4090f7c";
+        this.events = ["MatchOrderResults"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
         this.chunkSize = 6;
@@ -46,18 +47,25 @@ class OKX {
         this.sdk.stop();
     };
 
-    _getToken = (item: any): string => {
-        if (item[2] === "0x0000000000000000000000000000000000000000") {
+    _getToken = (paymentTokenContract: any): string => {
+        if (paymentTokenContract === "0x0000000000000000000000000000000000000000") {
             return "bnb";
         }
-        return item[2].toLowerCase();
+        return paymentTokenContract.toLowerCase();
     };
 
     _processItem = async (event: EventData, item: any): Promise<void> => {
-        const [actionType, price, payToken, nftContract, tokenId, amount, tradeType, extraData] = item;
-        const token = this._getToken(item);
-        const maker = extraData.substring(0, 42);
-        const taker = `0x${extraData.substring(42, 82)}`;
+        const {
+            actionType,
+            paymentTokenAmount,
+            paymentTokenContract,
+            nftContract,
+            tokenId,
+            taker,
+            maker,
+            amount,
+        } = item;
+        const token = this._getToken(paymentTokenContract);
         const isAceeptOffer = Number(actionType) === 3;
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
@@ -76,7 +84,7 @@ class OKX {
                 },
             ],
             token,
-            price: new BigNumber(price),
+            price: new BigNumber(paymentTokenAmount),
             seller: seller.toLowerCase(),
             buyer: buyer.toLowerCase(),
             soldAt: timestamp,
@@ -88,7 +96,8 @@ class OKX {
     };
 
     process = async (event: EventData): Promise<void> => {
-        const params = event.returnValues.params;
+        const extraData = event.returnValues.extraData;
+        const params = handleExtraData(extraData);
         for (let i = 0; i < params.length; i++) {
             await this._processItem(event, params[i]);
         }
