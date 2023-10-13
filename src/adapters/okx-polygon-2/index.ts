@@ -64,8 +64,7 @@ export const handleExtraData = (data: any) => {
     let groupCursor = 0;
     // split multiple order
     const orderGroup = new Array(extraData.length / singleOrderLength).fill("").map((_, i) => {
-        let res = "";
-        res = extraData.substring(groupCursor, singleOrderLength * (i + 1));
+        const res = extraData.substring(groupCursor, singleOrderLength * (i + 1));
         groupCursor += singleOrderLength;
         return res;
     });
@@ -104,7 +103,7 @@ class OKX {
         this.protocol = "polygon";
         this.block = 48612325;
         // this.deprecatedAtBlock = 39539879;
-        this.contract = "0xa7FD99748cE527eAdC0bDAc60cba8a4eF4090f7c";
+        this.contract = "0xa7fd99748ce527eadc0bdac60cba8a4ef4090f7c";
         this.events = ["MatchOrderResults"];
         this.pathToAbi = path.join(__dirname, "./abi.json");
         this.range = 500;
