@@ -1,51 +1,23 @@
-import * as dotenv from "dotenv";
-
-dotenv.config();
-
 import moment from "moment";
 import BigNumber from "bignumber.js";
-import Ethereum from "../../sdk/ethereum";
-import { AVAILABLE_PROTOCOLS } from "../../sdk/constants";
-import path from "path";
-import { ISaleEntity } from "../../sdk/Interfaces";
-import { EventData } from "web3-eth-contract";
+import {ISaleEntity} from "../../sdk/Interfaces";
+import {EventData} from "web3-eth-contract";
+import BasicProvider, {IBasicProviderOptions} from "../../sdk/basic-provider";
 
-class Galler {
-    name: string;
-    token: string;
-    protocol: string;
-    block: number;
-    contract: string;
-    events: string[];
-    pathToAbi: string | undefined;
-    sdk: any;
+class Galler extends BasicProvider {
+    defaultPaymentToken: string;
 
-    constructor() {
-        this.name = "galler";
-        this.token = "eth";
-        this.protocol = AVAILABLE_PROTOCOLS.ETH;
-        this.block = 14079071;
-        this.pathToAbi = path.join(__dirname, "./abi.json");
-        this.contract = "0xe9fcdb934cfa605e149482d21b330b022ca12e48";
+    constructor(options: IBasicProviderOptions) {
+        super(options);
+
+        if (!this.defaultPaymentToken) {
+            throw new Error(`Missing default payment token for provider "${this.name}"`);
+        }
+
         this.events = ["OrdersMatched"];
-        this.sdk = new Ethereum(this);
     }
 
-    run = async (): Promise<void> => {
-        this.sdk = await this.loadSdk();
-
-        await this.sdk.run();
-    };
-
-    stop = async (): Promise<void> => {
-        this.sdk.stop();
-    };
-
-    loadSdk = (): any => {
-        return new Ethereum(this);
-    };
-
-    getNftContractAndId = async (event: EventData): Promise<[string | null, string | null]> => {
+    private getNftContractAndId = async (event: EventData): Promise<[string | null, string | null]> => {
         const txReceipt = await this.sdk.getTransactionReceipt(event.transactionHash);
 
         const buyer = event.returnValues.secondMaker.toLowerCase();
@@ -54,17 +26,19 @@ class Galler {
         if (txReceipt === null) {
             return [null, null];
         }
-        const logs = txReceipt.logs;
-        for (let i = 0; i < logs.length; i++) {
-            const topics = logs[i].topics;
+
+        for (const log of txReceipt.logs) {
+            const topics = log.topics;
+
             if (
                 topics[0] === "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef" &&
-                this.sdk.hexToAddress(topics[1]) === seller.toLowerCase() &&
-                this.sdk.hexToAddress(topics[2]) === buyer.toLowerCase()
+                this.sdk.hexToAddress(topics[1]) === seller &&
+                this.sdk.hexToAddress(topics[2]) === buyer
             ) {
-                const nftContract = logs[i].address.toLowerCase();
+                const nftContract = log.address.toLowerCase();
                 const tokenIdHex = topics[3];
                 const tokenId = parseInt(tokenIdHex, 16);
+
                 return [nftContract, tokenId.toString()];
             }
         }
@@ -78,28 +52,39 @@ class Galler {
         const amount = event.returnValues.newFirstFill;
         const buyer = event.returnValues.secondMaker.toLowerCase();
         const seller = event.returnValues.firstMaker.toLowerCase();
-
         const [nftCollectionAddress, nftId] = await this.getNftContractAndId(event);
+
+        if (!nftCollectionAddress) {
+            throw new Error(`NFT collection address not defined for transaction "${event.transactionHash}". Provider "${this.name}"`);
+        }
+
+        if (!nftId) {
+            throw new Error(`NFT ID not defined for transaction "${event.transactionHash}". Provider "${this.name}"`);
+        }
 
         const entity: ISaleEntity = {
             providerName: this.name,
             providerContract: this.contract,
-            nftContract: nftCollectionAddress || "",
-            nftId: nftId || "",
-            token: this.token,
-            amount,
+            nfts: [
+                {
+                    contract: nftCollectionAddress,
+                    id: nftId,
+                    amount
+                }
+            ],
+            token: this.defaultPaymentToken,
             price: new BigNumber(event.returnValues.newSecondFill),
             seller,
             buyer,
             soldAt: timestamp,
             blockNumber: event.blockNumber,
             transactionHash: event.transactionHash,
-            protocol: AVAILABLE_PROTOCOLS.ETH,
             chainId: this.sdk.chainId,
         };
 
         return this.addToDatabase(entity);
     };
+
     addToDatabase = async (entity: ISaleEntity): Promise<ISaleEntity> => {
         return entity;
     };

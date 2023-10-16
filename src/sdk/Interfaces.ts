@@ -17,11 +17,8 @@ export interface ISaleEntityNFTTest {
 export interface ISaleEntity {
     providerName: string;
     providerContract: string;
-    nfts?: ISaleEntityNFT[];
-    nftId?: string;
-    nftContract?: string;
+    nfts: ISaleEntityNFT[];
     token: string;
-    amount?: number;
     price: BigNumber;
     seller: string;
     buyer: string;
