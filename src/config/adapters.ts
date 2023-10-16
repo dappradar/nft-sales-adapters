@@ -42,6 +42,14 @@ const ETHEREUM: IBasicProviderOptions[] = [
         chainId: 1,
         defaultPaymentToken: "eth",
     },
+    {
+        name: "galler-ethereum-1",
+        basicProvider: "galler-bp-1",
+        block: 14079071,
+        contract: "0xe9fcdb934cfa605e149482d21b330b022ca12e48",
+        chainId: 1,
+        defaultPaymentToken: "eth",
+    },
 ];
 
 const BSC: IBasicProviderOptions[] = [
@@ -83,6 +91,14 @@ const BSC: IBasicProviderOptions[] = [
         basicProvider: "okx-bp-2",
         block: 32526441,
         contract: "0xa7fd99748ce527eadc0bdac60cba8a4ef4090f7c",
+        chainId: 15,
+        defaultPaymentToken: "bnb",
+    },
+    {
+        name: "galler-bsc-1",
+        basicProvider: "galler-bp-1",
+        block: 14444440,
+        contract: "0xb50a86874394f75d9388dd5bc47705145110d9a5",
         chainId: 15,
         defaultPaymentToken: "bnb",
     },
