@@ -110,6 +110,14 @@ const BSC: IBasicProviderOptions[] = [
         chainId: 15,
         defaultPaymentToken: "bnb",
     },
+    {
+        name: "bazaar-bsc-1",
+        basicProvider: "bazaar-bp-1",
+        block: 8114624,
+        contract: "0x90099da42806b21128a094c713347c7885af79e2",
+        chainId: 15,
+        defaultPaymentToken: "0x154a9f9cbd3449ad22fdae23044319d6ef2a1fab",
+    },
 ];
 
 const POLYGON: IBasicProviderOptions[] = [
