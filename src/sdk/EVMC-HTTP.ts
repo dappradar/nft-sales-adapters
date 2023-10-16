@@ -26,7 +26,8 @@ class EVMC_HTTP extends BasicSDK {
 
         this.web3 = null;
         this.running = true;
-        this.range = 100;
+        this.range = 10000;
+        this.chunkSize = 1;
         this.chainId = 1;
         this.isConnected = false;
     }
