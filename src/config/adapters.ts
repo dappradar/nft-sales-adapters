@@ -192,6 +192,14 @@ const POLYGON: IBasicProviderOptions[] = [
         chainId: 16,
         defaultPaymentToken: "matic",
     },
+    {
+        name: "glexchange-polygon-1",
+        basicProvider: "glexchange-bp-1",
+        block: 36044498,
+        contract: "0x88cbb5881895d13fa3a35225b0fed9c81805f44b",
+        chainId: 16,
+        defaultPaymentToken: "matic",
+    },
 ];
 
 const AVALANCHE: IBasicProviderOptions[] = [
