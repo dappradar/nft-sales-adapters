@@ -58,7 +58,6 @@ class Element extends BasicProvider {
     };
 
     addToDatabase = async (entity: ISaleEntity): Promise<ISaleEntity> => {
-        console.log(`creating sale for ${entity.nftContract} with id ${entity.nftId}`);
         return entity;
     };
 }
