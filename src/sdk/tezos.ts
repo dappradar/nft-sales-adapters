@@ -85,7 +85,7 @@ class Tezos extends BasicSDK {
         super(provider);
 
         this.range = 500; // Maximum amount that API can handle is 500
-        this.chunkSize = 10;
+        this.chunkSize = 1;
         this.chainId = 21;
     }
 
