@@ -26,6 +26,14 @@ const ETHEREUM: IBasicProviderOptions[] = [
         chainId: 1,
         defaultPaymentToken: "eth",
     },
+    {
+        name: "okx-ethereum-1",
+        basicProvider: "okx-bp-1",
+        block: 16681307,
+        contract: "0x92701d42e1504ef9fce6d66a2054218b048dda43",
+        chainId: 1,
+        defaultPaymentToken: "eth",
+    },
 ];
 
 const BSC: IBasicProviderOptions[] = [
@@ -51,6 +59,14 @@ const BSC: IBasicProviderOptions[] = [
         basicProvider: "nftrade-bp-1",
         block: 21416323,
         contract: "0xbf6bfe5d6b86308cf3b7f147dd03ef11f80bfde3",
+        chainId: 15,
+        defaultPaymentToken: "bnb",
+    },
+    {
+        name: "okx-bsc-1",
+        basicProvider: "okx-bp-1",
+        block: 25862299,
+        contract: "0xcce3e3f79cf9091386f84610bb06947e2fc232a3",
         chainId: 15,
         defaultPaymentToken: "bnb",
     },
@@ -82,6 +98,14 @@ const POLYGON: IBasicProviderOptions[] = [
         chainId: 16,
         defaultPaymentToken: "matic",
     },
+    {
+        name: "okx-polygon-1",
+        basicProvider: "okx-bp-1",
+        block: 39574716,
+        contract: "0x954dab8830ad2b9c312bb87ace96f6cce0f51e3a",
+        chainId: 16,
+        defaultPaymentToken: "matic",
+    },
 ];
 
 const AVALANCHE: IBasicProviderOptions[] = [
@@ -107,6 +131,14 @@ const AVALANCHE: IBasicProviderOptions[] = [
         basicProvider: "nftrade-bp-1",
         block: 19958164,
         contract: "0xbf6bfe5d6b86308cf3b7f147dd03ef11f80bfde3",
+        chainId: 19,
+        defaultPaymentToken: "avax",
+    },
+    {
+        name: "okx-avalanche-1",
+        basicProvider: "okx-bp-1",
+        block: 26572369,
+        contract: "0xa88ba7ea2912cde5d632c8de048a17f2ea3e75a0",
         chainId: 19,
         defaultPaymentToken: "avax",
     },

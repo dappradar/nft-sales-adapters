@@ -14,9 +14,6 @@ class OKX extends BasicProvider {
             throw new Error(`Missing default payment token for provider "${this.name}"`);
         }
 
-        this.name = "okx-avalanche-1";
-        this.block = 26572369;
-        this.contract = "0xa88ba7ea2912cde5d632c8de048a17f2ea3e75a0";
         this.events = ["MatchOrderResultsV3"];
     }
 
