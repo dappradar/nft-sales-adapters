@@ -1,3 +1,7 @@
+import {config} from "dotenv";
+
+config();
+
 enum AVAILABLE_PROTOCOLS {
     ETH = "ethereum",
     BSC = "binance-smart-chain",

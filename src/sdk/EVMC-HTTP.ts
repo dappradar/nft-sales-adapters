@@ -456,7 +456,7 @@ class EVMC_HTTP extends BasicSDK {
             }
 
             if (from > latestBlock) {
-                logger.info({
+                console.log({
                     providerName: this.provider.name,
                     message: `"from" value is higher than "latestBlock' value`,
                     fromBlock: from,
@@ -473,7 +473,7 @@ class EVMC_HTTP extends BasicSDK {
             }
 
             if (from === to) {
-                logger.info({
+                console.log({
                     providerName: this.provider.name,
                     message: `"from" value is equal to "to' value`,
                     fromBlock: from,
@@ -488,7 +488,7 @@ class EVMC_HTTP extends BasicSDK {
             }
 
             if (from >= to) {
-                logger.info({
+                console.log({
                     providerName: this.provider.name,
                     message: `"from" value is higher or equal to "to' value`,
                     fromBlock: from,
