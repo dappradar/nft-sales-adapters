@@ -8,10 +8,7 @@ class Element extends BasicProvider {
     constructor(options: IBasicProviderOptions) {
         super(options);
 
-        if (!this.defaultPaymentToken) {
-            throw new Error(`Missing default payment token for provider "${this.name}"`);
-        }
-
+        this.requireDefaultPaymentToken();
         this.events = ["ERC721SellOrderFilled", "ERC721BuyOrderFilled"];
     }
 
