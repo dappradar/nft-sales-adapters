@@ -176,6 +176,14 @@ const POLYGON: IBasicProviderOptions[] = [
         chainId: 16,
         defaultPaymentToken: "matic",
     },
+    {
+        name: "cryptopunks2-polygon-1",
+        basicProvider: "cryptopunks2-bp-1",
+        block: 20346370,
+        contract: "0xc02d332abc7f9e755e2b1eb56f6ae21a7da4b7ad",
+        chainId: 16,
+        defaultPaymentToken: "matic",
+    },
 ];
 
 const AVALANCHE: IBasicProviderOptions[] = [
