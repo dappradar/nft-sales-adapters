@@ -66,6 +66,14 @@ const ETHEREUM: IBasicProviderOptions[] = [
         chainId: 1,
         defaultPaymentToken: "0x0000000000000000000000000000000000000000",
     },
+    {
+        name: "golom-ethereum-1",
+        basicProvider: "golom-bp-1",
+        block: 14880514,
+        contract: "0xd29e1fcb07e55eaceb122c63f8e50441c6acedc9",
+        chainId: 1,
+        defaultPaymentToken: "eth",
+    },
 ];
 
 const BSC: IBasicProviderOptions[] = [
