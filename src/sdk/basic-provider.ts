@@ -98,6 +98,12 @@ class BasicProvider {
         this.sdk = new (await this.getSdk())(this);
     };
 
+    requireDefaultPaymentToken = () => {
+        if (!this.defaultPaymentToken) {
+            throw new Error(`Missing default payment token for provider "${this.name}"`);
+        }
+    }
+
     preRun = async () => {
         //
     };

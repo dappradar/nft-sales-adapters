@@ -50,6 +50,14 @@ const ETHEREUM: IBasicProviderOptions[] = [
         chainId: 1,
         defaultPaymentToken: "eth",
     },
+    {
+        name: "alienswap-ethereum-1",
+        basicProvider: "alienswap-bp-1",
+        block: 17080133,
+        contract: "0x83746de31fc8de985ffe46c1c20ea6d7d8f4ed3a",
+        chainId: 1,
+        defaultPaymentToken: "eth",
+    },
 ];
 
 const BSC: IBasicProviderOptions[] = [
