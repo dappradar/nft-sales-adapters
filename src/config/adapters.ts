@@ -118,6 +118,20 @@ const BSC: IBasicProviderOptions[] = [
         chainId: 15,
         defaultPaymentToken: "0x154a9f9cbd3449ad22fdae23044319d6ef2a1fab",
     },
+    {
+        name: "bhero-market-bsc-1",
+        basicProvider: "b-market-bp-1",
+        block: 15498601,
+        contract: "0x376a10e7f125a4e0a567cc08043c695cd8edd704",
+        chainId: 15,
+    },
+    {
+        name: "bhouse-market-bsc-1",
+        basicProvider: "b-market-bp-1",
+        block: 14498666,
+        contract: "0x049896f350c802cd5c91134e5f35ec55fa8f0108",
+        chainId: 15,
+    },
 ];
 
 const POLYGON: IBasicProviderOptions[] = [
