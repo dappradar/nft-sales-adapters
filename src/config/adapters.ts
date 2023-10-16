@@ -34,6 +34,14 @@ const ETHEREUM: IBasicProviderOptions[] = [
         chainId: 1,
         defaultPaymentToken: "eth",
     },
+    {
+        name: "okx-ethereum-2",
+        basicProvider: "okx-bp-2",
+        block: 18311795,
+        contract: "0xa7fd99748ce527eadc0bdac60cba8a4ef4090f7c",
+        chainId: 1,
+        defaultPaymentToken: "eth",
+    },
 ];
 
 const BSC: IBasicProviderOptions[] = [
@@ -67,6 +75,14 @@ const BSC: IBasicProviderOptions[] = [
         basicProvider: "okx-bp-1",
         block: 25862299,
         contract: "0xcce3e3f79cf9091386f84610bb06947e2fc232a3",
+        chainId: 15,
+        defaultPaymentToken: "bnb",
+    },
+    {
+        name: "okx-bsc-2",
+        basicProvider: "okx-bp-2",
+        block: 32526441,
+        contract: "0xa7fd99748ce527eadc0bdac60cba8a4ef4090f7c",
         chainId: 15,
         defaultPaymentToken: "bnb",
     },
@@ -106,6 +122,14 @@ const POLYGON: IBasicProviderOptions[] = [
         chainId: 16,
         defaultPaymentToken: "matic",
     },
+    {
+        name: "okx-polygon-2",
+        basicProvider: "okx-bp-2",
+        block: 48612325,
+        contract: "0xa7fd99748ce527eadc0bdac60cba8a4ef4090f7c",
+        chainId: 16,
+        defaultPaymentToken: "matic",
+    },
 ];
 
 const AVALANCHE: IBasicProviderOptions[] = [
@@ -139,6 +163,14 @@ const AVALANCHE: IBasicProviderOptions[] = [
         basicProvider: "okx-bp-1",
         block: 26572369,
         contract: "0xa88ba7ea2912cde5d632c8de048a17f2ea3e75a0",
+        chainId: 19,
+        defaultPaymentToken: "avax",
+    },
+    {
+        name: "okx-avalanche-2",
+        basicProvider: "okx-bp-2",
+        block: 36224739,
+        contract: "0xa7fd99748ce527eadc0bdac60cba8a4ef4090f7c",
         chainId: 19,
         defaultPaymentToken: "avax",
     },
