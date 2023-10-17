@@ -155,6 +155,13 @@ const BSC: IBasicProviderOptions[] = [
         contract: "0xe97fdca0a3fc76b3046ae496c1502c9d8dfef6fc",
         chainId: 15,
     },
+    {
+        name: "thetan-arena-bsc-1",
+        basicProvider: "thetan-arena-bp-1",
+        block: 14551809,
+        contract: "0x7bf5d1dec7e36d5b4e9097b48a1b9771e6c96aa4",
+        chainId: 15,
+    },
 ];
 
 const POLYGON: IBasicProviderOptions[] = [
