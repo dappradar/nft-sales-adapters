@@ -32,7 +32,7 @@ class X extends BasicProvider {
         }
     }
 
-    process = async (event: EventData): Promise<ISaleEntity | undefined> => {
+    process = async (event: EventData): Promise<ISaleEntity> => {
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
 

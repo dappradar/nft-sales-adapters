@@ -14,7 +14,7 @@ class Alienswap extends BasicProvider {
         this.events = ["OrderFulfilled"];
     }
 
-    process = async (event: EventData): Promise<void> => {
+    process = async (event: EventData): Promise<ISaleEntity | undefined> => {
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
         const tokenId = event.returnValues.offer[0][2];
@@ -46,7 +46,7 @@ class Alienswap extends BasicProvider {
             transactionHash: event.transactionHash,
         };
 
-        await this.addToDatabase(entity);
+        return this.addToDatabase(entity);
     };
 
     addToDatabase = async (entity: ISaleEntity): Promise<ISaleEntity> => {

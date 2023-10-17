@@ -44,7 +44,7 @@ class Bazaar extends BasicProvider {
             chainId: this.sdk.chainId,
         };
 
-        await this.addToDatabase(entity);
+        return this.addToDatabase(entity);
     };
 
     addToDatabase = async (entity: ISaleEntity): Promise<ISaleEntity> => {

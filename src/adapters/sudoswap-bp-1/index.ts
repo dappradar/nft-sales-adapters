@@ -261,7 +261,7 @@ class SudoSwap extends BasicProvider {
         return pairData;
     };
 
-    process = async (transaction: Transaction): Promise<ISaleEntity | undefined> => {
+    process = async (transaction: Transaction): Promise<ISaleEntity[] | undefined> => {
         if (!transaction.blockNumber) return;
 
         const block = await this.sdk.getBlock(transaction.blockNumber);
@@ -270,6 +270,8 @@ class SudoSwap extends BasicProvider {
         const pairData = await this.decodeData(transaction.input);
 
         if (!pairData) return;
+
+        const sales: ISaleEntity[] = [];
 
         for (const pair of pairData) {
             for (const pairInfo of pair.info) {
@@ -292,11 +294,11 @@ class SudoSwap extends BasicProvider {
                     chainId: this.sdk.chainId,
                 };
 
-                await this.addToDatabase(entity);
+                sales.push(await this.addToDatabase(entity));
             }
         }
 
-        return;
+        return sales;
     };
 
     addToDatabase = async (entity: ISaleEntity): Promise<ISaleEntity> => {

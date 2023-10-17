@@ -71,7 +71,7 @@ class OKX extends BasicProvider {
         return paymentTokenContract.toLowerCase();
     };
 
-    private processItem = async (event: EventData, item: any): Promise<void> => {
+    private processItem = async (event: EventData, item: any): Promise<ISaleEntity> => {
         const {
             actionType,
             paymentTokenAmount,
@@ -109,7 +109,7 @@ class OKX extends BasicProvider {
             chainId: this.sdk.chainId,
         };
 
-        await this.addToDatabase(entity);
+        return this.addToDatabase(entity);
     };
 
     private handleExtraData = (data: any) => {
@@ -141,13 +141,17 @@ class OKX extends BasicProvider {
         return params;
     };
 
-    process = async (event: EventData): Promise<void> => {
+    process = async (event: EventData): Promise<ISaleEntity[]> => {
         const extraData = event.returnValues.extraData;
         const params = this.handleExtraData(extraData);
 
+        const sales: ISaleEntity[] = [];
+
         for (let i = 0; i < params.length; i++) {
-            await this.processItem(event, params[i]);
+            sales.push(await this.processItem(event, params[i]));
         }
+
+        return sales;
     };
 
     addToDatabase = async (entity: ISaleEntity): Promise<ISaleEntity> => {

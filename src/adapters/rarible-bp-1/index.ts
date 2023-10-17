@@ -14,7 +14,7 @@ class Rarible extends BasicProvider {
         this.event = "transfer";
     }
 
-    process = async (call: any) => {
+    process = async (call: any): Promise<ISaleEntity | undefined> => {
         if ("applied" !== call.status) {
             return;
         }
@@ -73,7 +73,7 @@ class Rarible extends BasicProvider {
             chainId: this.sdk.chainId,
         };
 
-        await this.addToDatabase(entity);
+        return this.addToDatabase(entity);
     };
 
     addToDatabase = async (entity: ISaleEntity): Promise<ISaleEntity> => {

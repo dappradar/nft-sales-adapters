@@ -22,7 +22,7 @@ class OKX extends BasicProvider {
         return item[2].toLowerCase();
     };
 
-    private processItem = async (event: EventData, item: any): Promise<void> => {
+    private processItem = async (event: EventData, item: any): Promise<ISaleEntity> => {
         const [actionType, price, payToken, nftContract, tokenId, amount, tradeType, extraData] = item;
         const token = this.getToken(item);
         const maker = extraData.substring(0, 42);
@@ -53,15 +53,19 @@ class OKX extends BasicProvider {
             chainId: this.sdk.chainId,
         };
 
-        await this.addToDatabase(entity);
+        return this.addToDatabase(entity);
     };
 
-    process = async (event: EventData): Promise<void> => {
+    process = async (event: EventData): Promise<ISaleEntity[]> => {
         const params = event.returnValues.params;
 
+        const sales: ISaleEntity[] = [];
+
         for (let i = 0; i < params.length; i++) {
-            await this.processItem(event, params[i]);
+            sales.push(await this.processItem(event, params[i]));
         }
+
+        return sales;
     };
 
     addToDatabase = async (entity: ISaleEntity): Promise<ISaleEntity> => {

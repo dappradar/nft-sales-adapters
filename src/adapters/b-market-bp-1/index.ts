@@ -11,7 +11,7 @@ class BMarket extends BasicProvider {
         this.events = ["Sold"];
     }
 
-    process = async (event: EventData): Promise<ISaleEntity | undefined> => {
+    process = async (event: EventData): Promise<ISaleEntity> => {
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
         const token = await this.sdk.callContractMethod("bcoinContract", [], undefined, event.blockNumber);

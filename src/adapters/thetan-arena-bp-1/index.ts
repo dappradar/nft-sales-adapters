@@ -11,7 +11,7 @@ class ThetanArena extends BasicProvider {
         this.events = ["MatchTransaction"];
     }
 
-    process = async (event: EventData): Promise<ISaleEntity | void> => {
+    process = async (event: EventData): Promise<ISaleEntity | undefined> => {
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
 
@@ -35,7 +35,7 @@ class ThetanArena extends BasicProvider {
             chainId: this.sdk.chainId,
         };
 
-        await this.addToDatabase(entity);
+        return this.addToDatabase(entity);
     };
 
     addToDatabase = async (entity: ISaleEntity): Promise<ISaleEntity> => {

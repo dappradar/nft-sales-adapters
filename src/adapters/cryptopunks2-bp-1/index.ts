@@ -51,7 +51,7 @@ class CRYPTOPUNKS2 extends BasicProvider {
             chainId: 16,
         };
 
-        await this.addToDatabase(entity);
+        return this.addToDatabase(entity);
     };
 
     addToDatabase = async (entity: ISaleEntity): Promise<ISaleEntity> => {

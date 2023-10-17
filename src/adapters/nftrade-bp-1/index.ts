@@ -59,7 +59,7 @@ class NFTRADE extends BasicProvider {
         };
     };
 
-    process = async (event: EventData): Promise<ISaleEntity | void> => {
+    process = async (event: EventData): Promise<ISaleEntity> => {
         const isOffer = this.isOffer(event.returnValues["makerAssetData"]);
         const nft = this.getNFTData(event.returnValues[isOffer ? "takerAssetData" : "makerAssetData"]);
         const block = await this.sdk.getBlock(event.blockNumber);
@@ -94,11 +94,10 @@ class NFTRADE extends BasicProvider {
             chainId: this.sdk.chainId,
         };
 
-        await this.addToDatabase(entity);
+        return this.addToDatabase(entity);
     };
 
     addToDatabase = async (entity: ISaleEntity): Promise<ISaleEntity> => {
-        console.log(entity.blockNumber);
         return entity;
     };
 }

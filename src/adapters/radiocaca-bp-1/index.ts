@@ -11,7 +11,7 @@ class RadioCaca extends BasicProvider {
         this.events = ["AuctionExecuted"];
     }
 
-    process = async (event: EventData): Promise<ISaleEntity | void> => {
+    process = async (event: EventData): Promise<ISaleEntity | undefined> => {
         const auctionInfo = await this.sdk.callContractMethod("auctions", [event.returnValues.auctionId], undefined, event.blockNumber);
 
         if (Number(auctionInfo.status) === 0) {
@@ -41,7 +41,7 @@ class RadioCaca extends BasicProvider {
             chainId: this.sdk.chainId,
         };
 
-        await this.addToDatabase(entity);
+        return this.addToDatabase(entity);
     };
 
     addToDatabase = async (entity: ISaleEntity): Promise<ISaleEntity> => {

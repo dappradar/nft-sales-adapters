@@ -52,7 +52,7 @@ class NFTKey extends BasicProvider {
         return event.returnValues.listing.seller;
     };
 
-    process = async (event: EventData): Promise<ISaleEntity | void> => {
+    process = async (event: EventData): Promise<ISaleEntity> => {
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
         const buyer = this.getBuyer(event);
@@ -80,7 +80,7 @@ class NFTKey extends BasicProvider {
             chainId: this.sdk.chainId,
         };
 
-        await this.addToDatabase(entity);
+        return this.addToDatabase(entity);
     };
 
     addToDatabase = async (entity: ISaleEntity): Promise<ISaleEntity> => {
