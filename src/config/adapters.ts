@@ -269,9 +269,21 @@ const AVALANCHE: IBasicProviderOptions[] = [
     },
 ];
 
+const TEZOS: IBasicProviderOptions[] = [
+    {
+        name: "rarible-tezos-1",
+        basicProvider: "rarible-bp-1",
+        block: 0,
+        contract: "KT18pVpRXKPY2c4U2yFEGSH3ZnhB2kL8kwXS",
+        chainId: 21,
+        defaultPaymentToken: "xtz",
+    },
+];
+
 export const ADAPTERS = [
     ...ETHEREUM,
     ...BSC,
     ...POLYGON,
-    ...AVALANCHE
+    ...AVALANCHE,
+    ...TEZOS,
 ]
