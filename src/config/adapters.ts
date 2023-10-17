@@ -74,6 +74,13 @@ const ETHEREUM: IBasicProviderOptions[] = [
         chainId: 1,
         defaultPaymentToken: "eth",
     },
+    {
+        name: "x-ethereum-1",
+        basicProvider: "x-bp-1",
+        block: 15127333,
+        contract: "0xb4a2e49818dd8a5cdd818f22ab99263b62ddeb6c",
+        chainId: 1,
+    },
 ];
 
 const BSC: IBasicProviderOptions[] = [
