@@ -148,6 +148,13 @@ const BSC: IBasicProviderOptions[] = [
         contract: "0x049896f350c802cd5c91134e5f35ec55fa8f0108",
         chainId: 15,
     },
+    {
+        name: "radiocaca-bsc-1",
+        basicProvider: "radiocaca-bp-1",
+        block: 13219620,
+        contract: "0xe97fdca0a3fc76b3046ae496c1502c9d8dfef6fc",
+        chainId: 15,
+    },
 ];
 
 const POLYGON: IBasicProviderOptions[] = [
