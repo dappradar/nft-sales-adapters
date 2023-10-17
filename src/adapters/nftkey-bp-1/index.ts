@@ -24,7 +24,7 @@ class NFTKey extends BasicProvider {
 
     private getPaymentToken = async (event: EventData): Promise<string> => {
         if (event.event === "TokenBidAccepted") {
-            const paymentTokenCall = await this.sdk.callContractMethod("paymentToken");
+            const paymentTokenCall = await this.sdk.callContractMethod("paymentToken", [], undefined, event.blockNumber);
 
             return paymentTokenCall.toLowerCase();
         }

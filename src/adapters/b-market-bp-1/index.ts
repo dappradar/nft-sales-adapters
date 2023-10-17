@@ -14,13 +14,13 @@ class BMarket extends BasicProvider {
     process = async (event: EventData): Promise<ISaleEntity | undefined> => {
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
-        const token = await this.sdk.callContractMethod("bcoinContract");
+        const token = await this.sdk.callContractMethod("bcoinContract", [], undefined, event.blockNumber);
 
         if (!token) {
             throw new Error(`Failed to fetch token address for transaction "${event.transactionHash}". Provider - "${this.name}"`);
         }
 
-        const nftContract = await this.sdk.callContractMethod("nftContract");
+        const nftContract = await this.sdk.callContractMethod("nftContract", [], undefined, event.blockNumber);
 
         if (!nftContract) {
             throw new Error(`Failed to fetch NFT contract address for transaction "${event.transactionHash}". Provider - "${this.name}"`);

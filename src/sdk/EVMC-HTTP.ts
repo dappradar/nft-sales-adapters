@@ -6,7 +6,7 @@ import fs from "fs";
 import {asyncTimeout} from "./utils";
 import {API_KEY, HTTP_PROXY_URL} from "./constants";
 import BasicSDK from "./basic-sdk";
-import {Log, PastLogsOptions, Transaction, TransactionReceipt} from "web3-core";
+import {Log, PastLogsOptions, Transaction, TransactionConfig, TransactionReceipt} from "web3-core";
 import {BlockTransactionString} from "web3-eth";
 import {Contract, EventData, PastEventOptions} from "web3-eth-contract";
 
@@ -198,11 +198,19 @@ class EVMC_HTTP extends BasicSDK {
         });
     };
 
-    callContractMethod = async (methodName: string, params: any[] = []): Promise<any> => {
-        const callback = async () => {
+    callContractMethod = async (
+        methodName: string,
+        params: any[] = [],
+        transactionConfig?: TransactionConfig,
+        blockNumber?: number
+    ): Promise<any> => {
+        const callback = async (): Promise<any> => {
             this.ensureWeb3();
-            const contract = await this.getContract();
-            const response = await contract.methods[methodName](...params).call();
+            const contract: Contract = await this.getContract();
+            const response: any = await contract.methods[methodName](...params).call(
+                transactionConfig,
+                blockNumber,
+            );
 
             if (null === response) {
                 await asyncTimeout(60);
@@ -217,6 +225,7 @@ class EVMC_HTTP extends BasicSDK {
             customParams: {
                 methodName,
                 params,
+                blockNumber,
             },
         });
     };
