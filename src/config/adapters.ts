@@ -169,6 +169,14 @@ const BSC: IBasicProviderOptions[] = [
         contract: "0x7bf5d1dec7e36d5b4e9097b48a1b9771e6c96aa4",
         chainId: 15,
     },
+    {
+        name: "xcad-bsc-1",
+        basicProvider: "xcad-bp-1",
+        block: 31085662,
+        contract: "0x48ca89f26a9f7588148e1051c3ec5a8e073cf407",
+        chainId: 15,
+        defaultPaymentToken: "0xd069599e718f963bd84502b49ba8f8657faf5b3a"
+    },
 ];
 
 const POLYGON: IBasicProviderOptions[] = [
