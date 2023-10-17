@@ -6,10 +6,10 @@ passed the test.
 Tests can be run by running command:
 ```
 Pattern:
-> ts-node path-to-tester path-to-adapter
+> npm run test [adapter name]
 
 Example:
-> ts-node ./src/tester/test.ts ../adapters/my-adapter/index.ts
+> npm run test okx-ethereum-1
 ```
 
 If tests were **not passed**, the process will crash with

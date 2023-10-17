@@ -8,7 +8,7 @@
   * [SDK for Tezos chain](_sdks/tezos/sdk.md)
 
 [//]: # (* Providers)
-* [Providers](providers/index.md)
+* [Adapters](adapters/index.md)
 * [Testing](testing/index.md)
 * [Examples](examples.md)
 * [Contact us](contact-us.md)

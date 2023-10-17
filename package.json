@@ -48,7 +48,8 @@
     "lint": "eslint . --ext .ts --fix",
     "prepare": "husky install",
     "build": "rm -rf ./dist && tsc && copyfiles -u 1 ./src/**/*.json ./dist",
-    "docs": "docsify serve docs"
+    "docs": "docsify serve docs",
+    "test": "ts-node src/tester/test.ts"
   },
   "lint-staged": {
     "*.{js,json}": "eslint --fix"
