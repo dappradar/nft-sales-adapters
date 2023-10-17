@@ -81,6 +81,15 @@ const ETHEREUM: IBasicProviderOptions[] = [
         contract: "0xb4a2e49818dd8a5cdd818f22ab99263b62ddeb6c",
         chainId: 1,
     },
+    {
+        name: "sudoswap-ethereum-1",
+        basicProvider: "sudoswap-bp-1",
+        block: 14718943,
+        blockRange: 100,
+        contract: "0x2b2e8cda09bba9660dca5cb6233787738ad68329",
+        chainId: 1,
+        defaultPaymentToken: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    },
 ];
 
 const BSC: IBasicProviderOptions[] = [

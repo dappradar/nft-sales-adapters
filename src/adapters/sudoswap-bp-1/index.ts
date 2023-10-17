@@ -1,19 +1,16 @@
-import * as dotenv from "dotenv";
-
-dotenv.config();
-
 import fs from "fs";
 import path from "path";
 
 import moment from "moment";
 import BigNumber from "bignumber.js";
 import Ethereum from "../../sdk/ethereum";
-import { Transaction } from "web3-core";
-import { Contract } from "web3-eth-contract";
-import { asyncTimeout } from "../../sdk/utils";
-import { BlockTransactionString } from "web3-eth";
+import {Transaction} from "web3-core";
+import {Contract} from "web3-eth-contract";
+import {asyncTimeout} from "../../sdk/utils";
+import {BlockTransactionString} from "web3-eth";
 import InputDataDecoder from "ethereum-input-data-decoder";
-import { ISaleEntity } from "../../sdk/Interfaces";
+import {ISaleEntity} from "../../sdk/Interfaces";
+import BasicProvider, {IBasicProviderOptions} from "../../sdk/basic-provider";
 
 export class PairData {
     private _sdk: Ethereum;
@@ -94,18 +91,10 @@ export class PairData {
     }
 }
 
-class SudoSwap {
-    name: string;
-    token: string;
-    protocol: string;
-    block: number;
-    contract: string;
+class SudoSwap extends BasicProvider {
+    pathToAbi: string;
     searchType: string;
-    events: string[];
-    pathToAbi: string | undefined;
-    blockRange: number;
-    chunkSize: number;
-    sdk: Ethereum;
+    defaultPaymentToken: string;
 
     decoder: InputDataDecoder;
     pairFactoryAbi: string;
@@ -113,54 +102,33 @@ class SudoSwap {
     pairContractAbi: string;
     bondingCurveContractAbi: string;
 
-    constructor() {
-        this.name = "sudoswap-ethereum-1";
-        this.token = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
-        this.protocol = "ethereum";
-        this.block = 14718943;
-        this.contract = "0x2b2e8cda09bba9660dca5cb6233787738ad68329";
-        this.pathToAbi = path.join(__dirname, "./abis/PairRouter.json");
-        this.blockRange = 5;
-        this.searchType = "block-scan";
+    constructor(options: IBasicProviderOptions) {
+        super(options);
 
-        this.pairFactoryAddress = "0xb16c1342E617A5B6E4b631EB114483FDB289c0A4";
+        this.requireDefaultPaymentToken();
+        this.pathToAbi = path.join(__dirname, "./abis/PairRouter.json");
+        this.searchType = "block-scan";
+        this.pairFactoryAddress = "0xb16c1342e617a5b6e4b631eb114483fdb289c0a4";
         this.pairContractAbi = path.join(__dirname, "./abis/PairETH.json");
         this.bondingCurveContractAbi = path.join(__dirname, "./abis/BondingCurve.json");
         this.pairFactoryAbi = path.join(__dirname, "./abis/PairFactory.json");
 
         this.decoder = new InputDataDecoder(JSON.parse(fs.readFileSync(this.pathToAbi, "utf8")));
-
-        this.sdk = new Ethereum(this);
     }
 
-    loadSdk = async () => {
-        return new Ethereum(this);
-    };
-
-    run = async (): Promise<void> => {
-        this.sdk = await this.loadSdk();
-
-        await this.sdk.run();
-    };
-
-    stop = async (): Promise<void> => {
-        this.sdk.stop();
-    };
-
-    _getExternalAbi = async (pathToAbi: string): Promise<object> => {
+    private getExternalAbi = async (pathToAbi: string): Promise<object> => {
         const stringifiedAbi: string = await fs.promises.readFile(pathToAbi, "utf8");
-        const abi: object = JSON.parse(stringifiedAbi || "[]");
 
-        return abi;
+        return JSON.parse(stringifiedAbi || "[]");
     };
 
-    _getExternalContract = async (abi: object, contract_address: string): Promise<Contract> => {
+    private getExternalContract = async (abi: object, contract_address: string): Promise<Contract> => {
         const web3 = this.sdk.ensureWeb3();
 
         return new web3.eth.Contract(abi, contract_address);
     };
 
-    _callExternalContractMethod = async (
+    private callExternalContractMethod = async (
         contract_address: string,
         abi: string,
         methodName: string,
@@ -169,8 +137,8 @@ class SudoSwap {
     ): Promise<any> => {
         const callback = async () => {
             this.sdk.ensureWeb3();
-            const contract_abi = await this._getExternalAbi(abi);
-            const contract = await this._getExternalContract(contract_abi, contract_address);
+            const contract_abi = await this.getExternalAbi(abi);
+            const contract = await this.getExternalContract(contract_abi, contract_address);
             contract.defaultBlock = blockNumber - 1;
 
             const response = await contract.methods[methodName](...params).call();
@@ -192,32 +160,32 @@ class SudoSwap {
         });
     };
 
-    _getPrice = async (
+    private getPrice = async (
         pair_address: string,
         amount: number,
         isBuyCall: boolean,
         block: BlockTransactionString,
     ): Promise<BigNumber> => {
-        const pairFee = await this._callExternalContractMethod(pair_address, this.pairContractAbi, "fee", block.number);
-        const pairSpotPrice = await this._callExternalContractMethod(
+        const pairFee = await this.callExternalContractMethod(pair_address, this.pairContractAbi, "fee", block.number);
+        const pairSpotPrice = await this.callExternalContractMethod(
             pair_address,
             this.pairContractAbi,
             "spotPrice",
             block.number,
         );
-        const pairDelta = await this._callExternalContractMethod(
+        const pairDelta = await this.callExternalContractMethod(
             pair_address,
             this.pairContractAbi,
             "delta",
             block.number,
         );
-        const pairBondingCurve = await this._callExternalContractMethod(
+        const pairBondingCurve = await this.callExternalContractMethod(
             pair_address,
             this.pairContractAbi,
             "bondingCurve",
             block.number,
         );
-        const factoryFeeMultiplier = await this._callExternalContractMethod(
+        const factoryFeeMultiplier = await this.callExternalContractMethod(
             this.pairFactoryAddress,
             this.pairFactoryAbi,
             "protocolFeeMultiplier",
@@ -229,7 +197,7 @@ class SudoSwap {
             functionCall = "getBuyInfo";
         }
 
-        const buyInfo = await this._callExternalContractMethod(
+        const buyInfo = await this.callExternalContractMethod(
             pairBondingCurve,
             this.bondingCurveContractAbi,
             functionCall,
@@ -240,7 +208,7 @@ class SudoSwap {
         return new BigNumber(buyInfo[3]);
     };
 
-    _decodeData = async (input: string): Promise<PairData[] | null> => {
+    private decodeData = async (input: string): Promise<PairData[] | null> => {
         let pairData = null;
 
         const data = this.decoder.decodeData(input);
@@ -299,13 +267,13 @@ class SudoSwap {
         const block = await this.sdk.getBlock(transaction.blockNumber);
         const timestamp = moment.unix(block.timestamp as number).utc();
 
-        const pairData = await this._decodeData(transaction.input);
+        const pairData = await this.decodeData(transaction.input);
 
         if (!pairData) return;
 
         for (const pair of pairData) {
             for (const pairInfo of pair.info) {
-                const price = await this._getPrice(pairInfo.pairAddress, pairInfo.amount, pairInfo.isBuyCall, block);
+                const price = await this.getPrice(pairInfo.pairAddress, pairInfo.amount, pairInfo.isBuyCall, block);
 
                 console.log(`Price: ${price}, pair: ${pairInfo.pairAddress}, NftId: ${pairInfo.nfts}`);
                 console.log(`transaction Hash: ${transaction.hash}`);
@@ -313,9 +281,8 @@ class SudoSwap {
                 const entity: ISaleEntity = {
                     providerName: this.name,
                     providerContract: this.contract.toLowerCase(),
-                    protocol: this.protocol,
                     nfts: pairInfo.nfts,
-                    token: this.token.toLowerCase(),
+                    token: this.defaultPaymentToken.toLowerCase(),
                     price,
                     seller: pairInfo.pairAddress.toLowerCase(),
                     buyer: pairInfo.buyer.toLowerCase(),
