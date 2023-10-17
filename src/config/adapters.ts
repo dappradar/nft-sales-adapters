@@ -252,6 +252,14 @@ const AVALANCHE: IBasicProviderOptions[] = [
         chainId: 19,
         defaultPaymentToken: "avax",
     },
+    {
+        name: "nftkey-avalanche-1",
+        basicProvider: "nftkey-bp-1",
+        block: 6421617,
+        contract: "0x1a7d6ed890b6c284271ad27e7abe8fb5211d0739",
+        chainId: 19,
+        defaultPaymentToken: "avax",
+    },
 ];
 
 export const ADAPTERS = [
