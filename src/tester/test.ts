@@ -1,18 +1,15 @@
+// @ts-nocheck
 // In order to have your pull request approved this test case must not fail
 // Sample usage: node tester/test.js ../adapters/ens/index.js
-import * as dotenv from "dotenv";
-
-dotenv.config();
-
-import path from "path";
 
 import { PROVIDER_KEYS } from "./util";
-
 import { ISaleEntity, ISaleEntityTest } from "../sdk/Interfaces";
 import { getPaymentData, getChainData, dynamicImport } from "../sdk/utils";
 import moment from "moment";
 import { schema } from "./schema";
 import { ValidationError } from "yup";
+import {ADAPTERS} from "../config/adapters";
+import {IBasicProviderOptions} from "../sdk/basic-provider";
 
 interface IValidationError {
     reason: "InvalidQuery";
@@ -27,7 +24,7 @@ if (process.argv.length < 3) {
     process.exit(1);
 }
 
-const pathToAdapter = path.resolve(__dirname, process.argv[2]);
+const providerName = process.argv[2];
 
 const entities: unknown[] = [];
 
@@ -115,8 +112,14 @@ const addToDatabase = async (adapter: any, entity: ISaleEntity & ISaleEntityTest
 
 const tester = async (): Promise<void> => {
     try {
-        const AdapterClass = await dynamicImport(pathToAdapter);
-        const adapter = new AdapterClass();
+        const adapterConfig: IBasicProviderOptions | undefined = ADAPTERS.find(adapter => adapter.name === providerName);
+
+        if (!adapterConfig) {
+            throw new Error(`Adapter "${providerName}" does not exist`);
+        }
+
+        const AdapterClass = await dynamicImport(`${__dirname}/../adapters/${adapterConfig.basicProvider}/index.ts`);
+        const adapter = new AdapterClass(adapterConfig);
 
         for (const key of PROVIDER_KEYS) {
             if (!Object.keys(adapter).includes(key)) {

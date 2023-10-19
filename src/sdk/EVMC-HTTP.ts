@@ -6,7 +6,7 @@ import fs from "fs";
 import {asyncTimeout} from "./utils";
 import {API_KEY, HTTP_PROXY_URL} from "./constants";
 import BasicSDK from "./basic-sdk";
-import {Log, PastLogsOptions, Transaction, TransactionReceipt} from "web3-core";
+import {Log, PastLogsOptions, Transaction, TransactionConfig, TransactionReceipt} from "web3-core";
 import {BlockTransactionString} from "web3-eth";
 import {Contract, EventData, PastEventOptions} from "web3-eth-contract";
 
@@ -198,11 +198,19 @@ class EVMC_HTTP extends BasicSDK {
         });
     };
 
-    callContractMethod = async (methodName: string, params: any[] = []): Promise<any> => {
-        const callback = async () => {
+    callContractMethod = async (
+        methodName: string,
+        params: any[] = [],
+        transactionConfig?: TransactionConfig,
+        blockNumber?: number
+    ): Promise<any> => {
+        const callback = async (): Promise<any> => {
             this.ensureWeb3();
-            const contract = await this.getContract();
-            const response = await contract.methods[methodName](...params).call();
+            const contract: Contract = await this.getContract();
+            const response: any = await contract.methods[methodName](...params).call(
+                transactionConfig,
+                blockNumber,
+            );
 
             if (null === response) {
                 await asyncTimeout(60);
@@ -217,6 +225,7 @@ class EVMC_HTTP extends BasicSDK {
             customParams: {
                 methodName,
                 params,
+                blockNumber,
             },
         });
     };
@@ -457,7 +466,7 @@ class EVMC_HTTP extends BasicSDK {
             }
 
             if (from > latestBlock) {
-                logger.info({
+                console.log({
                     providerName: this.provider.name,
                     message: `"from" value is higher than "latestBlock' value`,
                     fromBlock: from,
@@ -474,7 +483,7 @@ class EVMC_HTTP extends BasicSDK {
             }
 
             if (from === to) {
-                logger.info({
+                console.log({
                     providerName: this.provider.name,
                     message: `"from" value is equal to "to' value`,
                     fromBlock: from,
@@ -489,7 +498,7 @@ class EVMC_HTTP extends BasicSDK {
             }
 
             if (from >= to) {
-                logger.info({
+                console.log({
                     providerName: this.provider.name,
                     message: `"from" value is higher or equal to "to' value`,
                     fromBlock: from,
@@ -570,7 +579,7 @@ class EVMC_HTTP extends BasicSDK {
         return "0x" + string.slice(string.length - 64);
     };
 
-    getAbi = async (): Promise<object> => {
+    getAbi = async (): Promise<IObjectStringAny> => {
         if (this.provider.hasOwnProperty("getAbi")) {
             return await this.provider.getAbi();
         }
@@ -579,12 +588,16 @@ class EVMC_HTTP extends BasicSDK {
             return this.provider.abi;
         }
 
-        if (!this.provider.hasOwnProperty("pathToAbi")) {
-            throw new Error("invalid path to abi, must provider full path");
+        let path: string;
+        if (this.provider.hasOwnProperty("pathToAbi")) {
+            path = this.provider.pathToAbi;
+        } else {
+            const dirName = this.provider.basicProvider ?? this.provider.name;
+            path = `${__dirname}/../adapters/${dirName}/abi.json`;
         }
 
-        const stringifiedAbi: string = await fs.promises.readFile(this.provider.pathToAbi, "utf8");
-        const abi: object = JSON.parse(stringifiedAbi || "[]");
+        const stringifiedAbi: string = await fs.promises.readFile(path, "utf8");
+        const abi: IObjectStringAny = JSON.parse(stringifiedAbi || "[]");
         this.provider.abi = abi;
         return abi;
     };

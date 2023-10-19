@@ -1,13 +1,8 @@
-import * as dotenv from "dotenv";
-dotenv.config();
-
-import axios from "axios";
-import { asyncTimeout } from "./utils";
-import { HTTP_PROXY_URL, API_KEY, AVAILABLE_PROTOCOLS } from "./constants";
+import axios, {AxiosInstance} from "axios";
+import {asyncTimeout} from "./utils";
+import {HTTP_PROXY_URL, API_KEY} from "./constants";
 import _ from "lodash";
 import BasicSDK from "./basic-sdk";
-
-import { IDappRadarAPIHeaders } from "./Interfaces";
 
 interface IAlias {
     alias?: string;
@@ -69,17 +64,12 @@ interface IOperation {
     tokenTransfersCount?: number;
 }
 
-const headers: IDappRadarAPIHeaders = {
-    key: API_KEY,
-    protocol: AVAILABLE_PROTOCOLS.TEZOS,
-    "content-type": "application/json",
-};
-
 class Tezos extends BasicSDK {
     provider: any;
     range: number;
     chunkSize: number;
     chainId: number;
+    axiosInstance: AxiosInstance;
 
     constructor(provider: any) {
         super(provider);
@@ -87,6 +77,13 @@ class Tezos extends BasicSDK {
         this.range = 500; // Maximum amount that API can handle is 500
         this.chunkSize = 1;
         this.chainId = 21;
+        this.axiosInstance = axios.create({
+            baseURL: HTTP_PROXY_URL,
+            headers: {
+                "x-api-key": API_KEY,
+                "chain-id": this.chainId,
+            }
+        })
     }
 
     run = async (): Promise<void> => {
@@ -121,7 +118,7 @@ class Tezos extends BasicSDK {
 
     getCalls = async (offset: number): Promise<IOperation[]> => {
         const callback = async (): Promise<object[]> => {
-            const url = `${HTTP_PROXY_URL}/operations/transactions`;
+            const url = `/operations/transactions`;
 
             const config = {
                 params: {
@@ -130,10 +127,9 @@ class Tezos extends BasicSDK {
                     limit: this.range,
                     offset,
                 },
-                headers,
             };
 
-            const response = await axios.get(url, config);
+            const response = await this.axiosInstance.get(url, config);
 
             return response.data;
         };
@@ -151,10 +147,8 @@ class Tezos extends BasicSDK {
 
     getOperation = async (hash: string): Promise<IOperation> => {
         const callback = async (): Promise<IOperation> => {
-            const url = `${HTTP_PROXY_URL}/operations/${hash}`;
-            const config = { headers };
-
-            const response = await axios.get(url, config);
+            const url = `/operations/${hash}`;
+            const response = await this.axiosInstance.get(url);
 
             return response.data;
         };
