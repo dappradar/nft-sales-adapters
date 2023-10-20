@@ -7,4 +7,8 @@
 * Cronos
 * Elysium
 * zkSync Era
+* Aurora
+* Celo
+* Moonbeam
+* Moonriver
 * Tezos
