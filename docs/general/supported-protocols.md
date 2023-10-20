@@ -6,6 +6,5 @@
 * Base
 * Cronos
 * Elysium
-* Mooi
 * zkSync Era
 * Tezos
