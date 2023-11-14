@@ -12,6 +12,11 @@ enum AVAILABLE_PROTOCOLS {
     CELO = "celo",
     MOONBEAM = "moonbeam",
     MOONRIVER = "moonriver",
+    BASE = "base",
+    CRONOS = "cronos",
+    ELYSIUM = "elysium",
+    MOOI = "mooi",
+    ZKSYNC_ERA = "zksync-era",
 }
 
 const API_KEY = process.env.DAPPRADAR_API_KEY || "";
