@@ -90,6 +90,14 @@ const ETHEREUM: IBasicProviderOptions[] = [
         chainId: 1,
         defaultPaymentToken: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
     },
+    {
+        name: "mooar-ethereum-1",
+        basicProvider: "mooar-bp-1",
+        block: 17336472,
+        contract: "0xaaaaaaaa33d3520a2266ce508bc079fcfe82c8e3",
+        chainId: 1,
+        defaultPaymentToken: "eth",
+    },
 ];
 
 const BSC: IBasicProviderOptions[] = [
@@ -243,6 +251,14 @@ const POLYGON: IBasicProviderOptions[] = [
         basicProvider: "glexchange-bp-1",
         block: 36044498,
         contract: "0x88cbb5881895d13fa3a35225b0fed9c81805f44b",
+        chainId: 16,
+        defaultPaymentToken: "matic",
+    },
+    {
+        name: "mooar-polygon-1",
+        basicProvider: "mooar-bp-1",
+        block: 46455707,
+        contract: "0xaaaaaaaa33d3520a2266ce508bc079fcfe82c8e3",
         chainId: 16,
         defaultPaymentToken: "matic",
     },
