@@ -1,6 +1,6 @@
 ## API key
 Apply for API key by filling out form
-https://forms.gle/5E8hsZhyd94X9a3M7.
+https://forms.gle/4zLovp34L8zxVuuE9.
 
 API keys are necessary to simplify testing of the 
 adapters and even if we will review untested adapters, 
