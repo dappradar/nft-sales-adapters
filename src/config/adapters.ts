@@ -194,6 +194,13 @@ const BSC: IBasicProviderOptions[] = [
         chainId: 15,
         defaultPaymentToken: "0xd069599e718f963bd84502b49ba8f8657faf5b3a"
     },
+    {
+        name: "kingdomstory-market-bsc-1",
+        basicProvider: "kingdomstory-market-bp-1",
+        block: 31877965,
+        contract: "0x0e37943581489f7771981bb5ca882b474d0d5ad2",
+        chainId: 15,
+    },
 ];
 
 const POLYGON: IBasicProviderOptions[] = [
