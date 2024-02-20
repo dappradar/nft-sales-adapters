@@ -197,9 +197,10 @@ const BSC: IBasicProviderOptions[] = [
     {
         name: "kingdomstory-market-bsc-1",
         basicProvider: "kingdomstory-market-bp-1",
-        block: 31877965,
+        block: 32932915,
         contract: "0x0e37943581489f7771981bb5ca882b474d0d5ad2",
         chainId: 15,
+        defaultPaymentToken: "bnb",
     },
 ];
 

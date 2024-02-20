@@ -17,18 +17,24 @@ import BasicProvider, {IBasicProviderOptions} from "../../sdk/basic-provider";
 class KingdomStoryMarket extends BasicProvider {
     constructor(options: IBasicProviderOptions) {
         super(options);
+        this.requireDefaultPaymentToken();
         this.events = ["NewSale"];
     }
+
+    private getToken = (event: EventData): string => {
+        let token = event.returnValues["currencyContract"].toLowerCase();
+
+        // bnb
+        if (token === "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee") {
+            token = this.defaultPaymentToken;
+        }
+
+        return token;
+    };
 
     process = async (event: EventData): Promise<ISaleEntity> => {
         const block = await this.sdk.getBlock(event.blockNumber);
         const timestamp = moment.unix(block.timestamp).utc();
-        // const token = await this.sdk.callContractMethod("bcoinContract", [], undefined, event.blockNumber);
-        const token = event.returnValues.currencyContract;
-
-        if (!token) {
-            throw new Error(`Failed to fetch token address for transaction "${event.transactionHash}". Provider - "${this.name}"`);
-        }
 
         // const nftContract = await this.sdk.callContractMethod("nftContract", [], undefined, event.blockNumber);
         const nftContract = event.returnValues.nftContract;
@@ -45,7 +51,7 @@ class KingdomStoryMarket extends BasicProvider {
                 id: event.returnValues.tokenId,
                 amount: 1
             }],
-            token: token.toLowerCase(),
+            token: this.getToken(event),
             price: new BigNumber(event.returnValues.totalPricePaid),
             seller: event.returnValues.seller.toLowerCase(),
             buyer: event.returnValues.buyer.toLowerCase(),
