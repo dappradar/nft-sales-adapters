@@ -1,15 +1,16 @@
+// @ts-nocheck
 import metadata from "./metadata";
 import Web3 from "web3";
 import _ from "lodash";
 import fs from "fs";
-import { asyncTimeout } from "./util";
-import { WS_PROXY_URL, AVAILABLE_PROTOCOLS, API_KEY } from "./constants";
+import {asyncTimeout} from "./utils";
+import {WS_PROXY_URL, AVAILABLE_PROTOCOLS, API_KEY} from "./constants";
 import BasicSDK from "./basic-sdk";
 
-import { IDappRadarAPIHeaders } from "./Interfaces";
-import { Log, TransactionReceipt, Transaction, PastLogsOptions } from "web3-core";
-import { BlockTransactionString } from "web3-eth";
-import { EventData, PastEventOptions, Contract } from "web3-eth-contract";
+import {IDappRadarAPIHeaders} from "./Interfaces";
+import {Log, TransactionReceipt, Transaction, PastLogsOptions} from "web3-core";
+import {BlockTransactionString} from "web3-eth";
+import {EventData, PastEventOptions, Contract} from "web3-eth-contract";
 
 // Ethereum Virtual Machine compatible
 class EVMC extends BasicSDK {
@@ -18,6 +19,9 @@ class EVMC extends BasicSDK {
     range: number;
     protocol?: string;
     chunkSize?: number;
+    chainId: number;
+    isConnected: boolean;
+    node?: string;
 
     constructor(provider: any) {
         super(provider);
@@ -25,6 +29,8 @@ class EVMC extends BasicSDK {
         this.web3 = null;
         this.running = true;
         this.range = 100;
+        this.chainId = 1;
+        this.isConnected = false;
     }
 
     stop = (): void => {
@@ -33,7 +39,7 @@ class EVMC extends BasicSDK {
 
     private _getOptions = (): object => {
         const headers: IDappRadarAPIHeaders = {
-            key: API_KEY,
+            "x-api-key": API_KEY,
             protocol: AVAILABLE_PROTOCOLS.ETH,
         };
 
@@ -44,9 +50,9 @@ class EVMC extends BasicSDK {
                 maxReceivedMessageSize: 100 * 1000 * 1000,
             },
             reconnect: {
-                auto: true,
+                auto: false,
                 delay: 5000,
-                maxAttempts: 1000,
+                maxAttempts: 1,
                 onTimeout: false,
             },
         };
@@ -64,7 +70,14 @@ class EVMC extends BasicSDK {
 
         const Web3ClientSocket = new Web3.providers.WebsocketProvider(WS_PROXY_URL, customOptions);
         this.web3 = new Web3(Web3ClientSocket);
-        this.web3.currentProvider.once("error", (error: Error): void => {
+        this.web3.currentProvider.on("connect", function () {
+            console.log("Websocket Provider connection established!");
+        });
+        this.web3.currentProvider.on("end", function () {
+            console.log("Websocket Provider connection ended!");
+            process.exit()
+        });
+        this.web3.currentProvider.on("error", (error: Error): void => {
             console.error("Error in web3", error);
             throw error;
         });
@@ -102,15 +115,20 @@ class EVMC extends BasicSDK {
 
     getCurrentBlock = async (): Promise<number> => {
         const callback = async () => {
-            this.ensureWeb3();
-            const response: number | null = await this.web3.eth.getBlockNumber();
+            try {
+                this.ensureWeb3();
+                const response: number | null = await this.web3.eth.getBlockNumber();
 
-            if (null === response) {
-                await asyncTimeout(60);
-                throw new Error("null response");
+                if (null === response) {
+                    await asyncTimeout(60);
+                    throw new Error("null response");
+                }
+
+                return response;
+            }catch(err) {
+                console.log(err);
+                process.exit()
             }
-
-            return response;
         };
 
         return this.retry({
@@ -238,7 +256,7 @@ class EVMC extends BasicSDK {
             const transactions = <Transaction[]>response.transactions;
 
             const contractTransactions = <Transaction>(
-                transactions.find(({ to }) => to !== undefined && to?.toLowerCase() === this.provider.contract)
+                transactions.find(({to}) => to !== undefined && to?.toLowerCase() === this.provider.contract)
             );
 
             if (contractTransactions !== undefined) {
@@ -513,7 +531,7 @@ class EVMC extends BasicSDK {
         for (const name of this.provider.events) {
             try {
                 const contract: Contract = await this.getContract();
-                contract.events[name]({ fromBlock: block }, async (error: Error, event: EventData) => {
+                contract.events[name]({fromBlock: block}, async (error: Error, event: EventData) => {
                     if (error) {
                         throw new Error();
                     }
