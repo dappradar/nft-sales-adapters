@@ -1,0 +1,81 @@
+[
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "leftHash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "rightHash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "leftMaker",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "rightMaker",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "newLeftFill",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "newRightFill",
+          "type": "uint256"
+        },
+        {
+          "components": [
+            {
+              "internalType": "bytes4",
+              "name": "assetClass",
+              "type": "bytes4"
+            },
+            {
+              "internalType": "bytes",
+              "name": "data",
+              "type": "bytes"
+            }
+          ],
+          "indexed": false,
+          "internalType": "struct LibAsset.AssetType",
+          "name": "leftAsset",
+          "type": "tuple"
+        },
+        {
+          "components": [
+            {
+              "internalType": "bytes4",
+              "name": "assetClass",
+              "type": "bytes4"
+            },
+            {
+              "internalType": "bytes",
+              "name": "data",
+              "type": "bytes"
+            }
+          ],
+          "indexed": false,
+          "internalType": "struct LibAsset.AssetType",
+          "name": "rightAsset",
+          "type": "tuple"
+        }
+      ],
+      "name": "OrderFilled",
+      "type": "event"
+    }
+]
