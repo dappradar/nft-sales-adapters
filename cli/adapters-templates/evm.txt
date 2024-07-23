@@ -1,0 +1,45 @@
+import moment from "moment";
+import {EventData} from "web3-eth-contract";
+import {ISaleEntity} from "../../sdk/Interfaces";
+import BasicProvider, {IBasicProviderOptions} from "../../sdk/basic-provider";
+
+class #PROVIDER_NAME# extends BasicProvider {
+    constructor(options: IBasicProviderOptions) {
+        super(options);
+
+        this.events = [#EVENTS_NAMES#];
+    }
+
+    process = async (event: EventData): Promise<ISaleEntity | undefined> => {
+        const block = await this.sdk.getBlock(event.blockNumber);
+        const timestamp = moment.unix(block.timestamp).utc();
+
+        const entity = {
+            providerName: this.name,
+            providerContract: this.contract,
+            chainId: this.sdk.chainId,
+            nfts: [
+                {
+                    id: 'NFT ID',
+                    amount: 'Amount of NFTs',
+                    contract: 'NFT contract'.toLowerCase(),
+                },
+            ],
+            token: 'Payment token'.toLowerCase(),
+            price: 'Price in token (e.g. in USDT)',
+            seller: 'Seller address'.toLowerCase(),
+            buyer: 'Buyer address'.toLowerCase(),
+            soldAt: timestamp,
+            blockNumber: event.blockNumber,
+            transactionHash: event.transactionHash,
+        };
+
+        return this.addToDatabase(entity);
+    };
+
+    addToDatabase = async (entity: ISaleEntity): Promise<ISaleEntity> => {
+        return entity;
+    };
+}
+
+export default #PROVIDER_NAME#;

@@ -15,6 +15,7 @@
   "private": true,
   "dependencies": {
     "@types/lodash": "^4.14.182",
+    "@types/prompts": "^2.4.9",
     "axios": "^0.21.1",
     "bignumber.js": "^9.0.1",
     "dotenv": "^8.2.0",
@@ -22,6 +23,7 @@
     "http-proxy": "^1.18.1",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
+    "prompts": "^2.4.2",
     "web3": "^1.8.0",
     "web3-eth-abi": "^1.3.4",
     "web3-utils": "^1.3.4",
@@ -50,6 +52,9 @@
     "build": "rm -rf ./dist && tsc && copyfiles -u 1 ./src/**/*.json ./dist",
     "docs": "docsify serve docs",
     "test": "ts-node src/tester/test.ts"
+  },
+  "bin": {
+    "create-basic-provider": "cli/create-basic-provider.ts"
   },
   "lint-staged": {
     "*.{js,json}": "eslint --fix"
