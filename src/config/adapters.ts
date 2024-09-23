@@ -270,6 +270,14 @@ const POLYGON: IBasicProviderOptions[] = [
         chainId: 16,
         defaultPaymentToken: "matic",
     },
+    {
+        name: "arenagames-polygon-1",
+        basicProvider: "arenagames-bp-1",
+        block: 62053712,
+        contract: "0xA24DA121a67631146F38928F9c77687F96fB8fd7",
+        chainId: 16,
+        defaultPaymentToken: "matic",
+    },
 ];
 
 const AVALANCHE: IBasicProviderOptions[] = [
