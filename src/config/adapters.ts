@@ -98,6 +98,14 @@ const ETHEREUM: IBasicProviderOptions[] = [
         chainId: 1,
         defaultPaymentToken: "eth",
     },
+    {
+        name: "arenagames-ethereum-1",
+        basicProvider: "arenagames-bp-1",
+        block: 22033374,
+        contract: "0xfee59910aa8cafcc6ba2fcacee5c380e9d595198",
+        chainId: 1,
+        defaultPaymentToken: "eth",
+    },
 ];
 
 const BSC: IBasicProviderOptions[] = [
