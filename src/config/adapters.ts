@@ -351,10 +351,22 @@ const TEZOS: IBasicProviderOptions[] = [
     },
 ];
 
+const BASE: IBasicProviderOptions[] = [
+    {
+        name: "arenagames-base-1",
+        basicProvider: "arenagames-bp-1",
+        block: 29872017,
+        contract: "0x045521B29A6991f90A9227C4ABF076933e4c3C04",
+        chainId: 94,
+        defaultPaymentToken: "eth",
+    },
+];
+
 export const ADAPTERS = [
     ...ETHEREUM,
     ...BSC,
     ...POLYGON,
     ...AVALANCHE,
     ...TEZOS,
+    ...BASE,
 ]
