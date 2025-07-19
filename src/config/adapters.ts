@@ -202,6 +202,14 @@ const BSC: IBasicProviderOptions[] = [
         chainId: 15,
         defaultPaymentToken: "bnb",
     },
+    {
+        name: "mooar-bsc-1",
+        basicProvider: "mooar-bp-1",
+        block: 54560410,
+        contract: "0xaaaaaaaa33d3520a2266ce508bc079fcfe82c8e3",
+        chainId: 15,
+        defaultPaymentToken: "bnb"
+    },
 ];
 
 const POLYGON: IBasicProviderOptions[] = [
