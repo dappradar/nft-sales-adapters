@@ -370,6 +370,17 @@ const BASE: IBasicProviderOptions[] = [
     },
 ];
 
+const SKALE: IBasicProviderOptions[] = [
+    {
+        name: "wizverse-skale-1",
+        basicProvider: "wizverse-bp-1",
+        block: 0, // TODO: set the correct start block
+        contract: "0x5e4D6E6F15FEAD25325d10e97289B99dcad3894A",
+        chainId: 1482601649,
+        defaultPaymentToken: "0xCC205196288B7A26f6D43bBD68AaA98dde97276d",
+    },
+];
+
 export const ADAPTERS = [
     ...ETHEREUM,
     ...BSC,
@@ -377,4 +388,5 @@ export const ADAPTERS = [
     ...AVALANCHE,
     ...TEZOS,
     ...BASE,
+    ...SKALE,
 ]
