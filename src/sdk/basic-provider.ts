@@ -8,7 +8,7 @@ export interface IBasicProviderOptions {
     contract: string;
     events?: string[];
     deprecatedAt?: number;
-    blockRange?: number;g
+    blockRange?: number;
     chunkSize?: number;
     defaultPaymentToken?: string;
 }
