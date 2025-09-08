@@ -351,10 +351,15 @@ const TEZOS: IBasicProviderOptions[] = [
     },
 ];
 
+const SKALE_NEBULA: IBasicProviderOptions[] = [
+    // ...
+];
+
 export const ADAPTERS = [
     ...ETHEREUM,
     ...BSC,
     ...POLYGON,
     ...AVALANCHE,
     ...TEZOS,
+    ...SKALE_NEBULA,
 ]

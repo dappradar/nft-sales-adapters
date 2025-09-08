@@ -8,7 +8,7 @@ export interface IBasicProviderOptions {
     contract: string;
     events?: string[];
     deprecatedAt?: number;
-    blockRange?: number;
+    blockRange?: number;g
     chunkSize?: number;
     defaultPaymentToken?: string;
 }
@@ -23,6 +23,7 @@ const PROTOCOL_TO_FILENAME_MAP: IObjectNumberString = {
     39: 'moonbeam',
     43: 'celo',
     50: 'aurora',
+    87: 'skale-nebula',
 }
 
 class BasicProvider {
