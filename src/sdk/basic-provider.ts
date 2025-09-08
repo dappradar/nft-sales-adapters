@@ -24,6 +24,7 @@ const PROTOCOL_TO_FILENAME_MAP: IObjectNumberString = {
     43: 'celo',
     50: 'aurora',
     87: 'skale-nebula',
+    94: 'base',
 }
 
 class BasicProvider {

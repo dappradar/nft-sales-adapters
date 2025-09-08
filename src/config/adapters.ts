@@ -98,6 +98,14 @@ const ETHEREUM: IBasicProviderOptions[] = [
         chainId: 1,
         defaultPaymentToken: "eth",
     },
+    {
+        name: "arenagames-ethereum-1",
+        basicProvider: "arenagames-bp-1",
+        block: 22033374,
+        contract: "0xfee59910aa8cafcc6ba2fcacee5c380e9d595198",
+        chainId: 1,
+        defaultPaymentToken: "eth",
+    },
 ];
 
 const BSC: IBasicProviderOptions[] = [
@@ -351,6 +359,17 @@ const TEZOS: IBasicProviderOptions[] = [
     },
 ];
 
+const BASE: IBasicProviderOptions[] = [
+    {
+        name: "arenagames-base-1",
+        basicProvider: "arenagames-bp-1",
+        block: 29872017,
+        contract: "0x045521B29A6991f90A9227C4ABF076933e4c3C04",
+        chainId: 94,
+        defaultPaymentToken: "eth",
+    },
+];
+
 const SKALE_NEBULA: IBasicProviderOptions[] = [
     // ...
 ];
@@ -361,5 +380,6 @@ export const ADAPTERS = [
     ...POLYGON,
     ...AVALANCHE,
     ...TEZOS,
+    ...BASE,
     ...SKALE_NEBULA,
 ]
