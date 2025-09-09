@@ -17,6 +17,7 @@ enum AVAILABLE_PROTOCOLS {
     ELYSIUM = "elysium",
     MOOI = "mooi",
     ZKSYNC_ERA = "zksync-era",
+    SKALE_NEBULA = "skale-nebula",
 }
 
 const API_KEY = process.env.DAPPRADAR_API_KEY || "";

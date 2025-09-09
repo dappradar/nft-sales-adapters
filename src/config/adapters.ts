@@ -370,6 +370,10 @@ const BASE: IBasicProviderOptions[] = [
     },
 ];
 
+const SKALE_NEBULA: IBasicProviderOptions[] = [
+    // ...
+];
+
 export const ADAPTERS = [
     ...ETHEREUM,
     ...BSC,
@@ -377,4 +381,5 @@ export const ADAPTERS = [
     ...AVALANCHE,
     ...TEZOS,
     ...BASE,
+    ...SKALE_NEBULA,
 ]
