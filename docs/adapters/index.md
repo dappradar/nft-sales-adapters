@@ -31,6 +31,19 @@ export default Adapter;
 
 ---
 
+## Progress tracking
+
+To expedite the integration process, the progress of the importer is tracked and stored in
+the `data/metadata/:providerName.txt` file. Once the provider has finished processing all events within a given block
+range (e.g., from
+block `1` to `1000`), it will store the last block (`1000`) as the starting point. When the provider is restarted, it
+will commence syncing from block `1000` instead of the initial block (in this example, `1`).
+
+Progress can be reset by either removing the metadata file or clearing its content. Additionally, progress can be
+advanced by updating the block number in the file to the desired block number.
+
+---
+
 ## Functions
 
 [process function](methods/process.md ':include')
