@@ -61,9 +61,9 @@ class Wizverse extends BasicProvider {
         const tokenId = event.returnValues["tokenId"] as string;
 
         // Skip mints/burns
-        if (from === "0x0000000000000000000000000000000000000000" || to === "0x0000000000000000000000000000000000000000") {
-            return;
-        }
+        //if (from === "0x0000000000000000000000000000000000000000" || to === "0x0000000000000000000000000000000000000000") {
+        //    return;
+        //}
 
         // Fetch tx receipt to inspect ERC20 transfers (USDC)
         const txReceipt = await this.sdk.getTransactionReceipt(event.transactionHash);
