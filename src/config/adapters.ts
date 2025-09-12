@@ -371,7 +371,14 @@ const BASE: IBasicProviderOptions[] = [
 ];
 
 const SKALE_NEBULA: IBasicProviderOptions[] = [
-    // ...
+    {
+        name: "wizverse-skale-nebula-1",
+        basicProvider: "wizverse-bp-1",
+        block: 28255768,
+        contract: "0x5e4d6e6f15fead25325d10e97289b99dcad3894a",
+        chainId: 87,
+        defaultPaymentToken: "0xcc205196288b7a26f6d43bbd68aaa98dde97276d",
+    },
 ];
 
 export const ADAPTERS = [
