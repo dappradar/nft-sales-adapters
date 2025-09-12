@@ -12,7 +12,7 @@ class SkaleNebula extends EVMC_HTTP {
         this.protocol = AVAILABLE_PROTOCOLS.SKALE_NEBULA;
         this.chainId = 87;
         this.node = process.env.SKALE_NEBULA_NODE_HTTP;
-        this.range = 500;
+        this.range = 2000;
     }
 }
 
