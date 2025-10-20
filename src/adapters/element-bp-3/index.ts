@@ -12,8 +12,8 @@ class Element extends BasicProvider {
         this.events = [
             "ERC721SellOrderFilled",
             "ERC721BuyOrderFilled",
-            "ERC1155SellOrderFilled",
-            "ERC1155BuyOrderFilled",
+            // "ERC1155SellOrderFilled", // Not supported by contract
+            // "ERC1155BuyOrderFilled", // Not supported by contract
         ];
     }
 
