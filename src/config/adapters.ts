@@ -1,3 +1,4 @@
+
 import {IBasicProviderOptions} from "../sdk/basic-provider";
 
 const ETHEREUM: IBasicProviderOptions[] = [
@@ -365,6 +366,14 @@ const BASE: IBasicProviderOptions[] = [
         basicProvider: "arenagames-bp-1",
         block: 29872017,
         contract: "0x045521B29A6991f90A9227C4ABF076933e4c3C04",
+        chainId: 94,
+        defaultPaymentToken: "eth",
+    },
+    {
+        name: "element-base-1",
+        basicProvider: "element-bp-3",
+        block: 29872017,
+        contract: "0xa39a5f160a1952ddf38781bd76e402b0006912a9",
         chainId: 94,
         defaultPaymentToken: "eth",
     },
