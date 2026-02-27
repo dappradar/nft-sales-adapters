@@ -1,6 +1,6 @@
 class Metadata {
     block = async (provider: any): Promise<number | string> => {
-        if (!provider.block) {
+        if (provider.block !== 0 && !provider.block) {
             throw new Error("Testing block not supplied");
         }
         return provider.block;
